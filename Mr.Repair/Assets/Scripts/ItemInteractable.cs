@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class ItemInteractable : MonoBehaviour
 {
-    public KeyItemData itemData; // このオブジェクトのアイテム情報
+    public ItemData itemData; // このオブジェクトのアイテム情報
 
     private void Reset()
     {

@@ -4,27 +4,27 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [SerializeField] private List<KeyItemData> allKeyItems;  // マップ上の全アイテム
-    private List<KeyItemData> obtainedItems = new List<KeyItemData>();
+    [SerializeField] private List<ItemData> allItems;  // マップ上の全アイテム
+    private List<ItemData> obtainedItems = new List<ItemData>();
 
     private void Start()
     {
         // UI にアイテムリストを渡して初期化
-        KeyItemListUI.Instance.InitializeSlots(allKeyItems);
+        ItemListUI.Instance.InitializeSlots(allItems);
     }
 
     // アイテム取得
-    public void ObtainItem(KeyItemData item)
+    public void ObtainItem(ItemData item)
     {
         obtainedItems.Add(item);  // ←重複チェックを削除
         Debug.Log($"{item.itemName} を取得しました。");
 
         // UI 更新
-        KeyItemListUI.Instance.UpdateSlot(item, true);
+        ItemListUI.Instance.UpdateSlot(item, true);
     }
 
     // アイテム使用
-    public void UseItem(KeyItemData item)
+    public void UseItem(ItemData item)
     {
         if (obtainedItems.Contains(item))
         {
@@ -32,12 +32,12 @@ public class PlayerInventory : MonoBehaviour
             Debug.Log($"{item.itemName} を使用しました。");
 
             // UI 更新（元の？アイコンに戻す）
-            KeyItemListUI.Instance.UpdateSlot(item, false);
+            ItemListUI.Instance.UpdateSlot(item, false);
         }
     }
 
     // 取得済みか確認
-    public bool HasItem(KeyItemData item)
+    public bool HasItem(ItemData item)
     {
         return obtainedItems.Contains(item);
     }
