@@ -33,4 +33,10 @@ public class PlayerController : MonoBehaviour
         if (context.performed)
             action.Jump();
     }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            action.Interact();
+    }
 }
