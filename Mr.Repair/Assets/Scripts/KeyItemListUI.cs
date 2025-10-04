@@ -10,51 +10,44 @@ public class KeyItemListUI : MonoBehaviour
     [SerializeField] private GameObject slotPrefab;
     [SerializeField] private Sprite unknownIcon;
 
-    private List<Image> slotImages = new List<Image>();
-    private List<KeyItemData> itemOrder = new List<KeyItemData>(); // 対応関係保持用
+    // KeyItemData 1種類に対して複数のスロットを持てるようにする
+    private Dictionary<KeyItemData, List<Image>> slotImages = new Dictionary<KeyItemData, List<Image>>();
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+    private void Awake() => Instance = this;
 
+    // 全アイテムスロット初期化
     public void InitializeSlots(List<KeyItemData> allItems)
     {
-        // 一度リセット
-        foreach (Transform child in panel)
-            Destroy(child.gameObject);
-
         slotImages.Clear();
-        itemOrder.Clear();
 
-        // 全アイテムぶんスロット生成
         foreach (var item in allItems)
         {
+            // スロットの数を1つにして初期化
             GameObject slot = Instantiate(slotPrefab, panel);
             Image img = slot.GetComponent<Image>();
-            if (img != null)
-            {
-                img.sprite = unknownIcon;
-                slotImages.Add(img);
-                itemOrder.Add(item);
-            }
-            else
-            {
-                Debug.LogError("slotPrefab に Image コンポーネントがありません。");
-            }
+            img.sprite = unknownIcon;
+
+            if (!slotImages.ContainsKey(item))
+                slotImages[item] = new List<Image>();
+
+            slotImages[item].Add(img);
         }
     }
 
+    // アイテム取得時に呼ぶ
     public void UpdateSlot(KeyItemData item, bool isObtained)
     {
-        int index = itemOrder.IndexOf(item);
-        if (index >= 0 && index < slotImages.Count)
+        if (slotImages.ContainsKey(item))
         {
-            slotImages[index].sprite = isObtained ? item.icon : unknownIcon;
-        }
-        else
-        {
-            Debug.LogWarning($"{item.name} に対応するスロットが見つかりません。");
+            // 未取得スロットのうち1つだけ更新
+            foreach (var img in slotImages[item])
+            {
+                if (img.sprite == unknownIcon)
+                {
+                    img.sprite = item.icon;
+                    break;  // 1つだけ更新
+                }
+            }
         }
     }
 }

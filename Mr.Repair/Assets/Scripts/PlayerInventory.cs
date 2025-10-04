@@ -4,45 +4,62 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
+    [SerializeField] private List<KeyItemData> allKeyItems;  // マップ上の全アイテム
     private List<KeyItemData> obtainedItems = new List<KeyItemData>();
-    [SerializeField] private List<KeyItemData> allKeyItems; // 全アイテムリスト（Inspectorで設定）
 
     private void Start()
     {
-        // UIスロットを初期化
+        // UI にアイテムリストを渡して初期化
         KeyItemListUI.Instance.InitializeSlots(allKeyItems);
     }
 
+    // アイテム取得
     public void ObtainItem(KeyItemData item)
     {
-        if (!obtainedItems.Contains(item))
-        {
-            obtainedItems.Add(item);
-            Debug.Log($"{item.itemName} を取得しました。");
+        obtainedItems.Add(item);  // ←重複チェックを削除
+        Debug.Log($"{item.itemName} を取得しました。");
 
-            // UI更新
-            KeyItemListUI.Instance.UpdateSlot(item, true);
+        // UI 更新
+        KeyItemListUI.Instance.UpdateSlot(item, true);
+    }
+
+    // アイテム使用
+    public void UseItem(KeyItemData item)
+    {
+        if (obtainedItems.Contains(item))
+        {
+            obtainedItems.Remove(item);  // 1つだけ削除
+            Debug.Log($"{item.itemName} を使用しました。");
+
+            // UI 更新（元の？アイコンに戻す）
+            KeyItemListUI.Instance.UpdateSlot(item, false);
         }
     }
 
+    // 取得済みか確認
     public bool HasItem(KeyItemData item)
     {
         return obtainedItems.Contains(item);
     }
 
-    // デバッグ表示（Qキー）
+    // デバッグ用：取得済みアイテムと個数を確認
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            if (obtainedItems.Count == 0)
-                Debug.Log("取得済みアイテムはありません。");
-            else
+            Dictionary<string, int> counts = new Dictionary<string, int>();
+            foreach (var it in obtainedItems)
             {
-                Debug.Log(" 取得済みアイテム一覧：");
-                foreach (var i in obtainedItems)
-                    Debug.Log($" - {i.itemName}");
+                if (counts.ContainsKey(it.itemName)) counts[it.itemName]++;
+                else counts[it.itemName] = 1;
             }
+
+            Debug.Log("=== 取得済みアイテム ===");
+            foreach (var pair in counts)
+            {
+                Debug.Log($"{pair.Key} : {pair.Value}個");
+            }
+            Debug.Log("=======================");
         }
     }
 }
