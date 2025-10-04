@@ -347,6 +347,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 12028865}
   lookSensitivity: 150
+  rb: {fileID: 0}
+  lookInput: {x: 0, y: 0}
+  pitch: 0
 --- !u!114 &4322155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -360,6 +363,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  cameraTransform: {fileID: 12028865}
+  lookSensitivity: 150
 --- !u!114 &4322157
 MonoBehaviour:
   m_ObjectHideFlags: 0

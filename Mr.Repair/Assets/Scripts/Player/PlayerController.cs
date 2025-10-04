@@ -1,17 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(PlayerMovement), typeof(PlayerLook), typeof(PlayerAction))]
+[RequireComponent(typeof(PlayerMovement), typeof(PlayerAction))]
 public class PlayerController : MonoBehaviour
 {
     private PlayerMovement movement;
-    private PlayerLook look;
     private PlayerAction action;
 
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
-        look = GetComponent<PlayerLook>();
         action = GetComponent<PlayerAction>();
     }
 
@@ -24,7 +22,7 @@ public class PlayerController : MonoBehaviour
     // Ž‹“_“ü—Í
     public void OnLook(InputAction.CallbackContext context)
     {
-        look.SetLookInput(context.ReadValue<Vector2>());
+        movement.SetLookInput(context.ReadValue<Vector2>());
     }
 
     // ƒWƒƒƒ“ƒv“ü—Í
