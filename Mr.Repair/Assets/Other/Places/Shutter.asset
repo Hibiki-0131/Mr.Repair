@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ee9ad99a0c9e2b4692e1ed199377478, type: 3}
-  m_Name: CrankHandle
+  m_Script: {fileID: 11500000, guid: 713a433f15fd2c64c8d584c6aeb03100, type: 3}
+  m_Name: Shutter
   m_EditorClassIdentifier: 
-  itemName: CrankHandle
-  icon: {fileID: 21300000, guid: 91ef9a1719b032447b4d036eb1ae484b, type: 3}
-  usablePlaceID: Shutter
+  placeID: Shutter
+  displayName: Shutter
