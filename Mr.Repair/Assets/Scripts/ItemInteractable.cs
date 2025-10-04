@@ -1,8 +1,14 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 public class ItemInteractable : MonoBehaviour
 {
-    public KeyItemData itemData;
+    public KeyItemData itemData; // このオブジェクトのアイテム情報
 
-    // Playerがこの範囲に入ったときPlayerAction側でInteract可能にする
+    private void Reset()
+    {
+        // Colliderはトリガーにする
+        Collider col = GetComponent<Collider>();
+        col.isTrigger = true;
+    }
 }
