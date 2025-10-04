@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerAction : MonoBehaviour
 {
     private bool canInteract = false;
+    private bool canUse = false;
     private GameObject currentItemObject;
     private PlayerInventory inventory;
 
@@ -25,7 +26,7 @@ public class PlayerAction : MonoBehaviour
             ItemInteractable item = currentItemObject.GetComponent<ItemInteractable>();
             if (item != null)
             {
-                inventory.ObtainItem(item.itemData); // ここでUIも更新される
+                inventory.ObtainItem(item.itemData);
                 Debug.Log($"{item.itemData.itemName} を拾いました");
                 Destroy(currentItemObject);
             }
@@ -38,12 +39,28 @@ public class PlayerAction : MonoBehaviour
 
     public void Use()
     {
-        Debug.Log("アイテムをつかった");
-    }
+        if (canUse && currentItemObject != null)
+        {
+            PlaceInteractable place = currentItemObject.GetComponent<PlaceInteractable>();
+            if (place != null)
+            {
+                foreach (var item in inventory.GetAllItems())
+                {
+                    if (item.usablePlaceID == place.placeData.placeID)
+                    {
+                        Debug.Log($"{item.itemName} を {place.placeData.displayName} で使用しました！");
+                        inventory.UseItem(item);
+                        return;
+                    }
+                }
 
-    public void Repair()
-    {
-        Debug.Log("修理を施した");
+                Debug.Log($"この場所 ({place.placeData.displayName}) では使用できるアイテムがありません。");
+            }
+        }
+        else
+        {
+            Debug.Log("ここでアイテムは使えません。");
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -53,6 +70,12 @@ public class PlayerAction : MonoBehaviour
             canInteract = true;
             currentItemObject = other.gameObject;
         }
+
+        if (other.CompareTag("Field"))
+        {
+            canUse = true;
+            currentItemObject = other.gameObject;
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -60,6 +83,12 @@ public class PlayerAction : MonoBehaviour
         if (other.CompareTag("Item"))
         {
             canInteract = false;
+            currentItemObject = null;
+        }
+
+        if (other.CompareTag("Field"))
+        {
+            canUse = false;
             currentItemObject = null;
         }
     }

@@ -62,4 +62,10 @@ public class PlayerInventory : MonoBehaviour
             Debug.Log("=======================");
         }
     }
+
+    public List<ItemData> GetAllItems()
+    {
+        return obtainedItems;
+    }
+
 }

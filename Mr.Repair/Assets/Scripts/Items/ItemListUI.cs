@@ -10,7 +10,7 @@ public class ItemListUI : MonoBehaviour
     [SerializeField] private GameObject slotPrefab;
     [SerializeField] private Sprite unknownIcon;
 
-    // KeyItemData 1種類に対して複数のスロットを持てるようにする
+    // 各アイテムごとに複数スロット（Image）を管理
     private Dictionary<ItemData, List<Image>> slotImages = new Dictionary<ItemData, List<Image>>();
 
     private void Awake() => Instance = this;
@@ -22,7 +22,6 @@ public class ItemListUI : MonoBehaviour
 
         foreach (var item in allItems)
         {
-            // スロットの数を1つにして初期化
             GameObject slot = Instantiate(slotPrefab, panel);
             Image img = slot.GetComponent<Image>();
             img.sprite = unknownIcon;
@@ -34,18 +33,36 @@ public class ItemListUI : MonoBehaviour
         }
     }
 
-    // アイテム取得時に呼ぶ
+    /// <summary>
+    /// アイテム取得 or 使用に応じてスロットを更新
+    /// </summary>
+    /// <param name="item">対象のアイテム</param>
+    /// <param name="isObtained">true: 取得 / false: 使用</param>
     public void UpdateSlot(ItemData item, bool isObtained)
     {
-        if (slotImages.ContainsKey(item))
+        if (!slotImages.ContainsKey(item)) return;
+
+        if (isObtained)
         {
-            // 未取得スロットのうち1つだけ更新
+            // 未取得スロットを1つ更新
             foreach (var img in slotImages[item])
             {
                 if (img.sprite == unknownIcon)
                 {
                     img.sprite = item.icon;
-                    break;  // 1つだけ更新
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // 取得済みスロットを1つ減らす（最後にあるアイコンを?に戻す）
+            for (int i = slotImages[item].Count - 1; i >= 0; i--)
+            {
+                if (slotImages[item][i].sprite == item.icon)
+                {
+                    slotImages[item][i].sprite = unknownIcon;
+                    break;
                 }
             }
         }
