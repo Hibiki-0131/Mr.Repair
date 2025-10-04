@@ -39,4 +39,16 @@ public class PlayerController : MonoBehaviour
         if (context.performed)
             action.Interact();
     }
+
+    public void OnUse(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            action.Use();
+    }
+
+    public void OnRepair(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            action.Repair();
+    }
 }

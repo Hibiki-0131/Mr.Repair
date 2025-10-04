@@ -36,6 +36,16 @@ public class PlayerAction : MonoBehaviour
         }
     }
 
+    public void Use()
+    {
+        Debug.Log("ƒAƒCƒeƒ€‚ğ‚Â‚©‚Á‚½");
+    }
+
+    public void Repair()
+    {
+        Debug.Log("C—‚ğ{‚µ‚½");
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Item"))
