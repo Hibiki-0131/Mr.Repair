@@ -25,6 +25,18 @@ public class PlayerMovement : MonoBehaviour
     [Range(0, 1f)] public float StopAnimTime = 0.15f;
     [Range(0, 1f)] public float allowPlayerRotation = 0.1f;
 
+    [Header("Stamina Settings")]
+    [SerializeField] private float maxStamina = 5f;       // 最大スタミナ（秒）
+    [SerializeField] private float staminaDrain = 1f;     // 走行中消費速度
+    [SerializeField] private float staminaRecover = 0.5f; // 回復速度
+    [SerializeField] private float staminaRecoverDelay = 3f; // スタミナ底後の回復待ち時間
+    [SerializeField] private PlayerStaminaBar staminaBar; // UI参照
+
+    private float stamina;
+    private bool isRunning = false;
+    private bool isStaminaEmpty = false;
+    private float emptyTimer = 0f;
+
     private Rigidbody rb;
     private CapsuleCollider capsule;
     private Animator anim;
@@ -39,6 +51,8 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
         anim = GetComponent<Animator>();
+
+        stamina = maxStamina;
 
         rb.constraints = RigidbodyConstraints.FreezeRotationX |
                          RigidbodyConstraints.FreezeRotationY |
@@ -58,11 +72,19 @@ public class PlayerMovement : MonoBehaviour
         lookInput = input;
     }
 
-    private void Update()
+    public void SetRunInput(bool running)
     {
-        HandleLook();
-        UpdateAnimation(); // アニメーション更新
+        // スタミナがあるときだけ走れる
+        isRunning = running && stamina > 0f;
     }
+
+    private void Update()
+{
+    HandleLook();
+    UpdateAnimation();
+    HandleStamina(); // ← ここで呼ぶ
+}
+
 
     private void FixedUpdate()
     {
@@ -79,9 +101,13 @@ public class PlayerMovement : MonoBehaviour
         right.y = 0f;
 
         Vector3 desiredMove = (forward * moveInput.y + right * moveInput.x).normalized;
-        Vector3 velocity = desiredMove * moveSpeed;
+        float currentSpeed = moveSpeed;
 
-        velocity.y = rb.velocity.y; // Y速度は重力・StepClimbで制御
+        if (isRunning)
+            currentSpeed *= 2f; // 走る速度に調整（任意）
+
+        Vector3 velocity = desiredMove * currentSpeed;
+        velocity.y = rb.velocity.y;
         rb.velocity = velocity;
     }
 
@@ -109,6 +135,48 @@ public class PlayerMovement : MonoBehaviour
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             cameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
         }
+    }
+
+    private void HandleStamina()
+    {
+        if (isRunning && new Vector2(moveInput.x, moveInput.y).sqrMagnitude > 0.01f)
+        {
+            stamina -= staminaDrain * Time.deltaTime;
+            if (stamina <= 0f)
+            {
+                stamina = 0f;
+                isRunning = false;
+
+                // 底になったフラグとタイマー開始
+                isStaminaEmpty = true;
+                emptyTimer = 0f;
+            }
+        }
+        else
+        {
+            // スタミナが底かどうかチェック
+            if (isStaminaEmpty)
+            {
+                emptyTimer += Time.deltaTime;
+                if (emptyTimer >= staminaRecoverDelay)
+                {
+                    isStaminaEmpty = false; // 遅延後に回復開始
+                }
+            }
+
+            if (!isStaminaEmpty)
+            {
+                stamina += staminaRecover * Time.deltaTime;
+                if (stamina > maxStamina) stamina = maxStamina;
+            }
+        }
+
+        // デバッグ用ログ
+        Debug.Log($"Stamina: {stamina:F2}, isRunning: {isRunning}, EmptyDelay: {emptyTimer:F2}");
+
+        // UI更新
+        if (staminaBar != null)
+            staminaBar.UpdateStamina(stamina, maxStamina);
     }
 
     private void StepClimb()

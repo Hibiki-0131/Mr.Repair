@@ -19,6 +19,16 @@ public class PlayerController : MonoBehaviour
         movement.SetMoveInput(context.ReadValue<Vector2>());
     }
 
+    // 走る入力
+    public void OnRun(InputAction.CallbackContext context)
+    {
+        // RunはPlayerMovement側でスタミナを管理
+        if (context.performed || context.canceled)
+        {
+            movement.SetRunInput(context.ReadValue<float>() > 0.5f);
+        }
+    }
+
     // 視点入力
     public void OnLook(InputAction.CallbackContext context)
     {
@@ -32,12 +42,14 @@ public class PlayerController : MonoBehaviour
             action.Jump();
     }
 
+    // Interact
     public void OnInteract(InputAction.CallbackContext context)
     {
         if (context.performed)
             action.Interact();
     }
 
+    // Use
     public void OnUse(InputAction.CallbackContext context)
     {
         if (context.performed)
