@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -10,51 +8,53 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Look Settings")]
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] private float lookSensitivity = 150f;
+    [SerializeField] private float lookSensitivity = 2f;
+    [SerializeField] private float lookXLimit = 80f;
 
     private Rigidbody rb;
     private Vector2 moveInput;
     private Vector2 lookInput;
-    private float pitch;
+    private float rotationX; // pitch
+    private bool canLook = true;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX |
-                         RigidbodyConstraints.FreezeRotationZ;
-        // プレイヤーが倒れないように X,Z軸の回転を固定
+
+        // Rigidbody設定
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
-    /// <summary>
-    /// 移動入力を設定（InputSystemなどから呼び出す）
-    /// </summary>
+    // PlayerController から呼ばれる
     public void SetMoveInput(Vector2 input)
     {
         moveInput = input;
     }
 
-    /// <summary>
-    /// 視点入力を設定（InputSystemなどから呼び出す）
-    /// </summary>
     public void SetLookInput(Vector2 input)
     {
+        // デバイスノイズ防止
+        if (input.sqrMagnitude < 0.0001f)
+            input = Vector2.zero;
+
         lookInput = input;
+    }
+
+    private void Update()
+    {
+        HandleLook();
     }
 
     private void FixedUpdate()
     {
         HandleMovement();
-        HandleLookHorizontal();
     }
 
-    private void LateUpdate()
-    {
-        HandleLookVertical();
-    }
-
-    // ====================================
-    // 移動処理
-    // ====================================
     private void HandleMovement()
     {
         Vector3 forward = transform.forward;
@@ -62,31 +62,21 @@ public class PlayerMovement : MonoBehaviour
         forward.y = 0f;
         right.y = 0f;
 
-        Vector3 move = forward * moveInput.y + right * moveInput.x;
-        if (move.magnitude > 1f) move.Normalize();
-
+        Vector3 move = (forward * moveInput.y + right * moveInput.x).normalized;
         rb.MovePosition(rb.position + move * moveSpeed * Time.fixedDeltaTime);
     }
 
-    // ====================================
-    // 視点処理（左右/Yaw）
-    // ====================================
-    private void HandleLookHorizontal()
+    private void HandleLook()
     {
-        float yaw = lookInput.x * lookSensitivity * Time.fixedDeltaTime;
-        Quaternion deltaRotation = Quaternion.Euler(0f, yaw, 0f);
-        rb.MoveRotation(rb.rotation * deltaRotation);
-    }
+        if (!canLook) return;
 
-    // ====================================
-    // 視点処理（上下/Pitch）
-    // ====================================
-    private void HandleLookVertical()
-    {
-        pitch -= lookInput.y * lookSensitivity * Time.deltaTime;
-        pitch = Mathf.Clamp(pitch, -80f, 80f);
+        // --- 水平回転（プレイヤー本体） ---
+        float yaw = lookInput.x * lookSensitivity;
+        transform.Rotate(Vector3.up * yaw);
 
-        if (cameraTransform != null)
-            cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        // --- 垂直回転（カメラ） ---
+        rotationX -= lookInput.y * lookSensitivity;
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        cameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
     }
 }
