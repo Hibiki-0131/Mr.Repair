@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class PatrolState : IRobotState
 {
@@ -11,14 +10,12 @@ public class PatrolState : IRobotState
 
     public void Update(RobotAI robot)
     {
-        // プレイヤーが追跡範囲に入ったらChaseに移行
         if (robot.IsPlayerInChaseRange())
         {
             robot.SetState(new ChaseState());
             return;
         }
 
-        // patrolPoints への移動
         if (!robot.agent.pathPending && robot.agent.remainingDistance < 0.2f)
         {
             MoveToNextPoint(robot);
@@ -27,11 +24,11 @@ public class PatrolState : IRobotState
 
     private void MoveToNextPoint(RobotAI robot)
     {
-        if (robot.patrolPoints.Length == 0)
+        if (robot.currentRoute == null || robot.currentRoute.Length == 0)
             return;
 
-        robot.agent.destination = robot.patrolPoints[robot.currentPatrolIndex].position;
-        robot.currentPatrolIndex = (robot.currentPatrolIndex + 1) % robot.patrolPoints.Length;
+        robot.agent.destination = robot.currentRoute[robot.currentPatrolIndex].position;
+        robot.currentPatrolIndex = (robot.currentPatrolIndex + 1) % robot.currentRoute.Length;
     }
 
     public void Exit(RobotAI robot) { }

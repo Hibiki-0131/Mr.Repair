@@ -6,18 +6,17 @@ public class RobotAI : MonoBehaviour
     [Header("Components")]
     public NavMeshAgent agent;
     public Transform player;
+    public RouteManager routeManager;
 
     [Header("Ranges")]
-    public float chaseRange = 10f;   // 追跡範囲
-    public float attackRange = 2f;   // 攻撃範囲（追跡範囲より小さい）
+    public float chaseRange = 10f;
+    public float attackRange = 2f;
 
     [Header("Speeds")]
     public float chaseSpeed = 3f;
     public float patrolSpeed = 1.5f;
 
-    [Header("Patrol Points")]
-    public Transform[] patrolPoints;
-
+    [HideInInspector] public Transform[] currentRoute;
     [HideInInspector] public int currentPatrolIndex = 0;
 
     private IRobotState currentState;
@@ -25,18 +24,50 @@ public class RobotAI : MonoBehaviour
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        player = GameObject.FindWithTag("Player").transform;
+        player = GameObject.FindWithTag("Player")?.transform;
 
-        SetState(new PatrolState()); // 初期状態はPatrol
+        if (routeManager == null)
+        {
+            Debug.LogError($"{name}: RouteManager が未設定です！RobotAI にドラッグしてください。");
+            return;
+        }
+
+        // 全ルートを取得
+        var allRoutes = routeManager.GetAllRoutes();
+        if (allRoutes == null || allRoutes.Length == 0)
+        {
+            Debug.LogError($"{name}: RouteManager にルートが登録されていません！");
+            return;
+        }
+
+        // ランダムにルート選択
+        int routeIndex = Random.Range(0, allRoutes.Length);
+        currentRoute = allRoutes[routeIndex];
+
+        if (currentRoute == null || currentRoute.Length == 0)
+        {
+            Debug.LogError($"{name}: 選択したルートに巡回ポイントがありません！（RouteIndex = {routeIndex}）");
+            return;
+        }
+
+        // --- デバッグ出力 ---
+        string routeName = routeManager.routeParents != null && routeManager.routeParents.Length > routeIndex
+            ? routeManager.routeParents[routeIndex].name
+            : "(名前不明)";
+        string points = string.Join(", ", System.Array.ConvertAll(currentRoute, p => p.name));
+
+        Debug.Log($"{name}: RouteManager から「{routeName}」を選択しました。({currentRoute.Length}ポイント)\n→経路: [{points}]");
+
+        // 初期状態を設定
+        SetState(new PatrolState());
     }
 
     private void Update()
     {
         currentState?.Update(this);
 
-        // デバッグ用に現在の状態を表示
         if (currentState != null)
-            Debug.Log("Current State: " + currentState.GetName());
+            Debug.Log($"Current State ({name}): {currentState.GetName()}");
     }
 
     public void SetState(IRobotState newState)
@@ -46,28 +77,25 @@ public class RobotAI : MonoBehaviour
         currentState.Enter(this);
     }
 
-    // Player が chaseRange 内にいるか
     public bool IsPlayerInChaseRange()
     {
+        if (player == null) return false;
         float distance = Vector3.Distance(transform.position, player.position);
         return distance <= chaseRange;
     }
 
-    // Player が attackRange 内にいるか
     public bool IsPlayerInAttackRange()
     {
+        if (player == null) return false;
         float distance = Vector3.Distance(transform.position, player.position);
         return distance <= attackRange;
     }
 
-
     private void OnDrawGizmosSelected()
     {
-        // 追跡範囲（青）
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
 
-        // 攻撃範囲（赤）
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }

@@ -9,15 +9,13 @@ public class AttackState : IRobotState
     {
         robot.agent.isStopped = true;
         timer = 0f;
-        // 攻撃アニメーション開始
     }
 
     public void Update(RobotAI robot)
     {
         timer += Time.deltaTime;
 
-        // 攻撃範囲から外れたらChaseに戻る
-        if (!robot.IsPlayerInAttackRange())
+        if (Vector3.Distance(robot.transform.position, robot.player.position) > robot.attackRange)
         {
             robot.agent.isStopped = false;
             robot.SetState(new ChaseState());
@@ -28,7 +26,6 @@ public class AttackState : IRobotState
         {
             Debug.Log("Robot attacks Player!");
             timer = 0f;
-            // ダメージ処理など
         }
     }
 

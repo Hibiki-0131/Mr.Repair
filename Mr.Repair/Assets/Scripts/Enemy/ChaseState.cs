@@ -17,7 +17,6 @@ public class ChaseState : IRobotState
             return;
         }
 
-        // ’ÇÕ”ÍˆÍ‚©‚çŠO‚ê‚½‚çPatrol‚É–ß‚é
         if (!robot.IsPlayerInChaseRange())
         {
             robot.SetState(new PatrolState());

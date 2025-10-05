@@ -8,5 +8,5 @@ public interface IRobotState
     void Enter(RobotAI robot);
     void Update(RobotAI robot);
     void Exit(RobotAI robot);
-    string GetName(); // èÛë‘ñºÇï‘Ç∑
+    string GetName();
 }
