@@ -473,8 +473,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   cameraTransform: {fileID: 12028865}
-  lookSensitivity: 10
+  lookSensitivity: 5
   lookXLimit: 40
+  stepHeight: 0.5
+  stepSmooth: 50
+  sphereRadius: 0.2
+  gravity: -20
+  maxFallSpeed: -50
 --- !u!114 &4322157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -646,7 +651,7 @@ Transform:
   m_GameObject: {fileID: 12028862}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 1.3, z: 0.277}
+  m_LocalPosition: {x: -0, y: 1.3, z: 0.263}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
