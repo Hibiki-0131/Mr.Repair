@@ -46,15 +46,16 @@ public class PlayerAction : MonoBehaviour
             {
                 foreach (var item in inventory.GetAllItems())
                 {
-                    if (item.usablePlaceID == place.placeData.placeID)
+                    if (item.usablePlaceID == place.PlaceID) // ← 修正！
                     {
-                        Debug.Log($"{item.itemName} を {place.placeData.displayName} で使用しました！");
+                        Debug.Log($"{item.itemName} を {place.PlaceID} で使用しました！");
                         inventory.UseItem(item);
+                        place.UseItem(item); // ← 実際の演出呼び出し
                         return;
                     }
                 }
 
-                Debug.Log($"この場所 ({place.placeData.displayName}) では使用できるアイテムがありません。");
+                Debug.Log($"この場所 ({place.PlaceID}) では使用できるアイテムがありません。");
             }
         }
         else

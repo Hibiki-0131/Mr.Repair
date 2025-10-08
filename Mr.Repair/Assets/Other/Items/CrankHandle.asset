@@ -15,3 +15,4 @@ MonoBehaviour:
   itemName: CrankHandle
   icon: {fileID: 21300000, guid: 91ef9a1719b032447b4d036eb1ae484b, type: 3}
   usablePlaceID: Shutter
+  effect: {fileID: 11400000, guid: 7e99a3465501fde4fa48b571287aaf69, type: 2}

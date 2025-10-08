@@ -8,4 +8,5 @@ public class ItemData : ScriptableObject
     public string itemName;        // アイテム名
     public Sprite icon;            // アイコン
     public string usablePlaceID;   // 使用可能な場所ID
+    public ItemEffectBase effect;  // 使用演出
 }
