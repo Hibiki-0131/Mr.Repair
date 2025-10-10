@@ -45,6 +45,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 lookInput;
     private float rotationX;
     private bool canLook = true;
+    private float yRotation = 0f; // ← 新しく追加（クラスのフィールドに）
 
     private void Awake()
     {
@@ -62,6 +63,11 @@ public class PlayerMovement : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    private void Start()
+    {
+        yRotation = transform.eulerAngles.y;
     }
 
     public void SetMoveInput(Vector2 input) => moveInput = input;
@@ -126,15 +132,17 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!canLook || lookInput.sqrMagnitude < 0.0001f) return;
 
-        if (lookInput.x != 0f)
-            transform.Rotate(Vector3.up * lookInput.x * lookSensitivity);
+        // マウス感度補正
+        Vector2 delta = lookInput * lookSensitivity * Time.deltaTime;
 
-        if (lookInput.y != 0f)
-        {
-            rotationX -= lookInput.y * lookSensitivity;
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            cameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
-        }
+        // ▼ 左右視点移動（プレイヤーのY軸回転）
+        yRotation += delta.x;
+        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+
+        // ▼ 上下視点移動（カメラのみ回転）
+        rotationX -= delta.y;
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        cameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
     }
 
     private void HandleStamina()

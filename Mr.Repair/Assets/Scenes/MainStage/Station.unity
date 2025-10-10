@@ -489,7 +489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   cameraTransform: {fileID: 12028865}
-  lookSensitivity: 5
+  lookSensitivity: 150
   lookXLimit: 40
   stepHeight: 0.2
   stepSmooth: 40
