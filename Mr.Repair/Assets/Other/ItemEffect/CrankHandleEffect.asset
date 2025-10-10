@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70ad08069daf417429a618ea6753c92a, type: 3}
   m_Name: CrankHandleEffect
   m_EditorClassIdentifier: 
+  targetChildName: HiddenHandle

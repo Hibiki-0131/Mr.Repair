@@ -1,21 +1,20 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ItemEffect/CrankHandleEffect")]
 public class CrankHandleEffect : ItemEffectBase
 {
     [Header("アクティブ化するオブジェクト名")]
-    public string targetChildName = "HiddenHandle";  // 任意で変更可
+    public string targetChildName = "HiddenHandle";
 
     public override void ExecuteEffect(GameObject target)
     {
         Transform handle = FindDeepChild(target.transform, targetChildName);
-
         if (handle != null)
         {
             handle.gameObject.SetActive(true);
             Debug.Log($"{targetChildName} をアクティブにしました。");
+            // EnableInteraction は削除
         }
         else
         {
@@ -23,7 +22,6 @@ public class CrankHandleEffect : ItemEffectBase
         }
     }
 
-    // 階層の深い子まで探すヘルパー関数
     private Transform FindDeepChild(Transform parent, string name)
     {
         foreach (Transform child in parent)

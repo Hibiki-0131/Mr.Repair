@@ -180,7 +180,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // デバッグ用ログ
-        Debug.Log($"Stamina: {stamina:F2}, isRunning: {isRunning}, EmptyDelay: {emptyTimer:F2}");
+       // Debug.Log($"Stamina: {stamina:F2}, isRunning: {isRunning}, EmptyDelay: {emptyTimer:F2}");
 
         // UI更新
         if (staminaBar != null)
