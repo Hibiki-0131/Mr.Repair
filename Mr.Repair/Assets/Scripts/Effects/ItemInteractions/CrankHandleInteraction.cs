@@ -9,17 +9,30 @@ public class CrankHandleInteraction : MonoBehaviour
     public float rotateSpeed = 120f;
 
     [Header("操作対象シャッター")]
-    public List<Transform> shutters; // Inspectorでシャッターオブジェクトを登録
+    public List<Transform> shutters;
 
-    [Header("シャッター下降速度")]
-    public float shutterDownSpeed = 2f;
+    [Header("シャッター上昇速度")]
+    public float shutterSpeed = 2f;
 
     [Header("シャッターの最終Y位置")]
-    public float targetY = 0f;
+    public float targetY = 5f;
 
     private bool isPressed;
     private PlayerInput playerInput;
     private InputAction interactAction;
+
+    private List<float> initialYPositions = new List<float>();
+
+    private void Start()
+    {
+        // 各シャッターの初期Y位置を記録
+        initialYPositions.Clear();
+        foreach (var shutter in shutters)
+        {
+            if (shutter != null)
+                initialYPositions.Add(shutter.position.y);
+        }
+    }
 
     private void Awake()
     {
@@ -42,19 +55,19 @@ public class CrankHandleInteraction : MonoBehaviour
     {
         while (isPressed)
         {
-            // ハンドルを回す
+            // ハンドル回転
             transform.Rotate(Vector3.forward, rotateSpeed * Time.deltaTime);
 
-            // シャッターを下げる
-            foreach (var shutter in shutters)
+            // シャッター上昇
+            for (int i = 0; i < shutters.Count; i++)
             {
+                var shutter = shutters[i];
                 if (shutter == null) continue;
 
-                Vector3 pos = shutter.position;
-                float nextY = pos.y - shutterDownSpeed * Time.deltaTime;
-
-                if (nextY < targetY) nextY = targetY;
-                shutter.position = new Vector3(pos.x, nextY, pos.z);
+                // 現在位置からtargetYまで少しずつ移動
+                float currentY = shutter.position.y;
+                float newY = Mathf.MoveTowards(currentY, targetY, shutterSpeed * Time.deltaTime);
+                shutter.position = new Vector3(shutter.position.x, newY, shutter.position.z);
             }
 
             yield return null;

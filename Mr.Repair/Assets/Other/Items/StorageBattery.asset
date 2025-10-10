@@ -15,3 +15,4 @@ MonoBehaviour:
   itemName: StorageBattery
   icon: {fileID: 21300000, guid: 254a3b2edc6d9db40800581ae1e84c0b, type: 3}
   usablePlaceID: Train
+  effect: {fileID: 11400000, guid: d8009caf9aa249b4d8db4a16847069da, type: 2}
