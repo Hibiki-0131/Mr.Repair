@@ -30,6 +30,15 @@ public class PlayerHealth : MonoBehaviour
     private void Die()
     {
         Debug.Log("Playerが死亡しました");
-        // TODO: リスポーンやゲームオーバー処理
+
+        // GameManager経由でゲームオーバー状態を設定
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetGameOver(true);
+        }
+        else
+        {
+            Debug.LogWarning("GameManagerが見つかりません。");
+        }
     }
 }

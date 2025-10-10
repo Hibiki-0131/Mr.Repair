@@ -14,7 +14,7 @@ public class SceneController : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // Šù‘¶‚Ì Instance ‚ª‚ ‚éê‡‚Í”jŠü
         }
     }
 
@@ -22,6 +22,7 @@ public class SceneController : MonoBehaviour
     public void LoadMain() => SceneManager.LoadScene("Station");
     public void LoadGameOver() => SceneManager.LoadScene("GameOver");
     public void LoadGameClear() => SceneManager.LoadScene("GameClear");
+
     public void QuitGame()
     {
         Debug.Log("QuitGame called");

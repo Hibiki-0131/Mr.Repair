@@ -4,7 +4,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public bool IsPaused { get; private set; }
+    private bool isGameOver = false;
+    private bool isPaused = false;
 
     private void Awake()
     {
@@ -19,15 +20,46 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // =====================
+    // ▼ Game Over 管理
+    // =====================
+    public void SetGameOver(bool value)
+    {
+        isGameOver = value;
+        Debug.Log($"GameManager: ゲームオーバー状態 = {isGameOver}");
+
+        if (isGameOver && SceneController.Instance != null)
+        {
+            SceneController.Instance.LoadGameOver();
+        }
+    }
+
+    public bool IsGameOver()
+    {
+        return isGameOver;
+    }
+
+    // =====================
+    // ▼ Pause 管理
+    // =====================
     public void PauseGame()
     {
-        IsPaused = true;
+        if (isPaused) return;
+        isPaused = true;
         Time.timeScale = 0f;
+        Debug.Log("Game Paused");
     }
 
     public void ResumeGame()
     {
-        IsPaused = false;
+        if (!isPaused) return;
+        isPaused = false;
         Time.timeScale = 1f;
+        Debug.Log("Game Resumed");
+    }
+
+    public bool IsPaused()
+    {
+        return isPaused;
     }
 }
