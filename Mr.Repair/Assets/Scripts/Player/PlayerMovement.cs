@@ -101,19 +101,27 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMovement()
     {
-        Vector3 forward = transform.forward;
-        Vector3 right = transform.right;
+        // カメラの向きを基準に移動方向を決定
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+
+        // 上下方向を無視（水平移動のみ）
         forward.y = 0f;
         right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
 
+        // 左スティック入力から移動方向を計算
         Vector3 desiredMove = (forward * moveInput.y + right * moveInput.x).normalized;
+
+        // 走行中なら速度を2倍に
         float currentSpeed = moveSpeed;
-
         if (isRunning)
-            currentSpeed *= 2f; // 走る速度に調整（任意）
+            currentSpeed *= 2f;
 
+        // Rigidbodyに速度を設定
         Vector3 velocity = desiredMove * currentSpeed;
-        velocity.y = rb.velocity.y;
+        velocity.y = rb.velocity.y; // 重力成分を維持
         rb.velocity = velocity;
     }
 
@@ -130,19 +138,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleLook()
     {
-        if (!canLook || lookInput.sqrMagnitude < 0.0001f) return;
+        if (!canLook) return;
 
-        // マウス感度補正
         Vector2 delta = lookInput * lookSensitivity * Time.deltaTime;
 
-        // ▼ 左右視点移動（プレイヤーのY軸回転）
-        yRotation += delta.x;
-        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-
-        // ▼ 上下視点移動（カメラのみ回転）
+        // ▼ 上下回転（カメラのみ）
         rotationX -= delta.y;
         rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
         cameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
+
+        // ▼ 左右回転（プレイヤー本体のY軸）
+        yRotation += delta.x;
+        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
 
     private void HandleStamina()
