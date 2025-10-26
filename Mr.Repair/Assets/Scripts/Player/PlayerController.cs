@@ -21,16 +21,23 @@ public class PlayerController : MonoBehaviour
         animationControl.SetIsWalking(input.sqrMagnitude > 0.01f);
     }
 
-    /*// 部品モード切替（RTボタン）
+    // 部品化ボタン（RT長押し）
     public void OnParts(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            bool toParts = !movement.IsPartsMode;
-            movement.SetPartsMode(toParts);
-            animationControl.SetPartsState(toParts);
-            animationControl.PlayTransformAnimation(toParts);
+            movement.BeginPartsMode();
+            animationControl.SetPartsState(true);
+            animationControl.PlayTransformAnimation(true);
+        }
+        else if (context.canceled)
+        {
+            movement.TryEndPartsMode(); // ← 狭い場所では解除されない
+            if (!movement.IsPartsMode)
+            {
+                animationControl.SetPartsState(false);
+                animationControl.PlayTransformAnimation(false);
+            }
         }
     }
-    */
 }
