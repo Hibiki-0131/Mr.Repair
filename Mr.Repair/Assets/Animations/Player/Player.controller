@@ -8,9 +8,6 @@ AnimatorStateTransition:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   m_Conditions:
-  - m_ConditionMode: 2
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
   - m_ConditionMode: 1
     m_ConditionEvent: isParts
     m_EventTreshold: 0
@@ -62,10 +59,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
-  - m_ConditionMode: 1
-    m_ConditionEvent: isParts
+    m_ConditionEvent: ChangeToNormal
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2980341807437385762}
@@ -92,7 +86,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 7166646880460547106}
-    m_Position: {x: -100, y: 170, z: 0}
+    m_Position: {x: -100, y: 180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3767887538455840351}
     m_Position: {x: -300, y: 40, z: 0}
@@ -132,10 +126,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
-  - m_ConditionMode: 2
-    m_ConditionEvent: isParts
+    m_ConditionEvent: ChangeToParts
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2511905842568187331}
@@ -371,19 +362,25 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   - m_Name: isParts
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: isChanging
-    m_Type: 4
+    m_Controller: {fileID: 0}
+  - m_Name: ChangeToParts
+    m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
+  - m_Name: ChangeToNormal
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 0}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -434,10 +431,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
-  - m_ConditionMode: 2
-    m_ConditionEvent: isParts
+    m_ConditionEvent: ChangeToParts
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2511905842568187331}
@@ -462,13 +456,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 2
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
-  - m_ConditionMode: 2
     m_ConditionEvent: isParts
-    m_EventTreshold: 0
-  - m_ConditionMode: 2
-    m_ConditionEvent: isWalking
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7166646880460547106}
@@ -492,14 +480,8 @@ AnimatorStateTransition:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   m_Conditions:
-  - m_ConditionMode: 2
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
   - m_ConditionMode: 1
     m_ConditionEvent: isParts
-    m_EventTreshold: 0
-  - m_ConditionMode: 2
-    m_ConditionEvent: isWalking
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 3462688637961165103}
@@ -627,10 +609,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
-  - m_ConditionMode: 1
-    m_ConditionEvent: isParts
+    m_ConditionEvent: ChangeToNormal
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2980341807437385762}
@@ -654,9 +633,6 @@ AnimatorStateTransition:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   m_Conditions:
-  - m_ConditionMode: 2
-    m_ConditionEvent: isChanging
-    m_EventTreshold: 0
   - m_ConditionMode: 2
     m_ConditionEvent: isParts
     m_EventTreshold: 0
