@@ -4,27 +4,34 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float normalSpeed = 3f;
+    [SerializeField] private float partsSpeed = 1.5f;
     [SerializeField] private float rotationSpeed = 10f;
 
     [Header("Camera Reference")]
-    [SerializeField] private Transform cameraTransform; // 定点カメラを割り当てる
+    [SerializeField] private Transform cameraTransform;
 
     private Rigidbody rb;
     private Vector2 moveInput;
-    private bool isMoving;
+    private bool isPartsMode = false;
+
+    public bool IsPartsMode => isPartsMode;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX |
-                         RigidbodyConstraints.FreezeRotationZ;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
     public void SetMoveInput(Vector2 input)
     {
         moveInput = input;
+    }
+
+    public void SetPartsMode(bool active)
+    {
+        isPartsMode = active;
     }
 
     private void FixedUpdate()
@@ -34,17 +41,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMovement()
     {
-        // 入力がない場合は停止
         if (moveInput.sqrMagnitude < 0.01f)
         {
-            isMoving = false;
             rb.velocity = Vector3.zero;
             return;
         }
 
-        isMoving = true;
-
-        // カメラの向きを基準にした前後左右
+        // カメラ基準方向を取得
         Vector3 camForward = cameraTransform.forward;
         Vector3 camRight = cameraTransform.right;
         camForward.y = 0;
@@ -52,17 +55,18 @@ public class PlayerMovement : MonoBehaviour
         camForward.Normalize();
         camRight.Normalize();
 
-        // カメラ基準の移動方向を計算
+        // カメラから見た移動方向
         Vector3 moveDir = (camForward * moveInput.y + camRight * moveInput.x).normalized;
 
-        // プレイヤーの向きを移動方向に合わせる（ラジコン式）
-        if (moveDir != Vector3.zero)
+        // 向きを更新（即時回転）
+        if (moveDir.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRot = Quaternion.LookRotation(moveDir);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.fixedDeltaTime);
+            Quaternion targetRotation = Quaternion.LookRotation(moveDir, Vector3.up);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * 100 * Time.fixedDeltaTime);
         }
 
-        // 移動
-        rb.MovePosition(rb.position + moveDir * moveSpeed * Time.fixedDeltaTime);
+        // モードごとの速度設定
+        float speed = isPartsMode ? partsSpeed : normalSpeed;
+        rb.MovePosition(rb.position + moveDir * speed * Time.fixedDeltaTime);
     }
 }

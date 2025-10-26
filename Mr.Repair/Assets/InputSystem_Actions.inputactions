@@ -3,12 +3,12 @@
     "maps": [
         {
             "name": "Player",
-            "id": "ca004390-deeb-4071-a94c-9afcb2825ada",
+            "id": "7c7d7094-2be7-4cc7-b3e0-333032dd5067",
             "actions": [
                 {
                     "name": "Move",
                     "type": "Value",
-                    "id": "011d2d1b-321c-486f-88bf-667297a3de5e",
+                    "id": "160ba69f-244d-4552-8ccd-69ee4fe45cbf",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
@@ -18,60 +18,12 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "23111d90-1d93-49f6-a8b2-8966fb80ebc3",
+                    "id": "10e74cb0-8f87-40c6-86f8-f79642e79b41",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "UIControl",
-            "id": "6fa32811-8fc2-491c-8e71-2b989503fcb7",
-            "actions": [
-                {
-                    "name": "Navigate",
-                    "type": "Value",
-                    "id": "8d216ef8-2407-4528-8bd0-dafe94f723f1",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "Submit",
-                    "type": "Button",
-                    "id": "67bee70a-bccb-42c8-95b7-3f3090b889bc",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "81c3261d-8639-4c60-835f-7adbf9f28580",
-                    "path": "<Gamepad>/leftStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Navigate",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3702de77-87bc-470f-acb9-a58808bbe3a6",
-                    "path": "<Gamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Submit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

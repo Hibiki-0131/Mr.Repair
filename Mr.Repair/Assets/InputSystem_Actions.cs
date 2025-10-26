@@ -30,7 +30,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""Move"",
                     ""type"": ""Value"",
-                    ""id"": ""011d2d1b-321c-486f-88bf-667297a3de5e"",
+                    ""id"": ""41cafbb5-19da-4340-9487-cba06d7a2a06"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -40,7 +40,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""23111d90-1d93-49f6-a8b2-8966fb80ebc3"",
+                    ""id"": ""acca6fa6-2a1b-4765-ad55-4c290419763f"",
                     ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
