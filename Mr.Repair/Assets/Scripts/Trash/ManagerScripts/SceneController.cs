@@ -19,7 +19,7 @@ public class SceneController : MonoBehaviour
     }
 
     public void LoadTitle() => SceneManager.LoadScene("Title");
-    public void LoadMain() => SceneManager.LoadScene("Station");
+    public void LoadMain() => SceneManager.LoadScene("Main");
     public void LoadGameOver() => SceneManager.LoadScene("GameOver");
     public void LoadGameClear() => SceneManager.LoadScene("GameClear");
 
