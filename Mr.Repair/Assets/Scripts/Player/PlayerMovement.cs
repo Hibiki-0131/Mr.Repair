@@ -24,6 +24,28 @@ public class PlayerMovement : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
+    private void Start()
+    {
+        // ゲーム開始時にMainCameraを参照
+        if (cameraTransform == null && Camera.main != null)
+        {
+            cameraTransform = Camera.main.transform;
+        }
+    }
+
+    private void LateUpdate()
+    {
+        // 毎フレーム、CameraManagerの現在アクティブなカメラを追従
+        if (CameraManager.Instance != null)
+        {
+            Camera activeCam = CameraManager.Instance.GetActiveCamera();
+            if (activeCam != null && cameraTransform != activeCam.transform)
+            {
+                cameraTransform = activeCam.transform;
+            }
+        }
+    }
+
     public void SetMoveInput(Vector2 input)
     {
         moveInput = input;
@@ -41,6 +63,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMovement()
     {
+        if (cameraTransform == null)
+            return;
+
         if (moveInput.sqrMagnitude < 0.01f)
         {
             rb.velocity = Vector3.zero;
@@ -58,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
         // カメラから見た移動方向
         Vector3 moveDir = (camForward * moveInput.y + camRight * moveInput.x).normalized;
 
-        // 向きを更新（即時回転）
+        // 向きを更新
         if (moveDir.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDir, Vector3.up);
