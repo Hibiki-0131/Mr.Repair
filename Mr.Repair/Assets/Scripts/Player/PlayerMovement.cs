@@ -103,12 +103,6 @@ public class PlayerMovement : MonoBehaviour
         if (cameraTransform == null)
             return;
 
-        if (moveInput.sqrMagnitude < 0.01f)
-        {
-            rb.velocity = Vector3.zero;
-            return;
-        }
-
         Vector3 camForward = cameraTransform.forward;
         Vector3 camRight = cameraTransform.right;
         camForward.y = 0;
