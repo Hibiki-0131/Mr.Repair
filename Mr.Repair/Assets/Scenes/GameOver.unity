@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -300,7 +300,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1545794969}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SceneController, Assembly-CSharp
         m_MethodName: LoadTitle
         m_Mode: 1
@@ -872,7 +872,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1545794969}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SceneController, Assembly-CSharp
         m_MethodName: LoadMain
         m_Mode: 1
@@ -968,74 +968,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1545794968
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 932.8054
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 608.62256
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 201.34204
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 440088471317675609, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 832756719586685301, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-      propertyPath: m_Name
-      value: SceneController
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
---- !u!114 &1545794969 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8434605266721073152, guid: 38aaf2db753e9ab4990354675c337dc9, type: 3}
-  m_PrefabInstance: {fileID: 1545794968}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6036c8af6984bc4bb4a262c924b28aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1561504064
 GameObject:
   m_ObjectHideFlags: 0
@@ -1407,4 +1339,3 @@ SceneRoots:
   - {fileID: 1561504067}
   - {fileID: 1406136353}
   - {fileID: 1933082749}
-  - {fileID: 1545794968}
