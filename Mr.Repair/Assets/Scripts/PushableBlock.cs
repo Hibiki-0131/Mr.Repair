@@ -75,13 +75,38 @@ public class PushableBlock : MonoBehaviour
         pushDir.y = 0f;
         pushDir.Normalize();
 
-        // 前方に壁がなければ移動予約
-        if (!Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 1f))
+        // 前方に障害物がないか確認
+        if (Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 1f))
+            return;
+
+        // 前方の地面高さをチェック
+        Vector3 frontCheckOrigin = transform.position + pushDir * stepCheckDistance + Vector3.up * 0.1f;
+
+        if (Physics.Raycast(frontCheckOrigin, Vector3.down, out RaycastHit hitDown, 1f))
         {
-            targetPos = rb.position + pushDir;
+            float heightDiff = hitDown.point.y - transform.position.y;
+
+            // 段差が高すぎる場合は移動しない
+            if (heightDiff > stepHeight)
+                return;
+
+            // 段差が低い場合は高さを合わせる
+            Vector3 adjustedTarget = new Vector3(
+                rb.position.x + pushDir.x,
+                transform.position.y + heightDiff,
+                rb.position.z + pushDir.z
+            );
+
+            targetPos = adjustedTarget;
             isMoving = true;
         }
+        else
+        {
+            // 前方に地面がない（穴や落下）場合は移動しない
+            return;
+        }
     }
+
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
