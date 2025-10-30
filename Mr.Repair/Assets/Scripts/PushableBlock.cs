@@ -4,84 +4,91 @@ using UnityEngine;
 public class PushableBlock : MonoBehaviour
 {
     [Header("押す設定")]
-    [SerializeField] private float pushForce = 8f;
-    [SerializeField] private float maxSpeed = 3f;
-    [SerializeField] private float stepHeight = 0.3f; // ← 乗り越え可能な段差の高さ
-    [SerializeField] private float stepCheckDistance = 0.6f; // プレイヤーとの距離
-    [SerializeField] private PhysicMaterial smoothMaterial;
+    [SerializeField] private float moveSpeed = 2f;
+    [SerializeField] private float stopThreshold = 0.05f;
+    [SerializeField] private float stepHeight = 0.3f;
+    [SerializeField] private float stepCheckDistance = 0.6f;
+
+    [Header("落下判定設定")]
+    [SerializeField] private float fallCheckDistance = 0.6f;
+    [SerializeField] private float fallGravityBoost = 10f;
+    [SerializeField] private float snapThreshold = 0.02f;
 
     private Rigidbody rb;
+    private bool isMoving = false;
+    private bool isFalling = false;
+    private Vector3 moveDir;
+    private Vector3 targetPos;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.drag = 5f;
+        rb.isKinematic = false;
+        rb.drag = 4f;
         rb.angularDrag = 2f;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+    }
 
-        if (smoothMaterial != null)
+    private void FixedUpdate()
+    {
+        if (isMoving)
         {
-            var col = GetComponent<Collider>();
-            col.material = smoothMaterial;
+            MoveBlock();
+        }
+
+        if (!HasGround())
+        {
+            StartFalling();
+        }
+    }
+
+    private void MoveBlock()
+    {
+        Vector3 newPos = Vector3.MoveTowards(rb.position, targetPos, moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(newPos);
+
+        if (Vector3.Distance(rb.position, targetPos) < stopThreshold)
+            isMoving = false;
+    }
+
+    private bool HasGround()
+    {
+        return Physics.Raycast(transform.position + Vector3.up * 0.05f, Vector3.down, fallCheckDistance);
+    }
+
+    private void StartFalling()
+    {
+        if (!isFalling)
+        {
+            isFalling = true;
+            rb.useGravity = true;
+            rb.AddForce(Vector3.down * fallGravityBoost, ForceMode.Acceleration);
         }
     }
 
     private void OnCollisionStay(Collision collision)
     {
-        if (!collision.gameObject.CompareTag("Player"))
+        if (!collision.gameObject.CompareTag("Player") || isMoving || isFalling)
             return;
 
-        // 押す方向を決定
         Vector3 pushDir = collision.transform.forward;
         pushDir.y = 0f;
         pushDir.Normalize();
 
-        // 段差乗り越えチェック
-        if (CanStep(pushDir))
+        // 前方に壁がなければ移動予約
+        if (!Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 1f))
         {
-            // 乗り越え時：少し上方向の補助力を加える
-            rb.AddForce(Vector3.up * 20f, ForceMode.Acceleration);
+            targetPos = rb.position + pushDir;
+            isMoving = true;
         }
-
-        // 通常の押し処理
-        if (rb.velocity.magnitude < maxSpeed)
-        {
-            rb.AddForce(pushDir * pushForce, ForceMode.Acceleration);
-        }
-    }
-
-    /// <summary>
-    /// 前方に小さな段差があるかをレイキャストで判定
-    /// </summary>
-    private bool CanStep(Vector3 pushDir)
-    {
-        Vector3 originLower = transform.position + Vector3.up * 0.05f; // 下の位置
-        Vector3 originUpper = transform.position + Vector3.up * stepHeight; // 上の位置
-
-        // 下のレイがヒットして、上のレイがヒットしないとき → 段差あり
-        if (Physics.Raycast(originLower, pushDir, out RaycastHit lowerHit, stepCheckDistance))
-        {
-            if (!Physics.Raycast(originUpper, pushDir, stepCheckDistance))
-            {
-                // 小さな段差とみなす
-                return true;
-            }
-        }
-        return false;
     }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        if (Application.isPlaying) return;
-
-        Vector3 originLower = transform.position + Vector3.up * 0.05f;
-        Vector3 originUpper = transform.position + Vector3.up * stepHeight;
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(originLower, originLower + transform.forward * stepCheckDistance);
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(originUpper, originUpper + transform.forward * stepCheckDistance);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position + Vector3.up * 0.05f,
+                        transform.position + Vector3.up * 0.05f + Vector3.down * fallCheckDistance);
     }
 #endif
 }
