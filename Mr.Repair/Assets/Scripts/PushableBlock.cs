@@ -14,9 +14,15 @@ public class PushableBlock : MonoBehaviour
     [SerializeField] private float fallGravityBoost = 10f;
     [SerializeField] private float snapThreshold = 0.02f;
 
+    [Header("連動ブロックとの衝突設定")]
+    [SerializeField] private string followerTag = "FollowerBlock";  // ← FollowerBlockのTag
+    [SerializeField] private float followerPushForce = 6f;          // ← 押されたときの力の強さ
+    [SerializeField] private float followerPushCooldown = 0.2f;     // ← 連続押し防止
+
     private Rigidbody rb;
     private bool isMoving = false;
     private bool isFalling = false;
+    private bool recentlyPushed = false;
     private Vector3 moveDir;
     private Vector3 targetPos;
 
@@ -68,45 +74,77 @@ public class PushableBlock : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if (!collision.gameObject.CompareTag("Player") || isMoving || isFalling)
+        if (isFalling)
             return;
 
-        Vector3 pushDir = collision.transform.forward;
-        pushDir.y = 0f;
-        pushDir.Normalize();
-
-        // 前方に障害物がないか確認
-        if (Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 1f))
-            return;
-
-        // 前方の地面高さをチェック
-        Vector3 frontCheckOrigin = transform.position + pushDir * stepCheckDistance + Vector3.up * 0.1f;
-
-        if (Physics.Raycast(frontCheckOrigin, Vector3.down, out RaycastHit hitDown, 1f))
+        // FollowerBlock から押された場合
+        if (collision.gameObject.CompareTag(followerTag))
         {
-            float heightDiff = hitDown.point.y - transform.position.y;
+            if (!recentlyPushed)
+            {
+                Vector3 pushDir = (transform.position - collision.transform.position);
+                pushDir.y = 0f;
+                pushDir.Normalize();
 
-            // 段差が高すぎる場合は移動しない
-            if (heightDiff > stepHeight * 0.8f)
+                TryMoveByFollower(pushDir);
+                StartCoroutine(ResetFollowerPush());
+            }
+            return;
+        }
+
+        // 通常のPlayerによる押し処理
+        if (collision.gameObject.CompareTag("Player") && !isMoving)
+        {
+            Vector3 pushDir = collision.transform.forward;
+            pushDir.y = 0f;
+            pushDir.Normalize();
+
+            if (Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 1f))
                 return;
 
-            // 段差が低い場合は高さを合わせる
-            Vector3 adjustedTarget = new Vector3(
-                rb.position.x + pushDir.x,
-                transform.position.y + heightDiff,
-                rb.position.z + pushDir.z
-            );
+            Vector3 frontCheckOrigin = transform.position + pushDir * stepCheckDistance + Vector3.up * 0.1f;
 
-            targetPos = adjustedTarget;
-            isMoving = true;
-        }
-        else
-        {
-            // 前方に地面がない（穴や落下）場合は移動しない
-            return;
+            if (Physics.Raycast(frontCheckOrigin, Vector3.down, out RaycastHit hitDown, 1f))
+            {
+                float heightDiff = hitDown.point.y - transform.position.y;
+
+                if (heightDiff > stepHeight * 0.8f)
+                    return;
+
+                Vector3 adjustedTarget = new Vector3(
+                    rb.position.x + pushDir.x,
+                    transform.position.y + heightDiff,
+                    rb.position.z + pushDir.z
+                );
+
+                targetPos = adjustedTarget;
+                isMoving = true;
+            }
         }
     }
 
+    /// <summary>
+    /// FollowerBlock から押されたときの移動処理
+    /// </summary>
+    private void TryMoveByFollower(Vector3 pushDir)
+    {
+        // 前方に障害物がある場合は動かない
+        if (Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 0.9f))
+            return;
+
+        Vector3 target = rb.position + pushDir.normalized * 1f;
+
+        rb.AddForce(pushDir * followerPushForce, ForceMode.VelocityChange);
+        targetPos = target;
+        isMoving = true;
+    }
+
+    private System.Collections.IEnumerator ResetFollowerPush()
+    {
+        recentlyPushed = true;
+        yield return new WaitForSeconds(followerPushCooldown);
+        recentlyPushed = false;
+    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
