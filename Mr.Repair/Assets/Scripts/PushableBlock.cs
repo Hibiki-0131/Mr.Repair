@@ -87,7 +87,7 @@ public class PushableBlock : MonoBehaviour
             float heightDiff = hitDown.point.y - transform.position.y;
 
             // ’i·‚ª‚‚·‚¬‚éê‡‚ÍˆÚ“®‚µ‚È‚¢
-            if (heightDiff > stepHeight)
+            if (heightDiff > stepHeight * 0.8f)
                 return;
 
             // ’i·‚ª’á‚¢ê‡‚Í‚‚³‚ğ‡‚í‚¹‚é

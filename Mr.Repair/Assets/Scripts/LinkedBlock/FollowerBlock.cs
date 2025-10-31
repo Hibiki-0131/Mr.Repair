@@ -5,10 +5,11 @@ public class FollowerBlock : MonoBehaviour
 {
     [SerializeField] private string groupID;
     [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private float collisionCheckDistance = 0.55f; // 壁チェック距離（ブロックサイズより少し短め）
     [SerializeField] private LayerMask wallMask;
+    [SerializeField] private LayerMask powerBlockMask; // ← PowerBlock用レイヤーを指定
 
     private Rigidbody rb;
+    private Collider col;
     private Vector3 targetPosition;
 
     public string GroupID => groupID;
@@ -16,7 +17,8 @@ public class FollowerBlock : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true; // ← キネマティックに戻す
+        col = GetComponent<Collider>();
+        rb.isKinematic = true;
         rb.interpolation = RigidbodyInterpolation.None;
     }
 
@@ -29,33 +31,63 @@ public class FollowerBlock : MonoBehaviour
     public void ApplyMovement(Vector3 delta)
     {
         Vector3 direction = delta.normalized;
+        float distance = delta.magnitude;
 
-        // ブロックの中心から少し上げてRayを飛ばす
-        Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
-
-        // 進行方向に壁があるかチェック
-        if (Physics.Raycast(rayOrigin, direction, out RaycastHit hit, collisionCheckDistance, wallMask))
+        // 前方に壁があればその手前で止まる
+        if (rb.SweepTest(direction, out RaycastHit hit, distance))
         {
-            // 壁がすぐ前にある → 移動禁止
-            return;
+            targetPosition = rb.position + direction * (hit.distance - 0.01f);
         }
-
-        // 壁がなければ移動許可
-        targetPosition += delta;
+        else
+        {
+            targetPosition += delta;
+        }
     }
 
     private void FixedUpdate()
     {
-        // スムーズに追従
+        // 壁やPowerBlockとめり込んでいないかチェック
+        ResolveOverlap();
+
+        // スムーズ移動
         rb.MovePosition(Vector3.MoveTowards(rb.position, targetPosition, moveSpeed * Time.fixedDeltaTime));
     }
 
+    /// <summary>
+    /// PowerBlockや他のFollowerとのめり込みを検出して押し戻す
+    /// </summary>
+    private void ResolveOverlap()
+    {
+        Collider[] overlaps = Physics.OverlapBox(
+            col.bounds.center,
+            col.bounds.extents * 0.98f,
+            transform.rotation,
+            powerBlockMask
+        );
+
+        foreach (var overlap in overlaps)
+        {
+            if (overlap == col) continue;
+
+            Vector3 dir = (transform.position - overlap.transform.position).normalized;
+            float distance = Vector3.Distance(transform.position, overlap.transform.position);
+            float minDist = col.bounds.extents.x + overlap.bounds.extents.x;
+
+            if (distance < minDist)
+            {
+                // 軽く押し戻す
+                Vector3 push = dir * (minDist - distance + 0.001f);
+                rb.MovePosition(rb.position + push);
+                targetPosition = rb.position; // 補正位置を追従目標に反映
+            }
+        }
+    }
+
 #if UNITY_EDITOR
-    // Scene上でRay確認できるように
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + transform.forward * collisionCheckDistance);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(col ? col.bounds.center : transform.position, (col ? col.bounds.size : Vector3.one) * 0.98f);
     }
 #endif
 }
