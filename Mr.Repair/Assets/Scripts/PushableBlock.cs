@@ -1,149 +1,99 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Collider))]
 public class PushableBlock : MonoBehaviour
 {
     [Header("押す設定")]
-    [SerializeField] private float moveSpeed = 2f;
-    [SerializeField] private float stopThreshold = 0.05f;
-    [SerializeField] private float stepHeight = 0.3f;
-    [SerializeField] private float stepCheckDistance = 0.6f;
+    [SerializeField] private float pushForce = 6f;         // 押されたときの力
+    [SerializeField] private float maxSpeed = 2f;          // 最大速度
+    [SerializeField] private float dragWhilePushed = 6f;   // 押され中の抵抗
+    [SerializeField] private float dragIdle = 10f;         // 静止中の抵抗
+    [SerializeField] private float friction = 0.1f;        // 摩擦を減らす値
+    [SerializeField] private string followerTag = "FollowerBlock"; // FollowerBlockのタグ
 
-    [Header("落下判定設定")]
+    [Header("落下設定")]
     [SerializeField] private float fallCheckDistance = 0.6f;
-    [SerializeField] private float fallGravityBoost = 10f;
-    [SerializeField] private float snapThreshold = 0.02f;
-
-    [Header("連動ブロックとの衝突設定")]
-    [SerializeField] private string followerTag = "FollowerBlock";  // ← FollowerBlockのTag
-    [SerializeField] private float followerPushForce = 6f;          // ← 押されたときの力の強さ
-    [SerializeField] private float followerPushCooldown = 0.2f;     // ← 連続押し防止
+    [SerializeField] private float gravityBoost = 10f;
 
     private Rigidbody rb;
-    private bool isMoving = false;
-    private bool isFalling = false;
-    private bool recentlyPushed = false;
-    private Vector3 moveDir;
-    private Vector3 targetPos;
+    private bool isGrounded = true;
+    private Vector3 lastFollowerPos;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = false;
-        rb.drag = 4f;
-        rb.angularDrag = 2f;
+        rb.mass = 5f;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+
+        // 滑りやすくする
+        Collider col = GetComponent<Collider>();
+        PhysicMaterial mat = new PhysicMaterial();
+        mat.dynamicFriction = friction;
+        mat.staticFriction = friction;
+        mat.frictionCombine = PhysicMaterialCombine.Minimum;
+        col.material = mat;
     }
 
     private void FixedUpdate()
     {
-        if (isMoving)
+        isGrounded = Physics.Raycast(transform.position + Vector3.up * 0.05f, Vector3.down, fallCheckDistance);
+
+        rb.drag = rb.velocity.magnitude > 0.05f ? dragWhilePushed : dragIdle;
+
+        if (!isGrounded)
         {
-            MoveBlock();
+            rb.AddForce(Vector3.down * gravityBoost, ForceMode.Acceleration);
         }
 
-        if (!HasGround())
+        // 水平方向の速度制限
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        if (flatVel.magnitude > maxSpeed)
         {
-            StartFalling();
-        }
-    }
-
-    private void MoveBlock()
-    {
-        Vector3 newPos = Vector3.MoveTowards(rb.position, targetPos, moveSpeed * Time.fixedDeltaTime);
-        rb.MovePosition(newPos);
-
-        if (Vector3.Distance(rb.position, targetPos) < stopThreshold)
-            isMoving = false;
-    }
-
-    private bool HasGround()
-    {
-        return Physics.Raycast(transform.position + Vector3.up * 0.05f, Vector3.down, fallCheckDistance);
-    }
-
-    private void StartFalling()
-    {
-        if (!isFalling)
-        {
-            isFalling = true;
-            rb.useGravity = true;
-            rb.AddForce(Vector3.down * fallGravityBoost, ForceMode.Acceleration);
+            flatVel = flatVel.normalized * maxSpeed;
+            rb.velocity = new Vector3(flatVel.x, rb.velocity.y, flatVel.z);
         }
     }
 
     private void OnCollisionStay(Collision collision)
     {
-        if (isFalling)
-            return;
-
-        // FollowerBlock から押された場合
-        if (collision.gameObject.CompareTag(followerTag))
+        // プレイヤーの押し
+        if (collision.gameObject.CompareTag("Player"))
         {
-            if (!recentlyPushed)
-            {
-                Vector3 pushDir = (transform.position - collision.transform.position);
-                pushDir.y = 0f;
-                pushDir.Normalize();
-
-                TryMoveByFollower(pushDir);
-                StartCoroutine(ResetFollowerPush());
-            }
-            return;
-        }
-
-        // 通常のPlayerによる押し処理
-        if (collision.gameObject.CompareTag("Player") && !isMoving)
-        {
-            Vector3 pushDir = collision.transform.forward;
+            Vector3 pushDir = (transform.position - collision.transform.position);
             pushDir.y = 0f;
             pushDir.Normalize();
+            rb.AddForce(pushDir * pushForce, ForceMode.Acceleration);
+        }
 
-            if (Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 1f))
-                return;
-
-            Vector3 frontCheckOrigin = transform.position + pushDir * stepCheckDistance + Vector3.up * 0.1f;
-
-            if (Physics.Raycast(frontCheckOrigin, Vector3.down, out RaycastHit hitDown, 1f))
+        // FollowerBlockによる押し（isKinematic対応）
+        else if (collision.gameObject.CompareTag(followerTag))
+        {
+            Rigidbody followerRb = collision.rigidbody;
+            if (followerRb != null && followerRb.isKinematic)
             {
-                float heightDiff = hitDown.point.y - transform.position.y;
+                // FollowerBlockの移動方向を検出
+                Vector3 moveDir = (collision.transform.position - lastFollowerPos);
+                moveDir.y = 0f;
 
-                if (heightDiff > stepHeight * 0.8f)
-                    return;
+                if (moveDir.sqrMagnitude > 0.0001f)
+                {
+                    moveDir.Normalize();
+                    rb.AddForce(moveDir * pushForce, ForceMode.VelocityChange);
+                }
 
-                Vector3 adjustedTarget = new Vector3(
-                    rb.position.x + pushDir.x,
-                    transform.position.y + heightDiff,
-                    rb.position.z + pushDir.z
-                );
-
-                targetPos = adjustedTarget;
-                isMoving = true;
+                lastFollowerPos = collision.transform.position;
             }
         }
     }
 
-    /// <summary>
-    /// FollowerBlock から押されたときの移動処理
-    /// </summary>
-    private void TryMoveByFollower(Vector3 pushDir)
+    private void OnCollisionExit(Collision collision)
     {
-        // 前方に障害物がある場合は動かない
-        if (Physics.Raycast(transform.position + Vector3.up * 0.2f, pushDir, 0.9f))
-            return;
-
-        Vector3 target = rb.position + pushDir.normalized * 1f;
-
-        rb.AddForce(pushDir * followerPushForce, ForceMode.VelocityChange);
-        targetPos = target;
-        isMoving = true;
-    }
-
-    private System.Collections.IEnumerator ResetFollowerPush()
-    {
-        recentlyPushed = true;
-        yield return new WaitForSeconds(followerPushCooldown);
-        recentlyPushed = false;
+        if (collision.gameObject.CompareTag(followerTag))
+        {
+            lastFollowerPos = Vector3.zero;
+        }
     }
 
 #if UNITY_EDITOR
