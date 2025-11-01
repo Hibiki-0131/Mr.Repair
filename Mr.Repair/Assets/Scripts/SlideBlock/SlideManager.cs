@@ -5,7 +5,8 @@ public class SlideManager : MonoBehaviour
 {
     public static SlideManager Instance { get; private set; }
 
-    private Dictionary<string, SlideBlock> blockDictionary = new();
+    // 1Ç¬ÇÃIDÇ…ï°êîÇÃSlideBlockÇìoò^Ç≈Ç´ÇÈÇÊÇ§Ç…Ç∑ÇÈ
+    private Dictionary<string, List<SlideBlock>> blockDictionary = new();
 
     private void Awake()
     {
@@ -17,16 +18,23 @@ public class SlideManager : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(block.BlockID))
             {
-                blockDictionary[block.BlockID] = block;
+                if (!blockDictionary.ContainsKey(block.BlockID))
+                {
+                    blockDictionary[block.BlockID] = new List<SlideBlock>();
+                }
+                blockDictionary[block.BlockID].Add(block);
             }
         }
     }
 
     public void ActivateBlock(string id)
     {
-        if (blockDictionary.TryGetValue(id, out SlideBlock block))
+        if (blockDictionary.TryGetValue(id, out List<SlideBlock> blocks))
         {
-            block.Activate();
+            foreach (var block in blocks)
+            {
+                block.Activate();
+            }
         }
         else
         {
