@@ -16,7 +16,7 @@ public class PlayerDeathHandler : MonoBehaviour
     private System.Collections.IEnumerator GoToGameOver()
     {
         // 少し待ってからゲームオーバーへ
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0f);
         SceneController.Instance.LoadSceneAsync("GameOver");
     }
 }

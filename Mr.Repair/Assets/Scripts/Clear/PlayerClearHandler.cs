@@ -16,7 +16,7 @@ public class PlayerClearHandler : MonoBehaviour
     private System.Collections.IEnumerator GoToGameClear()
     {
         // 少し待ってからゲームオーバーへ
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0f);
         SceneController.Instance.LoadSceneAsync("GameClear");
     }
 }
