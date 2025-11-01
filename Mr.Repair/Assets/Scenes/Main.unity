@@ -6194,7 +6194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 843f555910388f1419d4103bc4358b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pushForce: 4
+  pushForce: 10
   maxSpeed: 2
   dragWhilePushed: 6
   dragIdle: 10
@@ -11559,7 +11559,7 @@ Transform:
   m_GameObject: {fileID: 901713621}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.57, y: 1.65, z: 3.96}
+  m_LocalPosition: {x: 4.66, y: 1.65, z: 4.78}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15597,7 +15597,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 843f555910388f1419d4103bc4358b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pushForce: 4
+  pushForce: 10
   maxSpeed: 2
   dragWhilePushed: 6
   dragIdle: 2
