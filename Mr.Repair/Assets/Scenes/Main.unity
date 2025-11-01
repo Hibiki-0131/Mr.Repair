@@ -7242,7 +7242,7 @@ GameObject:
   - component: {fileID: 626129318}
   - component: {fileID: 626129317}
   - component: {fileID: 626129316}
-  - component: {fileID: 626129315}
+  - component: {fileID: 626129319}
   m_Layer: 0
   m_Name: Magma (4)
   m_TagString: DeathZone
@@ -7265,27 +7265,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1339378078}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &626129315
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 626129313}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 10, y: 2.220446e-16, z: 10}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!64 &626129316
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -7301,11 +7280,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &626129317
@@ -7358,6 +7337,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 626129313}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &626129319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626129313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0736810b2c0ee429d269fed427bf39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &626473615
 GameObject:
   m_ObjectHideFlags: 0
@@ -8317,7 +8308,7 @@ GameObject:
   - component: {fileID: 714092528}
   - component: {fileID: 714092527}
   - component: {fileID: 714092526}
-  - component: {fileID: 714092525}
+  - component: {fileID: 714092529}
   m_Layer: 0
   m_Name: Magma (3)
   m_TagString: DeathZone
@@ -8340,27 +8331,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1339378078}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &714092525
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 714092523}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 10, y: 2.220446e-16, z: 10}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!64 &714092526
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8376,11 +8346,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &714092527
@@ -8433,6 +8403,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 714092523}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &714092529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714092523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0736810b2c0ee429d269fed427bf39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &719756507
 GameObject:
   m_ObjectHideFlags: 0
@@ -11184,6 +11166,7 @@ GameObject:
   - component: {fileID: 901713627}
   - component: {fileID: 901713626}
   - component: {fileID: 901713629}
+  - component: {fileID: 901713630}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -11404,6 +11387,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6980bf45527a544499427d4747ccafb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &901713630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 901713621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54d6cf87f6a2b274287d09268735df09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &902295625
@@ -15539,7 +15534,7 @@ GameObject:
   - component: {fileID: 1313315145}
   - component: {fileID: 1313315144}
   - component: {fileID: 1313315143}
-  - component: {fileID: 1313315142}
+  - component: {fileID: 1313315146}
   m_Layer: 0
   m_Name: Magma (2)
   m_TagString: DeathZone
@@ -15562,27 +15557,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1339378078}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1313315142
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313315140}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 10, y: 2.220446e-16, z: 10}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!64 &1313315143
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -15598,11 +15572,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1313315144
@@ -15655,6 +15629,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1313315140}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1313315146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313315140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0736810b2c0ee429d269fed427bf39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1319512853
 GameObject:
   m_ObjectHideFlags: 0
@@ -15771,7 +15757,7 @@ GameObject:
   - component: {fileID: 1339378078}
   m_Layer: 0
   m_Name: Magma
-  m_TagString: DeathZone
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15784,8 +15770,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1339378077}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.1191373, y: 3.4790018, z: 9.475793}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.1191373, y: 3.87, z: -3.524207}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15793,7 +15779,7 @@ Transform:
   - {fileID: 1313315141}
   - {fileID: 714092524}
   - {fileID: 626129314}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 572548937}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1344341429
 GameObject:
@@ -23043,6 +23029,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5078984291393706260, guid: 63370f8a0c4c483418b3531524b1ee51, type: 3}
       insertIndex: 619
       addedObject: {fileID: 1216558216}
+    - targetCorrespondingSourceObject: {fileID: 5078984291393706260, guid: 63370f8a0c4c483418b3531524b1ee51, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1339378078}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 574709996337040091, guid: 63370f8a0c4c483418b3531524b1ee51, type: 3}
       insertIndex: -1
@@ -23432,7 +23421,7 @@ GameObject:
   - component: {fileID: 1876115645}
   - component: {fileID: 1876115644}
   - component: {fileID: 1876115643}
-  - component: {fileID: 1876115642}
+  - component: {fileID: 1876115647}
   m_Layer: 0
   m_Name: Magma (1)
   m_TagString: DeathZone
@@ -23440,27 +23429,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!65 &1876115642
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1876115641}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 10, y: 2.220446e-16, z: 10}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!64 &1876115643
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -23476,11 +23444,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1876115644
@@ -23548,6 +23516,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1339378078}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1876115647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876115641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0736810b2c0ee429d269fed427bf39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1876672262
 GameObject:
   m_ObjectHideFlags: 0
@@ -27232,7 +27212,6 @@ SceneRoots:
   - {fileID: 2021962423}
   - {fileID: 463033355}
   - {fileID: 622621893}
-  - {fileID: 1339378078}
   - {fileID: 1589570817}
   - {fileID: 1192633118}
   - {fileID: 859724745}
