@@ -585,7 +585,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 21072718}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -5883,9 +5883,9 @@ MonoBehaviour:
   stopThreshold: 0.05
   stepHeight: 0.1
   stepCheckDistance: 0.8
-  fallCheckDistance: 0.4
+  fallCheckDistance: 1
   fallGravityBoost: 15
-  snapThreshold: 0.05
+  snapThreshold: 0.02
   followerTag: FollowerBlock
   followerPushForce: 6
   followerPushCooldown: 0.2
@@ -6554,7 +6554,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 584961036}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -8154,7 +8154,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 699780638}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -8666,7 +8666,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 728622195}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -9188,7 +9188,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8683442698848828435, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12.565
+      value: -22.53
       objectReference: {fileID: 0}
     - target: {fileID: 8683442698848828435, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9908,7 +9908,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 797788279}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -11210,7 +11210,7 @@ Transform:
   m_GameObject: {fileID: 901713621}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.29, y: 1.327, z: 4.52}
+  m_LocalPosition: {x: -11.61, y: 1.327, z: 12.26}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11245,7 +11245,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 901713621}
-  m_Material: {fileID: 13400000, guid: e410378529f95894b842a6c3ca665f01, type: 2}
+  m_Material: {fileID: 13400000, guid: 558c124b47e2a0443bac0986f89ecb9f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -13356,7 +13356,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1124619848}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -13671,7 +13671,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1145742817}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -13881,7 +13881,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1151140657}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -15118,9 +15118,9 @@ MonoBehaviour:
   stopThreshold: 0.05
   stepHeight: 0.3
   stepCheckDistance: 0.4
-  fallCheckDistance: 0.6
+  fallCheckDistance: 1
   fallGravityBoost: 100
-  snapThreshold: 0.05
+  snapThreshold: 0.02
   followerTag: FollowerBlock
   followerPushForce: 6
   followerPushCooldown: 0.2
@@ -16845,7 +16845,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1373092024}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -26379,7 +26379,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2067502489}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 6cd2d2d861d4a6e4c92560db03458787, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
