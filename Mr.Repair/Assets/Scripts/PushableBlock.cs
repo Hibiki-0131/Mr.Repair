@@ -32,7 +32,9 @@ public class PushableBlock : MonoBehaviour
         PhysicMaterial mat = new PhysicMaterial();
         mat.dynamicFriction = friction;
         mat.staticFriction = friction;
+        mat.bounciness = friction;
         mat.frictionCombine = PhysicMaterialCombine.Minimum;
+        mat.bounceCombine = PhysicMaterialCombine.Maximum;
         col.material = mat;
     }
 
