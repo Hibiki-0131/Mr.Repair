@@ -12,9 +12,11 @@ public class PushableBlock : MonoBehaviour
     [SerializeField] private float friction = 0.1f;        // 摩擦を減らす値
     [SerializeField] private string followerTag = "FollowerBlock"; // FollowerBlockのタグ
 
-    [Header("落下設定")]
+    [Header("重力設定")]
+    [SerializeField] private float gravityMultiplier = 3f; // ← Playerと同じ。標準重力の何倍にするか
+
+    [Header("落下判定設定")]
     [SerializeField] private float fallCheckDistance = 0.6f;
-    [SerializeField] private float gravityBoost = 10f;
 
     private Rigidbody rb;
     private bool isGrounded = true;
@@ -23,11 +25,12 @@ public class PushableBlock : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.mass = 5f;
+        rb.mass = 20f;
+        rb.useGravity = false; // ← Unity標準重力を切る（自前で制御）
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
-        // 滑りやすくする
+        // 滑りやすくする（PhysicMaterial設定）
         Collider col = GetComponent<Collider>();
         PhysicMaterial mat = new PhysicMaterial();
         mat.dynamicFriction = friction;
@@ -40,14 +43,13 @@ public class PushableBlock : MonoBehaviour
 
     private void FixedUpdate()
     {
+        ApplyCustomGravity();
+
+        // 地面チェック
         isGrounded = Physics.Raycast(transform.position + Vector3.up * 0.05f, Vector3.down, fallCheckDistance);
 
+        // 空気抵抗を調整
         rb.drag = rb.velocity.magnitude > 0.05f ? dragWhilePushed : dragIdle;
-
-        if (!isGrounded)
-        {
-            rb.AddForce(Vector3.down * gravityBoost, ForceMode.Acceleration);
-        }
 
         // 水平方向の速度制限
         Vector3 flatVel = new Vector3(rb.velocity.x, 0, rb.velocity.z);
@@ -58,9 +60,18 @@ public class PushableBlock : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// PlayerMovementと同様のカスタム重力適用
+    /// </summary>
+    private void ApplyCustomGravity()
+    {
+        Vector3 customGravity = Physics.gravity * gravityMultiplier;
+        rb.AddForce(customGravity, ForceMode.Acceleration);
+    }
+
     private void OnCollisionStay(Collision collision)
     {
-        // プレイヤーの押し
+        // --- プレイヤーの押し ---
         if (collision.gameObject.CompareTag("Player"))
         {
             Vector3 pushDir = (transform.position - collision.transform.position);
@@ -69,13 +80,12 @@ public class PushableBlock : MonoBehaviour
             rb.AddForce(pushDir * pushForce, ForceMode.Acceleration);
         }
 
-        // FollowerBlockによる押し（isKinematic対応）
+        // --- FollowerBlockによる押し（isKinematic対応） ---
         else if (collision.gameObject.CompareTag(followerTag))
         {
             Rigidbody followerRb = collision.rigidbody;
             if (followerRb != null && followerRb.isKinematic)
             {
-                // FollowerBlockの移動方向を検出
                 Vector3 moveDir = (collision.transform.position - lastFollowerPos);
                 moveDir.y = 0f;
 
