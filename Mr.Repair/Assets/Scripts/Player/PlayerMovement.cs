@@ -13,9 +13,12 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Collider Size")]
     [SerializeField] private Vector3 normalColliderSize = new Vector3(0.51f, 0.82f, 0.52f);
-    [SerializeField] private Vector3 partsColliderSize = new Vector3(0.51f, 0.43f,0.52f);
+    [SerializeField] private Vector3 partsColliderSize = new Vector3(0.51f, 0.43f, 0.52f);
     [SerializeField] private Vector3 normalColliderCenter = new Vector3(0.004f, -0.11f, 0.2f);
     [SerializeField] private Vector3 partsColliderCenter = new Vector3(0.004f, -0.3045f, 0.2f);
+
+    [Header("Gravity Settings")]
+    [SerializeField] private float gravityMultiplier = 3f; // ← これを追加（標準の重力の何倍か）
 
     private Rigidbody rb;
     private BoxCollider boxCollider;
@@ -29,6 +32,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         boxCollider = GetComponent<BoxCollider>();
+        rb.useGravity = false; // ← Unity標準重力を切る（自前で制御する）
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
@@ -38,15 +42,13 @@ public class PlayerMovement : MonoBehaviour
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
 
-        // Collider初期値を明示的に設定
         boxCollider.size = normalColliderSize;
         boxCollider.center = normalColliderCenter;
     }
 
-
     private void LateUpdate()
     {
-        // カメラ更新（CameraManager対応）
+        // カメラ追従・Collider維持処理（省略同様）
         if (CameraManager.Instance != null)
         {
             Camera activeCam = CameraManager.Instance.GetActiveCamera();
@@ -54,7 +56,6 @@ public class PlayerMovement : MonoBehaviour
                 cameraTransform = activeCam.transform;
         }
 
-        // Collider強制維持（Animatorや他の要因で戻される対策）
         if (isPartsMode)
         {
             boxCollider.size = partsColliderSize;
@@ -67,13 +68,11 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
     public void SetMoveInput(Vector2 input)
     {
         moveInput = input;
     }
 
-    // 部品化開始
     public void BeginPartsMode()
     {
         if (!isPartsMode)
@@ -83,7 +82,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // 部品化終了（狭い場所ではキャンセルされる）
     public void TryEndPartsMode()
     {
         if (!isInNarrowSpace)
@@ -95,7 +93,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        ApplyCustomGravity();  // ← 重力を追加
         HandleMovement();
+    }
+
+    /// <summary>
+    /// 通常より強い重力を加える
+    /// </summary>
+    private void ApplyCustomGravity()
+    {
+        // Unity標準のPhysics.gravityを拡張して適用
+        Vector3 customGravity = Physics.gravity * gravityMultiplier;
+        rb.AddForce(customGravity, ForceMode.Acceleration);
     }
 
     private void HandleMovement()
@@ -122,7 +131,6 @@ public class PlayerMovement : MonoBehaviour
         rb.MovePosition(rb.position + moveDir * speed * Time.fixedDeltaTime);
     }
 
-    // Colliderサイズ変更
     private void UpdateColliderSize(bool toParts)
     {
         if (toParts)
@@ -137,7 +145,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // 狭い空間の出入り検出（例：NarrowSpaceタグのCubeに触れている間）
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("NarrowSpace"))
