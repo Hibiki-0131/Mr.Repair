@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.34244603, g: 0.33457103, b: 0.3499297, a: 1}
+  m_IndirectSpecularColor: {r: 0.342446, g: 0.33457085, b: 0.3499295, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -13160,9 +13160,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!1 &507576694 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7739031543561390653, guid: 63370f8a0c4c483418b3531524b1ee51, type: 3}
@@ -24461,8 +24461,8 @@ Rigidbody:
   m_GameObject: {fileID: 901713621}
   serializedVersion: 4
   m_Mass: 200
-  m_Drag: 0
-  m_AngularDrag: 0
+  m_Drag: 2
+  m_AngularDrag: 2
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -24488,7 +24488,7 @@ Transform:
   m_GameObject: {fileID: 901713621}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.72, y: 1.359, z: 4.69}
+  m_LocalPosition: {x: 5.27, y: 1.3, z: 4.87}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -30217,6 +30217,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 313437873}
     m_Modifications:
+    - target: {fileID: 1708846896325756414, guid: 9b528fc16df9a0f4ba254264e311b88e, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 28957976cce511645aeb8b1c78f1a455, type: 2}
     - target: {fileID: 6124274847574729426, guid: 9b528fc16df9a0f4ba254264e311b88e, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
