@@ -3,12 +3,12 @@ using UnityEngine;
 public class PlayerRideHandler : MonoBehaviour
 {
     [Header("足元チェック設定")]
-    [SerializeField] private float recheckDistance = 0.2f; // Collider変化時にも下のブロックを再検知できる距離
+    [SerializeField] private float recheckDistance = 0.3f;
+    [SerializeField] private float platformStayGrace = 0.25f; // 一瞬離れても落ちない猶予時間
 
     private Transform currentPlatform;
     private Vector3 lastPlatformPos;
-    private float platformLostTimer = 0f;
-    private const float platformLostDelay = 0.1f; // 一瞬の接触切れを無視する時間
+    private float lostTimer = 0f;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -17,45 +17,47 @@ public class PlayerRideHandler : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if (currentPlatform == null) TrySetPlatform(collision);
-        if (currentPlatform == null) return;
-
-        Vector3 platformDelta = currentPlatform.position - lastPlatformPos;
-        transform.position += platformDelta;
-        lastPlatformPos = currentPlatform.position;
+        TrySetPlatform(collision);
     }
 
     private void OnCollisionExit(Collision collision)
     {
+        // すぐには切らず、一定時間様子を見る
         if (collision.transform == currentPlatform)
         {
-            // 一瞬の接触切れ（しゃがみなど）に対応するため、遅延解除
-            platformLostTimer = platformLostDelay;
+            lostTimer = platformStayGrace;
         }
     }
 
     private void FixedUpdate()
     {
-        // 足元再チェック（しゃがみ時のCollider変更にも対応）
-        if (currentPlatform == null || platformLostTimer > 0f)
+        // プラットフォーム追従（FixedUpdate に統一）
+        if (currentPlatform != null)
         {
-            platformLostTimer -= Time.fixedDeltaTime;
-            if (platformLostTimer <= 0f)
-            {
-                RaycastHit hit;
-                Vector3 origin = transform.position + Vector3.up * 0.05f;
-                if (Physics.Raycast(origin, Vector3.down, out hit, recheckDistance))
-                {
-                    if (hit.transform.GetComponent<RepeatMoverBlock>() ||
-                        hit.transform.GetComponent<SlideBlock>())
-                    {
-                        currentPlatform = hit.transform;
-                        lastPlatformPos = currentPlatform.position;
-                        return;
-                    }
-                }
+            Vector3 delta = currentPlatform.position - lastPlatformPos;
+            transform.position += delta;
+            lastPlatformPos = currentPlatform.position;
+        }
 
-                currentPlatform = null; // 足元にブロックがない
+        // 接触が切れてもすぐには解除しない
+        if (lostTimer > 0f)
+        {
+            lostTimer -= Time.fixedDeltaTime;
+            if (lostTimer <= 0f)
+                currentPlatform = null;
+        }
+
+        // ブロックの再検出
+        if (currentPlatform == null)
+        {
+            if (Physics.Raycast(transform.position + Vector3.up * 0.05f, Vector3.down, out RaycastHit hit, recheckDistance))
+            {
+                if (hit.transform.GetComponent<RepeatMoverBlock>() ||
+                    hit.transform.GetComponent<SlideBlock>())
+                {
+                    currentPlatform = hit.transform;
+                    lastPlatformPos = currentPlatform.position;
+                }
             }
         }
     }
@@ -67,7 +69,7 @@ public class PlayerRideHandler : MonoBehaviour
         {
             currentPlatform = collision.transform;
             lastPlatformPos = currentPlatform.position;
-            platformLostTimer = 0f;
+            lostTimer = 0f;
         }
     }
 }

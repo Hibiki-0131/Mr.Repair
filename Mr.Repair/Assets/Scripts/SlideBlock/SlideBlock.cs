@@ -21,10 +21,10 @@ public class SlideBlock : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true; // ← 他オブジェクトを弾かない
+        rb.isKinematic = true;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative; // ★これを追加
     }
-
     private void Start()
     {
         startPos = transform.position;
