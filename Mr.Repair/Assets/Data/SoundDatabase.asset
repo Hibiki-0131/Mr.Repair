@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7dd4112a2c87c34da525e967452bc72, type: 3}
   m_Name: SoundDatabase
   m_EditorClassIdentifier: 
-  sounds: []
+  sounds:
+  - key: walk
+    clip: {fileID: 8300000, guid: bcf32b285f3d1b547b32b192b992a41b, type: 3}
+    category: 0

@@ -27,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isInNarrowSpace = false;
 
     public bool IsPartsMode => isPartsMode;
+    public bool IsMoving => moveInput.sqrMagnitude > 0.01f;
+
 
     private void Awake()
     {

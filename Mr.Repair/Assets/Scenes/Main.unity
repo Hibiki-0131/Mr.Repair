@@ -25366,7 +25366,7 @@ GameObject:
   - component: {fileID: 901713630}
   - component: {fileID: 901713631}
   - component: {fileID: 901713632}
-  - component: {fileID: 901713633}
+  - component: {fileID: 901713634}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -25629,7 +25629,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   recheckDistance: 0.2
   platformStayGrace: 0.25
---- !u!114 &901713633
+--- !u!114 &901713634
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -25638,12 +25638,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 901713621}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f024ff7278e92446a4c050f24b43607, type: 3}
+  m_Script: {fileID: 11500000, guid: eae999339171f59429b0194e9e5544a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  database: {fileID: 11400000, guid: 0fe722dfd4273eb4bbd36e0ddf4b7305, type: 2}
-  soundKey: 
-  playOnStart: 0
+  soundTrigger: {fileID: 0}
+  footstepInterval: 0.2
 --- !u!1 &902295625
 GameObject:
   m_ObjectHideFlags: 0

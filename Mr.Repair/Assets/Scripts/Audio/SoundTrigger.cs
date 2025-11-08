@@ -3,26 +3,22 @@ using UnityEngine;
 public class SoundTrigger : MonoBehaviour
 {
     [SerializeField] private SoundDatabase database;
-    [SerializeField] private string soundKey;
-    [SerializeField] private bool playOnStart = false;
 
-    private void Start()
+    public void PlayByKey(string key, Vector3 position)
     {
-        if (playOnStart) PlayAt(transform.position);
-    }
-
-    public void PlayAt(Vector3 position)
-    {
-        var sound = database.GetSound(soundKey);
-        if (sound != null)
+        if (database == null)
         {
-            SoundPlayer.Instance.PlaySound(sound.clip, sound.category, position);
+            Debug.LogError("SoundTrigger: SoundDatabase が設定されていません。");
+            return;
         }
-    }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-            PlayAt(transform.position);
+        var sound = database.GetSound(key);
+        if (sound == null)
+        {
+            Debug.LogWarning($"SoundTrigger: '{key}' に対応する音がデータベースに存在しません。");
+            return;
+        }
+
+        SoundPlayer.Instance.PlaySound(sound.clip, sound.category, position);
     }
 }
