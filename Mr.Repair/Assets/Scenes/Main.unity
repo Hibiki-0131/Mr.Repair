@@ -25640,7 +25640,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soundTrigger: {fileID: 0}
-  footstepInterval: 0.2
+  footstepInterval: 0.5
 --- !u!1 &902295625
 GameObject:
   m_ObjectHideFlags: 0

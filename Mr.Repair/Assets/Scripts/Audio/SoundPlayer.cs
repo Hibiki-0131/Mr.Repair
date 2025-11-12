@@ -30,7 +30,7 @@ public class SoundPlayer : MonoBehaviour
         source.volume = volume;
         source.spatialBlend = 1f; // —§‘Ì‰¹‹¿
         source.minDistance = 1f;
-        source.maxDistance = 20f;
+        source.maxDistance = 50f;
         source.rolloffMode = AudioRolloffMode.Linear;
 
         source.Play();
