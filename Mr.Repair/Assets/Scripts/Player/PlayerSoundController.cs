@@ -48,7 +48,7 @@ public class PlayerSoundController : MonoBehaviour
                 footstepTimer = footstepInterval;
             }
         }
-        else if(isPartsWalking)
+        else if (isPartsWalking)
         {
             footstepTimer -= Time.deltaTime;
             if (footstepTimer <= 0f)
@@ -74,5 +74,12 @@ public class PlayerSoundController : MonoBehaviour
                 soundTrigger.PlayByKey("parts_restore", transform.position);
         }
         lastPartsMode = current;
+    }
+
+    //  スイッチを押したときの音
+    public void PlaySwitchSound(Vector3 position)
+    {
+        if (soundTrigger == null) return;
+        soundTrigger.PlayByKey("switch_press", position);
     }
 }

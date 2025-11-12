@@ -7,6 +7,12 @@ public class SlideSwitch : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        var sound = other.GetComponent<PlayerSoundController>();
+        if (sound != null)
+        {
+            sound.PlaySwitchSound(transform.position);
+        }
+
         if (!isPressed && other.CompareTag("Player"))
         {
             isPressed = true;
