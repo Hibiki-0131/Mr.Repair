@@ -26,5 +26,5 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: df01b8b09ddee8f4f9be09f672bbaa89, type: 3}
     category: 0
   - key: switch_press
-    clip: {fileID: 8300000, guid: 84cc03dd75da46a4aa122ef14dc8dcce, type: 3}
+    clip: {fileID: 8300000, guid: 4f7f9c3349f86754cb8dee09747c3f55, type: 3}
     category: 0
