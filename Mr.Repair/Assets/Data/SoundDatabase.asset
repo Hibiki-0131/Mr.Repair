@@ -16,3 +16,12 @@ MonoBehaviour:
   - key: walk
     clip: {fileID: 8300000, guid: bcf32b285f3d1b547b32b192b992a41b, type: 3}
     category: 0
+  - key: parts_transform
+    clip: {fileID: 8300000, guid: 08d9f803396232c46a0c15db58067b3f, type: 3}
+    category: 0
+  - key: parts_restore
+    clip: {fileID: 8300000, guid: b4949a4f925e89e41bbe12425819c2d1, type: 3}
+    category: 0
+  - key: parts_walk
+    clip: {fileID: 8300000, guid: df01b8b09ddee8f4f9be09f672bbaa89, type: 3}
+    category: 0

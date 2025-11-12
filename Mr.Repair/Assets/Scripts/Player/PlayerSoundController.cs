@@ -37,6 +37,7 @@ public class PlayerSoundController : MonoBehaviour
     private void HandleFootstepSound()
     {
         bool isWalking = movement.IsMoving && !movement.IsPartsMode;
+        bool isPartsWalking = movement.IsMoving && movement.IsPartsMode;
 
         if (isWalking)
         {
@@ -44,6 +45,15 @@ public class PlayerSoundController : MonoBehaviour
             if (footstepTimer <= 0f)
             {
                 soundTrigger.PlayByKey("walk", transform.position);
+                footstepTimer = footstepInterval;
+            }
+        }
+        else if(isPartsWalking)
+        {
+            footstepTimer -= Time.deltaTime;
+            if (footstepTimer <= 0f)
+            {
+                soundTrigger.PlayByKey("parts_walk", transform.position);
                 footstepTimer = footstepInterval;
             }
         }
