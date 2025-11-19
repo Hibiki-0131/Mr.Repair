@@ -1,22 +1,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteAlways]   // ← これを追加
 public class BlockFactoryInitializer : MonoBehaviour
 {
     [Header("Block Prefab Settings")]
-    public GameObject wallPrefab;   // CSVの '1' 用
-    public GameObject floorPrefab;  // 必要なら '2' など追加
-    // public GameObject trapPrefab; // 追加の種類もここに
+    public GameObject wallPrefab;   // CSV '1' 用（Tile_Floor でOK, 1×1×1なら）
+    public GameObject floorPrefab;  // 使わないなら null のままでOK
 
     private void Awake()
     {
+        Init();
+    }
+
+    private void OnEnable()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        if (wallPrefab == null)
+        {
+            Debug.LogWarning("BlockFactoryInitializer: wallPrefab が設定されていません");
+            return;
+        }
+
         var map = new Dictionary<char, GameObject>()
         {
-            { '1', wallPrefab },  // 壁
-            { '0', null },        // 0は空白（生成しない）
-            // { '2', trapPrefab },
+            { '1', wallPrefab },  // ブロックを置く
+            { '0', null },        // 何も置かない → 穴
         };
 
         BlockFactory.Initialize(map);
+        Debug.Log("BlockFactory initialized.");
     }
 }
