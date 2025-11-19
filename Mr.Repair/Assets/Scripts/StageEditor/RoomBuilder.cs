@@ -23,6 +23,7 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
+        // 既存の内容を削除
         foreach (Transform child in contentRoot)
             DestroyImmediate(child.gameObject);
 
@@ -33,6 +34,9 @@ public class RoomBuilder : MonoBehaviour
         foreach (var layer in layers)
         {
             string[] lines = layer.Trim().Split('\n');
+
+            // ★ 修正：lines を取得した後でログを出す
+            Debug.Log($"Building layer {height}: first line = {lines[0]}");
 
             for (int y = 0; y < lines.Length; y++)
             {
@@ -53,4 +57,5 @@ public class RoomBuilder : MonoBehaviour
             height++;
         }
     }
+
 }
