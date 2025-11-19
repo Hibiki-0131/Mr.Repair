@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2786d9026ef41b47864dce35ce8c095, type: 3}
-  m_Name: RoomMetadata
+  m_Name: MoveTutorialRoom
   m_EditorClassIdentifier: 
-  roomName: 
-  description: 
-  roomCsv: {fileID: 0}
+  roomName: MoveTutorialRoom
+  description: "Player\u306E\u6700\u521D\u306E\u30C1\u30E5\u30FC\u30C8\u30EA\u30A2\u30EB\u90E8\u5C4B"
+  roomCsv: {fileID: 4900000, guid: 4734790abef153f45b8ad87312653534, type: 3}
   roomColor: {r: 1, g: 1, b: 1, a: 1}
   traps: []
   decorations: []

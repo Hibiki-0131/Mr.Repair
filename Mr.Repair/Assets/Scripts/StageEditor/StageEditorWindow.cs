@@ -47,12 +47,23 @@ public class StageEditorWindow : EditorWindow
         GameObject room = (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
         room.name = selectedMetadata.roomName;
 
-        var holder = room.GetComponent<RoomMetadataHolder>();
+        var holder = room.GetComponentInChildren<RoomMetadataHolder>();
+        if (holder == null)
+        {
+            Debug.LogError("RoomMetadataHolder ‚ª RoomCube “à‚É‚ ‚è‚Ü‚¹‚ñ");
+            return;
+        }
         holder.metadata = selectedMetadata;
 
-        var builder = room.GetComponent<RoomBuilder>();
-        builder.BuildRoom();
+        var builder = room.GetComponentInChildren<RoomBuilder>();
+        if (builder == null)
+        {
+            Debug.LogError("RoomBuilder ‚ª RoomCube “à‚É‚ ‚è‚Ü‚¹‚ñ");
+            return;
+        }
 
+        builder.BuildRoom();
         Selection.activeGameObject = room;
     }
+
 }

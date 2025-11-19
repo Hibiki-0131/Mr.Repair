@@ -7,8 +7,12 @@ public class RoomBuilder : MonoBehaviour
 
     private void Reset()
     {
-        contentRoot = transform.Find("ContentRoot");
-        metadataHolder = GetComponent<RoomMetadataHolder>();
+        Transform root = transform.parent;
+        if (root != null)
+        {
+            contentRoot = root.Find("ContentRoot");
+            metadataHolder = root.GetComponent<RoomMetadataHolder>();
+        }
     }
 
     public void BuildRoom()
@@ -19,7 +23,6 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
-        // 以前のブロックを消す
         foreach (Transform child in contentRoot)
             DestroyImmediate(child.gameObject);
 
