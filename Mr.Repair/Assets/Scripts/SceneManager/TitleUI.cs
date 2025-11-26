@@ -5,7 +5,7 @@ public class TitleUI : MonoBehaviour
     public void OnStartButton()
     {
         GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
-        SceneController.Instance.LoadSceneAsync("Main");
+        StageManager.Instance.StartFirstStage();   // © ’Ç‰ÁI
     }
 
     public void OnExitButton() => Application.Quit();

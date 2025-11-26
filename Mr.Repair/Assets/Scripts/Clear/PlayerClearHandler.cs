@@ -9,14 +9,14 @@ public class PlayerClearHandler : MonoBehaviour
         if (isCleared) return;
         isCleared = true;
 
-        // ゲームオーバー画面へ遷移
-        StartCoroutine(GoToGameClear());
+        StartCoroutine(GoToNextStage());
     }
 
-    private System.Collections.IEnumerator GoToGameClear()
+    private System.Collections.IEnumerator GoToNextStage()
     {
-        // 少し待ってからゲームオーバーへ
         yield return new WaitForSeconds(0f);
-        SceneController.Instance.LoadSceneAsync("GameClear");
+
+        // ★ここを変更：次のステージへ進む
+        StageManager.Instance.ClearStage();
     }
 }

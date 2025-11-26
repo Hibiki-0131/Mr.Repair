@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteAlways]   // ← これを追加
+[ExecuteAlways]
 public class BlockFactoryInitializer : MonoBehaviour
 {
     [Header("Block Prefab Settings")]
-    public GameObject wallPrefab;   // CSV '1' 用（Tile_Floor でOK, 1×1×1なら）
-    public GameObject floorPrefab;  // 使わないなら null のままでOK
+    public GameObject wallPrefab;   // CSV '1' 用
+    public GameObject goalPrefab;   // CSV '2' 用（★追加）
 
     private void Awake()
     {
@@ -28,8 +28,9 @@ public class BlockFactoryInitializer : MonoBehaviour
 
         var map = new Dictionary<char, GameObject>()
         {
-            { '1', wallPrefab },  // ブロックを置く
-            { '0', null },        // 何も置かない → 穴
+            { '1', wallPrefab },  // ブロック
+            { '2', goalPrefab },  // ゴールスポット（★追加）
+            { '0', null },        // 空白/穴
         };
 
         BlockFactory.Initialize(map);

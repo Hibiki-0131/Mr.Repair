@@ -5,8 +5,11 @@ public class ClearTrigger : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        Debug.Log("Trigger Enter: " + other.name);  // ← デバッグ追加
+
+        if (other.CompareTag("ClearCube"))
         {
+            Debug.Log("Player detected!");
             var playerClear = other.GetComponent<PlayerClearHandler>();
             if (playerClear != null)
             {
