@@ -69,9 +69,10 @@ public class RoomBuilder : MonoBehaviour
 
                     if (prefab != null)
                     {
-                        Vector3 pos = new Vector3(x, currentY + yOffset, z) * voxelSize;
+                        int zReversed = (lines.Length - 1) - z;
+                        Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
                         Instantiate(prefab, pos, Quaternion.identity, contentRoot);
-                        solid[x, currentY, z] = true;
+                        solid[x, currentY, zReversed] = true;
                     }
                 }
             }
