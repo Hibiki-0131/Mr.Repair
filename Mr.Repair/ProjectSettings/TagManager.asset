@@ -10,6 +10,7 @@ TagManager:
   - DeathZone
   - FollowerBlock
   - ClearCube
+  - Ground
   layers:
   - Default
   - TransparentFX

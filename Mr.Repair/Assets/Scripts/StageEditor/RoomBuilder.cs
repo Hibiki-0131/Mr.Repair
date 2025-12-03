@@ -5,15 +5,28 @@ public class RoomBuilder : MonoBehaviour
     [SerializeField] private Transform contentRoot;
     [SerializeField] private RoomMetadataHolder metadataHolder;
 
-    [Header("Voxel Settings")]
-    public float voxelSize = 1f;
-    public int yOffset = 0;
+    [SerializeField] private float voxelSize = 1f;
+    [SerializeField] private int yOffset = 0;
 
-    // 外部から block 配置を参照できる
-    public bool[,,] solid;
-    public int width;
-    public int heightCount;
-    public int depth;
+    private bool[,,] solid;  // ← 穴埋めに使うグリッドデータ
+
+    // 他クラス（PushableBlock）から参照するための公開プロパティ
+    public bool[,,] SolidGrid => solid;
+    public float VoxelSize => voxelSize;
+    public int YOffset => yOffset;
+
+    public static RoomBuilder Instance { get; private set; }
+
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        BuildRoom();  // ← 追加！
+    }
 
     private void Reset()
     {
@@ -33,10 +46,16 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
+        // Child の削除
         foreach (Transform child in contentRoot)
             DestroyImmediate(child.gameObject);
 
-        string csv = metadataHolder.metadata.roomCsv.text.Replace("\r", "");
+        string csv = metadataHolder.metadata.roomCsv.text;
+
+        // ★ 改行コード CR を削除してから split する
+        csv = csv.Replace("\r", "");
+
+        // レイヤーで区切る
         string[] layers = csv.Split(new string[] { "---" }, System.StringSplitOptions.RemoveEmptyEntries);
 
         if (layers.Length == 0)
@@ -45,12 +64,13 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
+        // 1層目から幅と奥行きを算出
         string[] firstLines = layers[0].Trim().Split('\n');
-        depth = firstLines.Length;
-        width = firstLines[0].Trim().Length;
-        heightCount = layers.Length;
+        int depth = firstLines.Length;
+        int width = firstLines[0].Trim().Length;
+        int height = layers.Length;
 
-        solid = new bool[width, heightCount, depth];
+        solid = new bool[width, height, depth];
 
         int currentY = 0;
 
@@ -61,7 +81,6 @@ public class RoomBuilder : MonoBehaviour
             for (int z = 0; z < lines.Length; z++)
             {
                 string line = lines[z].Trim();
-                int zReversed = (lines.Length - 1) - z;
 
                 for (int x = 0; x < line.Length; x++)
                 {
@@ -70,14 +89,11 @@ public class RoomBuilder : MonoBehaviour
 
                     if (prefab != null)
                     {
+                        int zReversed = (lines.Length - 1) - z;
+
                         Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
-                        var obj = Instantiate(prefab, pos, Quaternion.identity, contentRoot);
 
-                        // CarryBlock 初期化
-                        var pb = obj.GetComponent<PushableBlock>();
-                        if (pb != null)
-                            pb.Init(this);
-
+                        Instantiate(prefab, pos, Quaternion.identity, contentRoot);
                         solid[x, currentY, zReversed] = true;
                     }
                 }
@@ -86,23 +102,21 @@ public class RoomBuilder : MonoBehaviour
             currentY++;
         }
 
+        // voxel 最適化コリジョン生成
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
         Debug.Log("Room build complete.");
     }
 
-    // 穴埋め用
-    public void SetSolidVoxel(int x, int y, int z, bool value)
+    // ★ 穴を埋める（carryblock が落ちたとき呼ぶ）
+    public void FillHole(int x, int y, int z)
     {
-        if (x < 0 || x >= width) return;
-        if (y < 0 || y >= heightCount) return;
-        if (z < 0 || z >= depth) return;
+        if (solid == null) return;
 
-        solid[x, y, z] = value;
-    }
+        solid[x, y, z] = true;
 
-    // コライダー再生成
-    public void RebuildColliders()
-    {
+        // コライダー再構築
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
+
+        Debug.Log($"Hole filled at {x},{y},{z}");
     }
 }

@@ -8,13 +8,7 @@ public class PushableBlock : MonoBehaviour
     [SerializeField] private float gravityMultiplier = 5f;
 
     private Rigidbody rb;
-    private bool settled = false;
-    private RoomBuilder builder;
-
-    public void Init(RoomBuilder room)
-    {
-        builder = room;
-    }
+    private bool isSettled = false; // 穴にハマった後は true
 
     private void Awake()
     {
@@ -29,62 +23,60 @@ public class PushableBlock : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!settled)
+        if (!isSettled)
             rb.AddForce(Physics.gravity * gravityMultiplier, ForceMode.Acceleration);
+    }
 
-        // 穴に入った条件を満たすと埋める
-        if (!settled && ShouldSettle())
+    private void OnCollisionEnter(Collision collision)
+    {
+        // 一度固定されたらもう処理しない
+        if (isSettled) return;
+
+        // GroundTag として RoomBuilder の床か他のブロックと接触したとき
+        if (collision.gameObject.CompareTag("Ground"))
         {
-            SettleIntoHole();
+            TrySettleIntoHole();
         }
     }
 
-    /// <summary>
-    /// 穴にハマったかどうかを判定する
-    /// </summary>
-    private bool ShouldSettle()
+    private void TrySettleIntoHole()
     {
-        if (builder == null) return false;
+        var builder = RoomBuilder.Instance;
+        if (builder == null)
+        {
+            Debug.LogError("RoomBuilder.Instance が見つかりません");
+            return;
+        }
 
-        // voxel 座標に変換
-        Vector3 local = builder.transform.InverseTransformPoint(transform.position);
+        if (builder.SolidGrid == null)
+        {
+            Debug.LogError("RoomBuilder.SolidGrid が初期化されていません");
+            return;
+        }
 
-        int vx = Mathf.RoundToInt(local.x / builder.voxelSize);
-        int vy = Mathf.RoundToInt(local.y / builder.voxelSize);
-        int vz = Mathf.RoundToInt(local.z / builder.voxelSize);
+        Vector3 pos = transform.position;
+        int x = Mathf.RoundToInt(pos.x / builder.VoxelSize);
+        int z = Mathf.RoundToInt(pos.z / builder.VoxelSize);
+        int y = 0;
 
-        // 範囲外は無視
-        if (vx < 0 || vx >= builder.width) return false;
-        if (vy < 0 || vy >= builder.heightCount) return false;
-        if (vz < 0 || vz >= builder.depth) return false;
+        // ★ 範囲チェック（これがないと例外が出る）
+        if (x < 0 || x >= builder.SolidGrid.GetLength(0)) return;
+        if (y < 0 || y >= builder.SolidGrid.GetLength(1)) return;
+        if (z < 0 || z >= builder.SolidGrid.GetLength(2)) return;
 
-        // ★ 穴の判定（solid=false → 穴）
-        if (builder.solid[vx, vy, vz] == true)
-            return false;
+        if (!builder.SolidGrid[x, y, z])
+        {
+            builder.FillHole(x, y, z);
 
-        // 地面に触ったときのみ埋まる（暴走防止）
-        return Physics.Raycast(transform.position, Vector3.down, 0.6f);
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+
+            isSettled = true;
+
+            Debug.Log("Block settled into hole.");
+        }
     }
 
-    private void SettleIntoHole()
-    {
-        settled = true;
-
-        rb.isKinematic = true;
-        rb.useGravity = false;
-
-        Vector3 local = builder.transform.InverseTransformPoint(transform.position);
-
-        int vx = Mathf.RoundToInt(local.x / builder.voxelSize);
-        int vy = Mathf.RoundToInt(local.y / builder.voxelSize);
-        int vz = Mathf.RoundToInt(local.z / builder.voxelSize);
-
-        // 穴を埋める
-        builder.SetSolidVoxel(vx, vy, vz, true);
-
-        // コライダー再構築（床と一体化）
-        builder.RebuildColliders();
-
-        Debug.Log($"CarryBlock settled at voxel ({vx},{vy},{vz})");
-    }
 }
