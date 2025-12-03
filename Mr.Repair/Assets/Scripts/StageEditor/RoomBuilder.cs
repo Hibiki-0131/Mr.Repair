@@ -8,9 +8,8 @@ public class RoomBuilder : MonoBehaviour
     [SerializeField] private float voxelSize = 1f;
     [SerializeField] private int yOffset = 0;
 
-    private bool[,,] solid;  // ← 穴埋めに使うグリッドデータ
+    private bool[,,] solid;  // ← 穴埋めや地形コライダー生成に使用
 
-    // 他クラス（PushableBlock）から参照するための公開プロパティ
     public bool[,,] SolidGrid => solid;
     public float VoxelSize => voxelSize;
     public int YOffset => yOffset;
@@ -25,7 +24,7 @@ public class RoomBuilder : MonoBehaviour
 
     private void Start()
     {
-        BuildRoom();  // ← 追加！
+        BuildRoom();
     }
 
     private void Reset()
@@ -38,6 +37,10 @@ public class RoomBuilder : MonoBehaviour
         }
     }
 
+
+    // ============================================================
+    //  ▼ ルーム構築
+    // ============================================================
     public void BuildRoom()
     {
         if (metadataHolder == null || metadataHolder.metadata == null)
@@ -46,12 +49,13 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
-        // Child の削除
+        // ▼ 古いオブジェクト破棄
         foreach (Transform child in contentRoot)
+        {
             DestroyImmediate(child.gameObject);
+        }
 
         string csv = metadataHolder.metadata.roomCsv.text;
-
         csv = csv.Replace("\r", "");
 
         string[] layers = csv.Split(new string[] { "---" }, System.StringSplitOptions.RemoveEmptyEntries);
@@ -61,6 +65,7 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
+        // ▼ マップサイズ
         string[] firstLines = layers[0].Trim().Split('\n');
         int depth = firstLines.Length;
         int width = firstLines[0].Trim().Length;
@@ -86,21 +91,23 @@ public class RoomBuilder : MonoBehaviour
                     if (prefab != null)
                     {
                         int zReversed = (lines.Length - 1) - z;
-
                         Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
 
-                        // ★ ここを修正 → インスタンスを取得する
-                        GameObject blockObj =
-                            Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+                        // 見た目 生成
+                        GameObject obj = Instantiate(prefab, pos, Quaternion.identity, contentRoot);
 
-                        // ★ PushableBlock なら元Prefab をセット
-                        PushableBlock pb = blockObj.GetComponent<PushableBlock>();
-                        if (pb != null)
+                        // ▼ '1' '2' のみ "地形" として solid に入れる
+                        if (code == '1' || code == '2')
                         {
-                            pb.SetPrefabReference(prefab);
+                            solid[x, currentY, zReversed] = true;
                         }
 
-                        solid[x, currentY, zReversed] = true;
+                        // ▼ PushableBlock の復元用に prefab を持たせる
+                        PushableBlock pb = obj.GetComponent<PushableBlock>();
+                        if (pb != null)
+                        {
+                            pb.prefabReference = prefab;
+                        }
                     }
                 }
             }
@@ -108,19 +115,23 @@ public class RoomBuilder : MonoBehaviour
             currentY++;
         }
 
+        // ▼ voxel 最適化コライダー生成
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
+
         Debug.Log("Room build complete.");
     }
 
-
-    // ★ 穴を埋める（carryblock が落ちたとき呼ぶ）
+    // ============================================================
+    //  ▼ 穴を埋める（carryblock が落ちた時に呼ぶ）
+    // ============================================================
     public void FillHole(int x, int y, int z)
     {
-        if (solid == null) return;
+        if (solid == null)
+            return;
 
         solid[x, y, z] = true;
 
-        // コライダー再構築
+        // ▼ コライダー再構築
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
 
         Debug.Log($"Hole filled at {x},{y},{z}");
