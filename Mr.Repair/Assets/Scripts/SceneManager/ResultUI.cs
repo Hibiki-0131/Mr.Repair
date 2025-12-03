@@ -8,7 +8,7 @@ public class ResultUI : MonoBehaviour
     public void OnRetry()
     {
         GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
-        SceneController.Instance.LoadSceneAsync("Main");
+        SceneController.Instance.LoadSceneAsync("1_1");
     }
 
     /// <summary>

@@ -1,16 +1,12 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class StageManager : MonoBehaviour
 {
     public static StageManager Instance { get; private set; }
 
-#if UNITY_EDITOR
-    // Editor でだけ SceneAsset を使う
-    public UnityEditor.SceneAsset[] stageSceneAssets;
-#endif
-
-    [SerializeField]
-    private string[] stageNames;  // 実際にロードするシーン名
+    [Header("ロードしたい順番でシーン名を並べる")]
+    [SerializeField] private List<string> stageOrder = new List<string>();
 
     private int currentStageIndex = 0;
 
@@ -21,29 +17,15 @@ public class StageManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-#if UNITY_EDITOR
-        // エディタ上でシーン名を自動更新
-        UpdateSceneNamesFromAssets();
-#endif
-    }
-
-#if UNITY_EDITOR
-    private void UpdateSceneNamesFromAssets()
-    {
-        if (stageSceneAssets == null) return;
-
-        stageNames = new string[stageSceneAssets.Length];
-
-        for (int i = 0; i < stageSceneAssets.Length; i++)
+        if (stageOrder.Count == 0)
         {
-            if (stageSceneAssets[i] != null)
-                stageNames[i] = stageSceneAssets[i].name;
+            Debug.LogError("StageManager にステージが1つも登録されていません！");
         }
     }
-#endif
 
     public void StartFirstStage()
     {
@@ -55,9 +37,8 @@ public class StageManager : MonoBehaviour
     {
         currentStageIndex++;
 
-        if (currentStageIndex >= stageNames.Length)
+        if (currentStageIndex >= stageOrder.Count)
         {
-            // 全ステージクリア
             GameStateManager.Instance.SetState(GameStateManager.GameState.GameClear);
             SceneController.Instance.LoadSceneAsync("Result");
             return;
@@ -68,12 +49,24 @@ public class StageManager : MonoBehaviour
 
     private void LoadCurrentStage()
     {
+        if (currentStageIndex < 0 || currentStageIndex >= stageOrder.Count)
+        {
+            Debug.LogError("Stage index が範囲外です");
+            return;
+        }
+
+        string sceneName = stageOrder[currentStageIndex];
+        Debug.Log("Load Stage: " + sceneName);
+
         GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
-        SceneController.Instance.LoadSceneAsync(stageNames[currentStageIndex]);
+        SceneController.Instance.LoadSceneAsync(sceneName);
     }
 
     public string GetCurrentStageName()
     {
-        return stageNames[currentStageIndex];
+        if (currentStageIndex < 0 || currentStageIndex >= stageOrder.Count)
+            return "Unknown";
+
+        return stageOrder[currentStageIndex];
     }
 }
