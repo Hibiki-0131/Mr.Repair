@@ -5,8 +5,9 @@ using UnityEngine;
 public class BlockFactoryInitializer : MonoBehaviour
 {
     [Header("Block Prefab Settings")]
-    public GameObject wallPrefab;   // CSV '1' 用
-    public GameObject goalPrefab;   // CSV '2' 用（★追加）
+    public GameObject wallPrefab;      // CSV '1' 用
+    public GameObject goalPrefab;      // CSV '2' 用
+    public GameObject carryBlockPrefab; // CSV '3' 用（★追加）
 
     private void Awake()
     {
@@ -20,17 +21,18 @@ public class BlockFactoryInitializer : MonoBehaviour
 
     private void Init()
     {
+        // 壁プレハブが未設定なら警告
         if (wallPrefab == null)
         {
             Debug.LogWarning("BlockFactoryInitializer: wallPrefab が設定されていません");
-            return;
         }
 
         var map = new Dictionary<char, GameObject>()
         {
-            { '1', wallPrefab },  // ブロック
-            { '2', goalPrefab },  // ゴールスポット（★追加）
-            { '0', null },        // 空白/穴
+            { '1', wallPrefab },        // 壁
+            { '2', goalPrefab },        // ゴール
+            { '3', carryBlockPrefab },  // ★ CarryBlock（PushableBlock）
+            { '0', null },              // 空白/穴
         };
 
         BlockFactory.Initialize(map);

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PauseMenuUI : MonoBehaviour
 {
-    [SerializeField] private GameObject pauseUI;  // ポーズメニューCanvas
+    [SerializeField] private GameObject pauseUI;
 
     public void Pause()
     {
@@ -18,9 +18,20 @@ public class PauseMenuUI : MonoBehaviour
 
     public void ReturnToTitle()
     {
-        // ポーズ中でもシーンを切り替えられるようにタイムスケールを戻す
         GameStateManager.Instance.SetState(GameStateManager.GameState.Title);
         SceneController.Instance.LoadSceneAsync("Title");
         GameStateManager.Instance.ResumeGame();
+    }
+
+    /// <summary>
+    /// ★ Reset ボタンから呼ばれる
+    /// </summary>
+    public void Reset()
+    {
+        // Pause 解除してから Reset すると安全
+        GameStateManager.Instance.ResumeGame();
+        pauseUI.SetActive(false);
+
+        ResettableStageController.Instance.ResetStage();
     }
 }

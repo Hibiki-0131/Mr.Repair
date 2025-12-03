@@ -52,19 +52,15 @@ public class RoomBuilder : MonoBehaviour
 
         string csv = metadataHolder.metadata.roomCsv.text;
 
-        // ★ 改行コード CR を削除してから split する
         csv = csv.Replace("\r", "");
 
-        // レイヤーで区切る
         string[] layers = csv.Split(new string[] { "---" }, System.StringSplitOptions.RemoveEmptyEntries);
-
         if (layers.Length == 0)
         {
             Debug.LogWarning("CSV にレイヤーがありません");
             return;
         }
 
-        // 1層目から幅と奥行きを算出
         string[] firstLines = layers[0].Trim().Split('\n');
         int depth = firstLines.Length;
         int width = firstLines[0].Trim().Length;
@@ -93,7 +89,17 @@ public class RoomBuilder : MonoBehaviour
 
                         Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
 
-                        Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+                        // ★ ここを修正 → インスタンスを取得する
+                        GameObject blockObj =
+                            Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+
+                        // ★ PushableBlock なら元Prefab をセット
+                        PushableBlock pb = blockObj.GetComponent<PushableBlock>();
+                        if (pb != null)
+                        {
+                            pb.SetPrefabReference(prefab);
+                        }
+
                         solid[x, currentY, zReversed] = true;
                     }
                 }
@@ -102,10 +108,10 @@ public class RoomBuilder : MonoBehaviour
             currentY++;
         }
 
-        // voxel 最適化コリジョン生成
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
         Debug.Log("Room build complete.");
     }
+
 
     // ★ 穴を埋める（carryblock が落ちたとき呼ぶ）
     public void FillHole(int x, int y, int z)

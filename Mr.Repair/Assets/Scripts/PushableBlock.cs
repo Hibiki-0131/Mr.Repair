@@ -4,6 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class PushableBlock : MonoBehaviour
 {
+    [Header("Original Prefab (Reset 用)")]
+    public GameObject prefabReference;   // ★ Reset に必要
+
     [Header("Gravity Settings")]
     [SerializeField] private float gravityMultiplier = 5f;
 
@@ -29,15 +32,37 @@ public class PushableBlock : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // 一度固定されたらもう処理しない
         if (isSettled) return;
 
-        // GroundTag として RoomBuilder の床か他のブロックと接触したとき
         if (collision.gameObject.CompareTag("Ground"))
         {
             TrySettleIntoHole();
         }
     }
+
+
+    // ----------------------------------------------------
+    // ★ ResettableStageController / RoomBuilder が利用する API
+    // ----------------------------------------------------
+
+    public void SetPrefabReference(GameObject prefab)
+    {
+        prefabReference = prefab;
+    }
+
+    public void MarkAsSettled()
+    {
+        isSettled = true;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+    }
+
+
+    // ----------------------------------------------------
+    // ★ 穴にはまって固定される処理
+    // ----------------------------------------------------
 
     private void TrySettleIntoHole()
     {
@@ -59,24 +84,18 @@ public class PushableBlock : MonoBehaviour
         int z = Mathf.RoundToInt(pos.z / builder.VoxelSize);
         int y = 0;
 
-        // ★ 範囲チェック（これがないと例外が出る）
+        // ★ 範囲チェック
         if (x < 0 || x >= builder.SolidGrid.GetLength(0)) return;
         if (y < 0 || y >= builder.SolidGrid.GetLength(1)) return;
         if (z < 0 || z >= builder.SolidGrid.GetLength(2)) return;
 
+        // ★ 落ちたマスが「穴」なら埋める
         if (!builder.SolidGrid[x, y, z])
         {
             builder.FillHole(x, y, z);
 
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = true;
-            rb.constraints = RigidbodyConstraints.FreezeAll;
-
-            isSettled = true;
-
+            MarkAsSettled();
             Debug.Log("Block settled into hole.");
         }
     }
-
 }
