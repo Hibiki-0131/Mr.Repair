@@ -5,8 +5,15 @@ public class RoomBuilder : MonoBehaviour
     [SerializeField] private Transform contentRoot;
     [SerializeField] private RoomMetadataHolder metadataHolder;
 
-    [SerializeField] private float voxelSize = 1f;
-    [SerializeField] private int yOffset = 0;
+    [Header("Voxel Settings")]
+    public float voxelSize = 1f;
+    public int yOffset = 0;
+
+    // 外部から block 配置を参照できる
+    public bool[,,] solid;
+    public int width;
+    public int heightCount;
+    public int depth;
 
     private void Reset()
     {
@@ -29,11 +36,7 @@ public class RoomBuilder : MonoBehaviour
         foreach (Transform child in contentRoot)
             DestroyImmediate(child.gameObject);
 
-        string csv = metadataHolder.metadata.roomCsv.text;
-
-        // ★ CRLF を除去してから Split するのが重要！
-        csv = csv.Replace("\r", "");
-
+        string csv = metadataHolder.metadata.roomCsv.text.Replace("\r", "");
         string[] layers = csv.Split(new string[] { "---" }, System.StringSplitOptions.RemoveEmptyEntries);
 
         if (layers.Length == 0)
@@ -43,24 +46,22 @@ public class RoomBuilder : MonoBehaviour
         }
 
         string[] firstLines = layers[0].Trim().Split('\n');
-        int depth = firstLines.Length;
-        int width = firstLines[0].Trim().Length;
-        int height = layers.Length;
+        depth = firstLines.Length;
+        width = firstLines[0].Trim().Length;
+        heightCount = layers.Length;
 
-        bool[,,] solid = new bool[width, height, depth];
+        solid = new bool[width, heightCount, depth];
 
         int currentY = 0;
+
         foreach (var layer in layers)
         {
-            // ★ layer ごとにも CR 削除
             string[] lines = layer.Replace("\r", "").Trim().Split('\n');
-
-            Debug.Log($"Building layer {currentY}, first line = '{lines[0]}'");
 
             for (int z = 0; z < lines.Length; z++)
             {
                 string line = lines[z].Trim();
-                Debug.Log($"line[{z}] = '{line}' length={line.Length}");
+                int zReversed = (lines.Length - 1) - z;
 
                 for (int x = 0; x < line.Length; x++)
                 {
@@ -69,9 +70,14 @@ public class RoomBuilder : MonoBehaviour
 
                     if (prefab != null)
                     {
-                        int zReversed = (lines.Length - 1) - z;
                         Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
-                        Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+                        var obj = Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+
+                        // CarryBlock 初期化
+                        var pb = obj.GetComponent<PushableBlock>();
+                        if (pb != null)
+                            pb.Init(this);
+
                         solid[x, currentY, zReversed] = true;
                     }
                 }
@@ -82,5 +88,21 @@ public class RoomBuilder : MonoBehaviour
 
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
         Debug.Log("Room build complete.");
+    }
+
+    // 穴埋め用
+    public void SetSolidVoxel(int x, int y, int z, bool value)
+    {
+        if (x < 0 || x >= width) return;
+        if (y < 0 || y >= heightCount) return;
+        if (z < 0 || z >= depth) return;
+
+        solid[x, y, z] = value;
+    }
+
+    // コライダー再生成
+    public void RebuildColliders()
+    {
+        VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
     }
 }
