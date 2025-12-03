@@ -1,5 +1,9 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class PushableBlock : MonoBehaviour
@@ -22,6 +26,18 @@ public class PushableBlock : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.mass = 20f;
+
+        // ★ prefabReference が空なら、自動で記録する（Editor のみ）
+#if UNITY_EDITOR
+        if (prefabReference == null)
+        {
+            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+            if (prefab != null)
+            {
+                prefabReference = prefab;
+            }
+        }
+#endif
     }
 
     private void FixedUpdate()

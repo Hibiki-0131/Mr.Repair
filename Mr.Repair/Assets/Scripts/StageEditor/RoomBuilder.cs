@@ -8,14 +8,13 @@ public class RoomBuilder : MonoBehaviour
     [SerializeField] private float voxelSize = 1f;
     [SerializeField] private int yOffset = 0;
 
-    private bool[,,] solid;  // ← 穴埋めや地形コライダー生成に使用
+    private bool[,,] solid;
 
     public bool[,,] SolidGrid => solid;
     public float VoxelSize => voxelSize;
     public int YOffset => yOffset;
 
     public static RoomBuilder Instance { get; private set; }
-
 
     private void Awake()
     {
@@ -37,7 +36,6 @@ public class RoomBuilder : MonoBehaviour
         }
     }
 
-
     // ============================================================
     //  ▼ ルーム構築
     // ============================================================
@@ -49,16 +47,19 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
-        // ▼ 古いオブジェクト破棄
+        // ▼ 古い地形オブジェクトだけ破棄（CarryBlock は破棄しない）
         foreach (Transform child in contentRoot)
         {
+            // PushableBlock を持つものは carryblock → 消してはいけない
+            if (child.GetComponent<PushableBlock>() != null)
+                continue;
+
             DestroyImmediate(child.gameObject);
         }
 
-        string csv = metadataHolder.metadata.roomCsv.text;
-        csv = csv.Replace("\r", "");
-
+        string csv = metadataHolder.metadata.roomCsv.text.Replace("\r", "");
         string[] layers = csv.Split(new string[] { "---" }, System.StringSplitOptions.RemoveEmptyEntries);
+
         if (layers.Length == 0)
         {
             Debug.LogWarning("CSV にレイヤーがありません");
@@ -77,7 +78,7 @@ public class RoomBuilder : MonoBehaviour
 
         foreach (var layer in layers)
         {
-            string[] lines = layer.Replace("\r", "").Trim().Split('\n');
+            string[] lines = layer.Trim().Split('\n');
 
             for (int z = 0; z < lines.Length; z++)
             {
@@ -88,22 +89,26 @@ public class RoomBuilder : MonoBehaviour
                     char code = line[x];
                     GameObject prefab = BlockFactory.GetPrefab(code);
 
-                    if (prefab != null)
+                    if (prefab == null)
+                        continue;
+
+                    int zReversed = (lines.Length - 1) - z;
+                    Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
+
+                    // 見た目生成（地形 or carryblock）
+                    GameObject obj = Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+
+                    // ▼ '1' '2' のみ地形として solid に登録
+                    if (code == '1' || code == '2')
                     {
-                        int zReversed = (lines.Length - 1) - z;
-                        Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
+                        solid[x, currentY, zReversed] = true;
+                    }
 
-                        // 見た目 生成
-                        GameObject obj = Instantiate(prefab, pos, Quaternion.identity, contentRoot);
-
-                        // ▼ '1' '2' のみ "地形" として solid に入れる
-                        if (code == '1' || code == '2')
-                        {
-                            solid[x, currentY, zReversed] = true;
-                        }
-
-                        // ▼ PushableBlock の復元用に prefab を持たせる
+                    // ▼ '3' のみ PushableBlock（carryblock）を扱う
+                    if (code == '3')
+                    {
                         PushableBlock pb = obj.GetComponent<PushableBlock>();
+
                         if (pb != null)
                         {
                             pb.prefabReference = prefab;

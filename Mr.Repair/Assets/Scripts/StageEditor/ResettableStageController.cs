@@ -12,9 +12,9 @@ public class ResettableStageController : MonoBehaviour
     private Rigidbody playerRb;
 
     [Header("CarryBlock 初期情報")]
-    private List<GameObject> initialBlockPrefabs = new();
-    private List<Vector3> blockStartPos = new();
-    private List<Quaternion> blockStartRot = new();
+    private readonly List<GameObject> initialBlockPrefabs = new();
+    private readonly List<Vector3> initialPositions = new();
+    private readonly List<Quaternion> initialRotations = new();
 
     [Header("RoomBuilder")]
     public RoomBuilder roomBuilder;
@@ -23,7 +23,7 @@ public class ResettableStageController : MonoBehaviour
     {
         Instance = this;
 
-        // Player 情報
+        // ▼ Player 初期情報保存
         if (player != null)
         {
             playerStartPos = player.position;
@@ -31,39 +31,44 @@ public class ResettableStageController : MonoBehaviour
             playerRb = player.GetComponent<Rigidbody>();
         }
 
-        // CarryBlock の初期状態記録
+        // ▼ CarryBlock 初期情報保存
         foreach (var block in FindObjectsOfType<PushableBlock>())
         {
-            var go = block.gameObject;
-
-            // ★ Prefab を保存
-            var prefab = block.prefabReference; // あなたの PushableBlock に追加する必要あり
-            initialBlockPrefabs.Add(prefab);
-
-            blockStartPos.Add(go.transform.position);
-            blockStartRot.Add(go.transform.rotation);
+            initialBlockPrefabs.Add(block.prefabReference);
+            initialPositions.Add(block.transform.position);
+            initialRotations.Add(block.transform.rotation);
         }
     }
 
+    // ============================================================
+    // ▼ Reset 実行
+    // ============================================================
     public void ResetStage()
     {
-        Debug.Log("ステージリセット開始");
+        Debug.Log("=== Reset Stage Begin ===");
 
-        // ① Room 再構築
-        roomBuilder.BuildRoom();
-
-        // ② CarryBlock 全削除
+        // ① CarryBlock を全削除（RoomBuilder 再構築前にやる）
         foreach (var b in FindObjectsOfType<PushableBlock>())
-            Destroy(b.gameObject);
-
-        // ③ 初期位置に再生成
-        for (int i = 0; i < initialBlockPrefabs.Count; i++)
         {
-            Instantiate(initialBlockPrefabs[i], blockStartPos[i], blockStartRot[i]);
+            Destroy(b.gameObject);
         }
 
-        // ④ Player 再配置
-        if (playerRb)
+        // ② Room（地形）を再構築
+        roomBuilder.BuildRoom();
+
+        // ③ CarryBlock を初期状態で再生成（親は null → Scene Root）
+        for (int i = 0; i < initialBlockPrefabs.Count; i++)
+        {
+            Instantiate(
+                initialBlockPrefabs[i],
+                initialPositions[i],
+                initialRotations[i],
+                null
+            );
+        }
+
+        // ④ Player を初期状態に戻す
+        if (playerRb != null)
         {
             playerRb.velocity = Vector3.zero;
             playerRb.angularVelocity = Vector3.zero;
@@ -76,9 +81,8 @@ public class ResettableStageController : MonoBehaviour
             player.rotation = playerStartRot;
         }
 
-        // ⑤ Transform 反映
         Physics.SyncTransforms();
 
-        Debug.Log("ステージリセット完了");
+        Debug.Log("=== Reset Stage Complete ===");
     }
 }
