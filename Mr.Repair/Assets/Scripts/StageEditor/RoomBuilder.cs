@@ -37,7 +37,7 @@ public class RoomBuilder : MonoBehaviour
     }
 
     // ============================================================
-    //  ▼ ルーム構築
+    //  ▼ ROOM BUILD (安定版)
     // ============================================================
     public void BuildRoom()
     {
@@ -47,10 +47,9 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
-        // ▼ 古い地形オブジェクトだけ破棄（CarryBlock は破棄しない）
+        // 古い地形だけ破棄（carryblockは残す）
         foreach (Transform child in contentRoot)
         {
-            // PushableBlock を持つものは carryblock → 消してはいけない
             if (child.GetComponent<PushableBlock>() != null)
                 continue;
 
@@ -66,7 +65,7 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
-        // ▼ マップサイズ
+        // マップサイズ
         string[] firstLines = layers[0].Trim().Split('\n');
         int depth = firstLines.Length;
         int width = firstLines[0].Trim().Length;
@@ -92,27 +91,25 @@ public class RoomBuilder : MonoBehaviour
                     if (prefab == null)
                         continue;
 
-                    int zReversed = (lines.Length - 1) - z;
-                    Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
+                    // UI の z=0 が Unity の奥になるように反転
+                    int zUnity = (lines.Length - 1) - z;
 
-                    // 見た目生成（地形 or carryblock）
+                    Vector3 pos = new Vector3(x, currentY + yOffset, zUnity) * voxelSize;
+
                     GameObject obj = Instantiate(prefab, pos, Quaternion.identity, contentRoot);
 
-                    // ▼ '1' '2' のみ地形として solid に登録
+                    // ■ solid に登録（1 & 2 = 壁／床）
                     if (code == '1' || code == '2')
                     {
-                        solid[x, currentY, zReversed] = true;
+                        solid[x, currentY, zUnity] = true;
                     }
 
-                    // ▼ '3' のみ PushableBlock（carryblock）を扱う
+                    // ■ 3 = carry block
                     if (code == '3')
                     {
                         PushableBlock pb = obj.GetComponent<PushableBlock>();
-
                         if (pb != null)
-                        {
                             pb.prefabReference = prefab;
-                        }
                     }
                 }
             }
@@ -120,14 +117,14 @@ public class RoomBuilder : MonoBehaviour
             currentY++;
         }
 
-        // ▼ voxel 最適化コライダー生成
+        // voxel collider
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
 
         Debug.Log("Room build complete.");
     }
 
     // ============================================================
-    //  ▼ 穴を埋める（carryblock が落ちた時に呼ぶ）
+    // ▼ Hole fill
     // ============================================================
     public void FillHole(int x, int y, int z)
     {
@@ -136,7 +133,6 @@ public class RoomBuilder : MonoBehaviour
 
         solid[x, y, z] = true;
 
-        // ▼ コライダー再構築
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
 
         Debug.Log($"Hole filled at {x},{y},{z}");
