@@ -4,8 +4,19 @@ public static class VoxelColliderUtility
 {
     public static void BuildColliders(Transform contentRoot, bool[,,] solid, float voxelSize, int yOffset)
     {
+        // 既存コライダー削除（ただし PushableBlock のコライダーは残す）
+        foreach (Transform child in contentRoot)
+        {
+            if (child.GetComponent<PushableBlock>() != null)
+                continue; // キャリーブロックは対象外
+
+            var col = child.GetComponent<BoxCollider>();
+            if (col != null)
+                Object.Destroy(col); // DestroyImmediate禁止
+        }
+
         foreach (var col in contentRoot.GetComponents<BoxCollider>())
-            Object.DestroyImmediate(col);
+            Object.Destroy(col);
 
         int width = solid.GetLength(0);
         int height = solid.GetLength(1);
@@ -19,61 +30,76 @@ public static class VoxelColliderUtility
             {
                 for (int x = 0; x < width; x++)
                 {
-                    if (!solid[x, y, z] || visited[x, y, z]) continue;
+                    if (!solid[x, y, z] || visited[x, y, z])
+                        continue;
 
                     int maxX = x, maxY = y, maxZ = z;
-                    Expand(ref maxX, ref maxZ, ref maxY, solid, visited, x, y, z);
 
+                    // Expand X
+                    int xEnd = x;
+                    while (xEnd + 1 < width && solid[xEnd + 1, y, z] && !visited[xEnd + 1, y, z])
+                        xEnd++;
+                    maxX = xEnd;
+
+                    // Expand Z
+                    int zEnd = z;
+                    bool okZ = true;
+                    while (okZ && zEnd + 1 < depth)
+                    {
+                        for (int xx = x; xx <= maxX; xx++)
+                        {
+                            if (!solid[xx, y, zEnd + 1] || visited[xx, y, zEnd + 1])
+                                okZ = false;
+                        }
+                        if (okZ) zEnd++;
+                    }
+                    maxZ = zEnd;
+
+                    // Expand Y
+                    int yEnd = y;
+                    bool okY = true;
+                    while (okY && yEnd + 1 < height)
+                    {
+                        for (int zz = z; zz <= maxZ; zz++)
+                            for (int xx = x; xx <= maxX; xx++)
+                                if (!solid[xx, yEnd + 1, zz] || visited[xx, yEnd + 1, zz])
+                                    okY = false;
+
+                        if (okY) yEnd++;
+                    }
+                    maxY = yEnd;
+
+                    // Mark visited
+                    for (int yy = y; yy <= maxY; yy++)
+                        for (int zz = z; zz <= maxZ; zz++)
+                            for (int xx = x; xx <= maxX; xx++)
+                                visited[xx, yy, zz] = true;
+
+                    // Create collider
                     CreateCollider(contentRoot, x, maxX, y, maxY, z, maxZ, voxelSize, yOffset);
                 }
             }
         }
     }
 
-    private static void Expand(ref int maxX, ref int maxZ, ref int maxY, bool[,,] solid, bool[,,] visited, int x, int y, int z)
+    private static void CreateCollider(
+        Transform parent,
+        int minX, int maxX,
+        int minY, int maxY,
+        int minZ, int maxZ,
+        float voxelSize, int yOffset)
     {
-        int width = solid.GetLength(0);
-        int height = solid.GetLength(1);
-        int depth = solid.GetLength(2);
+        var col = parent.gameObject.AddComponent<BoxCollider>();
 
-        while (maxX + 1 < width && solid[maxX + 1, y, z] && !visited[maxX + 1, y, z])
-            maxX++;
-
-        bool contZ = true;
-        while (contZ && maxZ + 1 < depth)
-        {
-            for (int xi = x; xi <= maxX; xi++)
-                if (!solid[xi, y, maxZ + 1] || visited[xi, y, maxZ + 1]) contZ = false;
-            if (contZ) maxZ++;
-        }
-
-        bool contY = true;
-        while (contY && maxY + 1 < height)
-        {
-            for (int zi = z; zi <= maxZ; zi++)
-                for (int xi = x; xi <= maxX; xi++)
-                    if (!solid[xi, maxY + 1, zi] || visited[xi, maxY + 1, zi]) contY = false;
-            if (contY) maxY++;
-        }
-
-        for (int yy = y; yy <= maxY; yy++)
-            for (int zz = z; zz <= maxZ; zz++)
-                for (int xx = x; xx <= maxX; xx++)
-                    visited[xx, yy, zz] = true;
-    }
-
-    private static void CreateCollider(Transform parent, int minX, int maxX, int minY, int maxY, int minZ, int maxZ, float voxelSize, int yOffset)
-    {
         float sizeX = (maxX - minX + 1) * voxelSize;
         float sizeY = (maxY - minY + 1) * voxelSize;
         float sizeZ = (maxZ - minZ + 1) * voxelSize;
 
-        float cx = ((minX + maxX) / 2f) * voxelSize;
-        float cy = ((minY + maxY) / 2f) * voxelSize + yOffset;
-        float cz = ((minZ + maxZ) / 2f) * voxelSize;
+        float centerX = (minX + maxX) * 0.5f * voxelSize;
+        float centerY = (minY + maxY) * 0.5f * voxelSize + yOffset;
+        float centerZ = (minZ + maxZ) * 0.5f * voxelSize;
 
-        var col = parent.gameObject.AddComponent<BoxCollider>();
-        col.center = new Vector3(cx, cy, cz);
+        col.center = new Vector3(centerX, centerY, centerZ);
         col.size = new Vector3(sizeX, sizeY, sizeZ);
     }
 }

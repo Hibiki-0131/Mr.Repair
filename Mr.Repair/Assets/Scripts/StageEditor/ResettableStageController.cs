@@ -5,54 +5,67 @@ public class ResettableStageController : MonoBehaviour
 {
     public static ResettableStageController Instance { get; private set; }
 
+    [Header("Player 初期位置")]
     public Transform player;
-
     private Vector3 playerStartPos;
     private Quaternion playerStartRot;
-    private Rigidbody playerRb;
 
+    [Header("CarryBlock 初期情報")]
+    private List<PushableBlock> initialBlocks = new();
+    private List<(Vector3 pos, Quaternion rot)> blockStartTransforms = new();
+
+    [Header("RoomBuilder")]
     public RoomBuilder roomBuilder;
 
-    private readonly List<PushableBlock> blocks = new();
-    private readonly List<Vector3> initPos = new();
-    private readonly List<Quaternion> initRot = new();
+    public Transform ContentRoot => contentRoot;
 
     private void Awake()
     {
         Instance = this;
 
-        // Player初期情報
         if (player != null)
         {
             playerStartPos = player.position;
             playerStartRot = player.rotation;
-            playerRb = player.GetComponent<Rigidbody>();
         }
+    }
 
-        // carryblock初期情報
-        foreach (var block in FindObjectsOfType<PushableBlock>())
+    // PushableBlock.Start() から呼ばれる
+    public void RegisterCarryBlock(PushableBlock block)
+    {
+        if (!initialBlocks.Contains(block))
         {
-            blocks.Add(block);
-            initPos.Add(block.transform.position);
-            initRot.Add(block.transform.rotation);
+            initialBlocks.Add(block);
+            blockStartTransforms.Add((block.transform.position, block.transform.rotation));
         }
     }
 
     public void ResetStage()
     {
-        Debug.Log("=== Reset Stage Begin ===");
+        Debug.Log("ステージリセット開始");
 
-        for (int i = 0; i < blocks.Count; i++)
+        // 地形を CSV 初期状態に戻す
+        roomBuilder.BuildRoom();
+
+        // 既存のブロック削除
+        foreach (var b in FindObjectsOfType<PushableBlock>())
+            Destroy(b.gameObject);
+
+        // 初期位置復元
+        for (int i = 0; i < initialBlocks.Count; i++)
         {
-            blocks[i].ResetBlock(initPos[i], initRot[i]);
+            var prefab = initialBlocks[i].prefabReference;
+            var tf = blockStartTransforms[i];
+            Instantiate(prefab, tf.pos, tf.rot, roomBuilder.ContentRoot);
         }
 
-        playerRb.velocity = Vector3.zero;
-        playerRb.angularVelocity = Vector3.zero;
-        playerRb.position = playerStartPos;
-        playerRb.rotation = playerStartRot;
+        // Player戻す
+        if (player != null)
+        {
+            player.position = playerStartPos;
+            player.rotation = playerStartRot;
+        }
 
-        Physics.SyncTransforms();
-        Debug.Log("=== Reset Stage Complete ===");
+        Debug.Log("ステージリセット完了");
     }
 }

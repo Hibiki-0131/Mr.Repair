@@ -1,14 +1,13 @@
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class PushableBlock : MonoBehaviour
 {
+    [Header("Prefab Reference (é©ìÆê›íË)")]
     public GameObject prefabReference;
 
+    [Header("Gravity Settings")]
     [SerializeField] private float gravityMultiplier = 5f;
 
     private Rigidbody rb;
@@ -17,23 +16,20 @@ public class PushableBlock : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-
         rb.useGravity = false;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.mass = 20f;
 
-#if UNITY_EDITOR
+        // Prefab éQè∆Ç™ãÛÇ»ÇÁé©ï™ÇÃ prefab root Çï€ë∂
         if (prefabReference == null)
-        {
-            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-            if (prefab != null)
-            {
-                prefabReference = prefab;
-            }
-        }
-#endif
+            prefabReference = gameObject;
+    }
+
+    private void Start()
+    {
+        ResettableStageController.Instance?.RegisterCarryBlock(this);
     }
 
     private void FixedUpdate()
@@ -42,34 +38,6 @@ public class PushableBlock : MonoBehaviour
             rb.AddForce(Physics.gravity * gravityMultiplier, ForceMode.Acceleration);
     }
 
-    // ========================
-    // Åö Reset óp API
-    // ========================
-    public void ResetBlock(Vector3 pos, Quaternion rot)
-    {
-        isSettled = false;
-
-        rb.isKinematic = false;
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        transform.SetPositionAndRotation(pos, rot);
-    }
-
-    public void MarkAsSettled()
-    {
-        isSettled = true;
-
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true;
-        rb.constraints = RigidbodyConstraints.FreezeAll;
-    }
-
-    // =========================
-    // Åö åäÇ…óéÇøÇΩÇ∆Ç´
-    // =========================
     private void OnCollisionEnter(Collision collision)
     {
         if (isSettled) return;
@@ -83,7 +51,8 @@ public class PushableBlock : MonoBehaviour
     private void TrySettleIntoHole()
     {
         var builder = RoomBuilder.Instance;
-        if (builder == null || builder.SolidGrid == null) return;
+        if (builder == null || builder.SolidGrid == null)
+            return;
 
         Vector3 pos = transform.position;
         int x = Mathf.RoundToInt(pos.x / builder.VoxelSize);
@@ -91,13 +60,17 @@ public class PushableBlock : MonoBehaviour
         int y = 0;
 
         if (x < 0 || x >= builder.SolidGrid.GetLength(0)) return;
-        if (y < 0 || y >= builder.SolidGrid.GetLength(1)) return;
         if (z < 0 || z >= builder.SolidGrid.GetLength(2)) return;
 
         if (!builder.SolidGrid[x, y, z])
         {
             builder.FillHole(x, y, z);
-            MarkAsSettled();
+
+            rb.velocity = Vector3.zero;
+            rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+
+            isSettled = true;
         }
     }
 }
