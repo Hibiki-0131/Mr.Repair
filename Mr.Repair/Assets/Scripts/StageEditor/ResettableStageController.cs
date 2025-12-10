@@ -1,23 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class ResettableStageController : MonoBehaviour
 {
     public static ResettableStageController Instance { get; private set; }
 
-    [Header("Player 初期位置")]
     public Transform player;
     private Vector3 playerStartPos;
     private Quaternion playerStartRot;
+    private Rigidbody playerRb;
 
-    [Header("CarryBlock 初期情報")]
-    private List<PushableBlock> initialBlocks = new();
+    private List<GameObject> initialPrefabs = new();
     private List<(Vector3 pos, Quaternion rot)> blockStartTransforms = new();
 
-    [Header("RoomBuilder")]
     public RoomBuilder roomBuilder;
-
-    public Transform ContentRoot => contentRoot;
 
     private void Awake()
     {
@@ -27,45 +26,43 @@ public class ResettableStageController : MonoBehaviour
         {
             playerStartPos = player.position;
             playerStartRot = player.rotation;
+            playerRb = player.GetComponent<Rigidbody>();
         }
-    }
 
-    // PushableBlock.Start() から呼ばれる
-    public void RegisterCarryBlock(PushableBlock block)
-    {
-        if (!initialBlocks.Contains(block))
+        // ★ 最初のシーンにあるブロックのみ登録
+        foreach (var block in FindObjectsOfType<PushableBlock>())
         {
-            initialBlocks.Add(block);
+#if UNITY_EDITOR
+            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(block.gameObject);
+            initialPrefabs.Add(prefab != null ? prefab : block.prefabReference);
+#else
+            initialPrefabs.Add(block.prefabReference);
+#endif
             blockStartTransforms.Add((block.transform.position, block.transform.rotation));
         }
     }
 
     public void ResetStage()
     {
-        Debug.Log("ステージリセット開始");
-
-        // 地形を CSV 初期状態に戻す
-        roomBuilder.BuildRoom();
-
-        // 既存のブロック削除
         foreach (var b in FindObjectsOfType<PushableBlock>())
             Destroy(b.gameObject);
 
-        // 初期位置復元
-        for (int i = 0; i < initialBlocks.Count; i++)
+        roomBuilder.BuildRoom();
+
+        for (int i = 0; i < initialPrefabs.Count; i++)
         {
-            var prefab = initialBlocks[i].prefabReference;
             var tf = blockStartTransforms[i];
-            Instantiate(prefab, tf.pos, tf.rot, roomBuilder.ContentRoot);
+            Instantiate(initialPrefabs[i], tf.pos, tf.rot, roomBuilder.ContentRoot);
         }
 
-        // Player戻す
-        if (player != null)
+        if (playerRb != null)
         {
-            player.position = playerStartPos;
-            player.rotation = playerStartRot;
+            playerRb.velocity = Vector3.zero;
+            playerRb.angularVelocity = Vector3.zero;
+            playerRb.position = playerStartPos;
+            playerRb.rotation = playerStartRot;
         }
 
-        Debug.Log("ステージリセット完了");
+        Physics.SyncTransforms();
     }
 }

@@ -1,15 +1,16 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class PushableBlock : MonoBehaviour
 {
-    [Header("Prefab Reference (©“®İ’è)")]
+    [Header("Prefab Reference (ŒÅ’è]")]
     public GameObject prefabReference;
 
-    [Header("Gravity Settings")]
     [SerializeField] private float gravityMultiplier = 5f;
-
     private Rigidbody rb;
     private bool isSettled = false;
 
@@ -22,14 +23,16 @@ public class PushableBlock : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.mass = 20f;
 
-        // Prefab QÆ‚ª‹ó‚È‚ç©•ª‚Ì prefab root ‚ğ•Û‘¶
+        // š Awake‚ÅPrefabReference‚ğ‘‚«Š·‚¦‚È‚¢
+        // EditorÅ‰‚Ì‚P‰ñ‚Ì‚İİ’è
+#if UNITY_EDITOR
         if (prefabReference == null)
-            prefabReference = gameObject;
-    }
-
-    private void Start()
-    {
-        ResettableStageController.Instance?.RegisterCarryBlock(this);
+        {
+            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+            if (prefab != null)
+                prefabReference = prefab;
+        }
+#endif
     }
 
     private void FixedUpdate()
@@ -59,17 +62,12 @@ public class PushableBlock : MonoBehaviour
         int z = Mathf.RoundToInt(pos.z / builder.VoxelSize);
         int y = 0;
 
-        if (x < 0 || x >= builder.SolidGrid.GetLength(0)) return;
-        if (z < 0 || z >= builder.SolidGrid.GetLength(2)) return;
-
         if (!builder.SolidGrid[x, y, z])
         {
             builder.FillHole(x, y, z);
-
             rb.velocity = Vector3.zero;
             rb.isKinematic = true;
             rb.constraints = RigidbodyConstraints.FreezeAll;
-
             isSettled = true;
         }
     }

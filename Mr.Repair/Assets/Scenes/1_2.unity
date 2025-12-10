@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -60056,7 +60056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 843f555910388f1419d4103bc4358b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabReference: {fileID: 1560749978}
+  prefabReference: {fileID: 657907303210040374, guid: e6051c4aaa5e6564fafeb833ed4c5214, type: 3}
   gravityMultiplier: 5
 --- !u!54 &1560749981
 Rigidbody:
@@ -67814,7 +67814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 843f555910388f1419d4103bc4358b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabReference: {fileID: 1787684070}
+  prefabReference: {fileID: 657907303210040374, guid: e6051c4aaa5e6564fafeb833ed4c5214, type: 3}
   gravityMultiplier: 5
 --- !u!54 &1787684073
 Rigidbody:
