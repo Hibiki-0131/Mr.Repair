@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class RoomBuilder : MonoBehaviour
 {
+    public static RoomBuilder Instance { get; private set; }
+
     [SerializeField] private Transform contentRoot;
     [SerializeField] private RoomMetadataHolder metadataHolder;
 
@@ -13,10 +15,7 @@ public class RoomBuilder : MonoBehaviour
     public bool[,,] SolidGrid => solid;
     public float VoxelSize => voxelSize;
     public int YOffset => yOffset;
-
     public Transform ContentRoot => contentRoot;
-
-    public static RoomBuilder Instance { get; private set; }
 
     private void Awake()
     {
@@ -36,13 +35,20 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
-        // 地形だけ消す（CarryBlockは残す）
+        // ★ 地形だけ破棄、PushableBlock は残す
         foreach (Transform child in contentRoot)
         {
             if (child.GetComponent<PushableBlock>() != null)
                 continue;
 
-            DestroyImmediate(child.gameObject);
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+                DestroyImmediate(child.gameObject);
+            else
+                Destroy(child.gameObject);
+#else
+            Destroy(child.gameObject);
+#endif
         }
 
         string csv = metadataHolder.metadata.roomCsv.text.Replace("\r", "");
@@ -55,7 +61,7 @@ public class RoomBuilder : MonoBehaviour
 
         solid = new bool[width, height, depth];
 
-        int currentY = 0;
+        int y = 0;
         foreach (var layer in layers)
         {
             string[] lines = layer.Trim().Split('\n');
@@ -63,32 +69,56 @@ public class RoomBuilder : MonoBehaviour
             for (int z = 0; z < lines.Length; z++)
             {
                 string line = lines[z].Trim();
+                int zr = (lines.Length - 1) - z;
+
                 for (int x = 0; x < line.Length; x++)
                 {
                     char code = line[x];
                     GameObject prefab = BlockFactory.GetPrefab(code);
-                    if (prefab == null) continue;
 
-                    // ★ CSV '3' (CarryBlock) は生成しない
-                    if (code == '3') continue;
+                    // CSV '3': CarryBlock → Instantiate するが static collider に含めない
+                    if (code == '3')
+                    {
+                        if (prefab != null)
+                        {
+                            Vector3 pos = new Vector3(x, y + yOffset, zr) * voxelSize;
+                            Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+                        }
+                        solid[x, y, zr] = false;
+                        continue;
+                    }
 
-                    int zReversed = (lines.Length - 1) - z;
-                    Vector3 pos = new Vector3(x, currentY + yOffset, zReversed) * voxelSize;
-
-                    Instantiate(prefab, pos, Quaternion.identity, contentRoot);
-                    solid[x, currentY, zReversed] = true;
+                    // Static Blocks
+                    if (prefab != null)
+                    {
+                        Vector3 pos = new Vector3(x, y + yOffset, zr) * voxelSize;
+                        Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+                        solid[x, y, zr] = true;
+                    }
+                    else
+                    {
+                        solid[x, y, zr] = false;
+                    }
                 }
             }
-            currentY++;
+            y++;
         }
 
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
+        Debug.Log("Room Build Complete");
     }
-
 
     public void FillHole(int x, int y, int z)
     {
         solid[x, y, z] = true;
+
+        StartCoroutine(RebuildLater());
+    }
+
+    private System.Collections.IEnumerator RebuildLater()
+    {
+        yield return new WaitForEndOfFrame();
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
+        Debug.Log("Collider Re-Built");
     }
 }

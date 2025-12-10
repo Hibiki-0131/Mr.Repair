@@ -4,19 +4,34 @@ public static class VoxelColliderUtility
 {
     public static void BuildColliders(Transform contentRoot, bool[,,] solid, float voxelSize, int yOffset)
     {
-        // 既存コライダー削除（ただし PushableBlock のコライダーは残す）
-        foreach (Transform child in contentRoot)
+        // 既存のコライダー削除
+        foreach (var col in contentRoot.GetComponents<BoxCollider>())
         {
-            if (child.GetComponent<PushableBlock>() != null)
-                continue; // キャリーブロックは対象外
-
-            var col = child.GetComponent<BoxCollider>();
-            if (col != null)
-                Object.Destroy(col); // DestroyImmediate禁止
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+                Object.DestroyImmediate(col);
+            else
+                Object.Destroy(col);
+#else
+            Object.Destroy(col);
+#endif
         }
 
-        foreach (var col in contentRoot.GetComponents<BoxCollider>())
-            Object.Destroy(col);
+        foreach (Transform child in contentRoot)
+        {
+            var childCol = child.GetComponent<BoxCollider>();
+            if (childCol != null)
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying)
+                    Object.DestroyImmediate(childCol);
+                else
+                    Object.Destroy(childCol);
+#else
+                Object.Destroy(childCol);
+#endif
+            }
+        }
 
         int width = solid.GetLength(0);
         int height = solid.GetLength(1);
@@ -24,6 +39,7 @@ public static class VoxelColliderUtility
 
         bool[,,] visited = new bool[width, height, depth];
 
+        // Greedy merge
         for (int y = 0; y < height; y++)
         {
             for (int z = 0; z < depth; z++)
@@ -33,49 +49,49 @@ public static class VoxelColliderUtility
                     if (!solid[x, y, z] || visited[x, y, z])
                         continue;
 
-                    int maxX = x, maxY = y, maxZ = z;
+                    int maxX = x;
+                    while (maxX + 1 < width && solid[maxX + 1, y, z] && !visited[maxX + 1, y, z])
+                        maxX++;
 
-                    // Expand X
-                    int xEnd = x;
-                    while (xEnd + 1 < width && solid[xEnd + 1, y, z] && !visited[xEnd + 1, y, z])
-                        xEnd++;
-                    maxX = xEnd;
-
-                    // Expand Z
-                    int zEnd = z;
-                    bool okZ = true;
-                    while (okZ && zEnd + 1 < depth)
+                    int maxZ = z;
+                    bool canExpandZ = true;
+                    while (canExpandZ && maxZ + 1 < depth)
                     {
-                        for (int xx = x; xx <= maxX; xx++)
+                        for (int xi = x; xi <= maxX; xi++)
                         {
-                            if (!solid[xx, y, zEnd + 1] || visited[xx, y, zEnd + 1])
-                                okZ = false;
+                            if (!solid[xi, y, maxZ + 1] || visited[xi, y, maxZ + 1])
+                            {
+                                canExpandZ = false;
+                                break;
+                            }
                         }
-                        if (okZ) zEnd++;
+                        if (canExpandZ) maxZ++;
                     }
-                    maxZ = zEnd;
 
-                    // Expand Y
-                    int yEnd = y;
-                    bool okY = true;
-                    while (okY && yEnd + 1 < height)
+                    int maxY = y;
+                    bool canExpandY = true;
+                    while (canExpandY && maxY + 1 < height)
                     {
-                        for (int zz = z; zz <= maxZ; zz++)
-                            for (int xx = x; xx <= maxX; xx++)
-                                if (!solid[xx, yEnd + 1, zz] || visited[xx, yEnd + 1, zz])
-                                    okY = false;
-
-                        if (okY) yEnd++;
+                        for (int zi = z; zi <= maxZ; zi++)
+                        {
+                            for (int xi = x; xi <= maxX; xi++)
+                            {
+                                if (!solid[xi, maxY + 1, zi] || visited[xi, maxY + 1, zi])
+                                {
+                                    canExpandY = false;
+                                    break;
+                                }
+                            }
+                            if (!canExpandY) break;
+                        }
+                        if (canExpandY) maxY++;
                     }
-                    maxY = yEnd;
 
-                    // Mark visited
                     for (int yy = y; yy <= maxY; yy++)
                         for (int zz = z; zz <= maxZ; zz++)
                             for (int xx = x; xx <= maxX; xx++)
                                 visited[xx, yy, zz] = true;
 
-                    // Create collider
                     CreateCollider(contentRoot, x, maxX, y, maxY, z, maxZ, voxelSize, yOffset);
                 }
             }
@@ -89,16 +105,15 @@ public static class VoxelColliderUtility
         int minZ, int maxZ,
         float voxelSize, int yOffset)
     {
-        var col = parent.gameObject.AddComponent<BoxCollider>();
-
         float sizeX = (maxX - minX + 1) * voxelSize;
         float sizeY = (maxY - minY + 1) * voxelSize;
         float sizeZ = (maxZ - minZ + 1) * voxelSize;
 
-        float centerX = (minX + maxX) * 0.5f * voxelSize;
-        float centerY = (minY + maxY) * 0.5f * voxelSize + yOffset;
-        float centerZ = (minZ + maxZ) * 0.5f * voxelSize;
+        float centerX = ((minX + maxX) / 2f) * voxelSize;
+        float centerY = ((minY + maxY) / 2f) * voxelSize + yOffset;
+        float centerZ = ((minZ + maxZ) / 2f) * voxelSize;
 
+        var col = parent.gameObject.AddComponent<BoxCollider>();
         col.center = new Vector3(centerX, centerY, centerZ);
         col.size = new Vector3(sizeX, sizeY, sizeZ);
     }
