@@ -5,6 +5,7 @@ public class StageEditorWindow : EditorWindow
 {
     private RoomMetadata selectedMetadata;
     private GameObject roomPrefab;
+    private Vector3 spawnPosition = Vector3.zero;
 
     [MenuItem("Tools/Stage Editor")]
     public static void Open()
@@ -16,8 +17,14 @@ public class StageEditorWindow : EditorWindow
     {
         GUILayout.Label("Room Placement", EditorStyles.boldLabel);
 
-        roomPrefab = (GameObject)EditorGUILayout.ObjectField("RoomCube Prefab", roomPrefab, typeof(GameObject), false);
-        selectedMetadata = (RoomMetadata)EditorGUILayout.ObjectField("Room Metadata", selectedMetadata, typeof(RoomMetadata), false);
+        roomPrefab = (GameObject)EditorGUILayout.ObjectField(
+            "RoomRoot Prefab", roomPrefab, typeof(GameObject), false);
+
+        selectedMetadata = (RoomMetadata)EditorGUILayout.ObjectField(
+            "Room Metadata", selectedMetadata, typeof(RoomMetadata), false);
+
+        spawnPosition = EditorGUILayout.Vector3Field(
+            "Spawn Position", spawnPosition);
 
         GUILayout.Space(10);
 
@@ -31,8 +38,8 @@ public class StageEditorWindow : EditorWindow
 
         if (selectedMetadata != null && selectedMetadata.roomCsv != null)
         {
-            string preview = selectedMetadata.roomCsv.text;
-            EditorGUILayout.TextArea(preview, GUILayout.Height(200));
+            EditorGUILayout.TextArea(
+                selectedMetadata.roomCsv.text, GUILayout.Height(200));
         }
     }
 
@@ -44,26 +51,19 @@ public class StageEditorWindow : EditorWindow
             return;
         }
 
-        GameObject room = (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
+        GameObject room =
+            (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
+
         room.name = selectedMetadata.roomName;
+        room.transform.position = spawnPosition;
+        room.transform.rotation = Quaternion.identity;
 
         var holder = room.GetComponentInChildren<RoomMetadataHolder>();
-        if (holder == null)
-        {
-            Debug.LogError("RoomMetadataHolder ‚ª RoomCube “à‚É‚ ‚è‚Ü‚¹‚ñ");
-            return;
-        }
         holder.metadata = selectedMetadata;
 
         var builder = room.GetComponentInChildren<RoomBuilder>();
-        if (builder == null)
-        {
-            Debug.LogError("RoomBuilder ‚ª RoomCube “à‚É‚ ‚è‚Ü‚¹‚ñ");
-            return;
-        }
-
         builder.BuildRoom();
+
         Selection.activeGameObject = room;
     }
-
 }

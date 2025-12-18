@@ -76,14 +76,19 @@ public class RoomBuilder : MonoBehaviour
                     char code = line[x];
                     GameObject prefab = BlockFactory.GetPrefab(code);
 
-                    // CSV '3': CarryBlock Å® Instantiate Ç∑ÇÈÇ™ static collider Ç…ä‹ÇﬂÇ»Ç¢
+                    Vector3 localPos =
+                        new Vector3(x, y + yOffset, zr) * voxelSize;
+
+                    // CSV '3': CarryBlockÅiCollider ìùçáëŒè€äOÅj
                     if (code == '3')
                     {
                         if (prefab != null)
                         {
-                            Vector3 pos = new Vector3(x, y + yOffset, zr) * voxelSize;
-                            Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+                            GameObject block = Instantiate(prefab, contentRoot);
+                            block.transform.localPosition = localPos;
+                            block.transform.localRotation = Quaternion.identity;
                         }
+
                         solid[x, y, zr] = false;
                         continue;
                     }
@@ -91,8 +96,10 @@ public class RoomBuilder : MonoBehaviour
                     // Static Blocks
                     if (prefab != null)
                     {
-                        Vector3 pos = new Vector3(x, y + yOffset, zr) * voxelSize;
-                        Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+                        GameObject block = Instantiate(prefab, contentRoot);
+                        block.transform.localPosition = localPos;
+                        block.transform.localRotation = Quaternion.identity;
+
                         solid[x, y, zr] = true;
                     }
                     else
@@ -101,7 +108,8 @@ public class RoomBuilder : MonoBehaviour
                     }
                 }
             }
-            y++;
+        
+        y++;
         }
 
         VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
