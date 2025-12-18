@@ -28,9 +28,12 @@ public class StageEditorWindow : EditorWindow
 
         GUILayout.Space(10);
 
-        if (GUILayout.Button("Create Room in Scene"))
+        using (new EditorGUI.DisabledScope(roomPrefab == null || selectedMetadata == null))
         {
-            CreateRoomInScene();
+            if (GUILayout.Button("Create Room in Scene"))
+            {
+                CreateRoomInScene();
+            }
         }
 
         GUILayout.Space(15);
@@ -51,19 +54,38 @@ public class StageEditorWindow : EditorWindow
             return;
         }
 
-        GameObject room =
-            (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
+        var room = (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
+        if (room == null)
+        {
+            Debug.LogError("Prefab ÇÃ Instantiate Ç…é∏îsÇµÇ‹ÇµÇΩ");
+            return;
+        }
+
+        Undo.RegisterCreatedObjectUndo(room, "Create Room");
 
         room.name = selectedMetadata.roomName;
         room.transform.position = spawnPosition;
         room.transform.rotation = Quaternion.identity;
 
         var holder = room.GetComponentInChildren<RoomMetadataHolder>();
+        if (holder == null)
+        {
+            Debug.LogError("RoomMetadataHolder Ç™ RoomPrefab ì‡Ç…å©Ç¬Ç©ÇËÇ‹ÇπÇÒ");
+            return;
+        }
         holder.metadata = selectedMetadata;
 
         var builder = room.GetComponentInChildren<RoomBuilder>();
+        if (builder == null)
+        {
+            Debug.LogError("RoomBuilder Ç™ RoomPrefab ì‡Ç…å©Ç¬Ç©ÇËÇ‹ÇπÇÒ");
+            return;
+        }
+
+        // Editor ê∂ê¨éûÇÕÇ±Ç±Ç≈ñæé¶ìIÇ… BuildÅiRoomBuilder.Start() ÇÕ Editor Ç≈é©ìÆ Build ÇµÇ»Ç¢Åj
         builder.BuildRoom();
 
         Selection.activeGameObject = room;
+        EditorGUIUtility.PingObject(room);
     }
 }
