@@ -14,7 +14,7 @@ public class ResettableStageController : MonoBehaviour
     private Rigidbody playerRb;
 
     private List<GameObject> initialPrefabs = new();
-    private List<(Vector3 pos, Quaternion rot)> blockStartTransforms = new();
+    private List<(Vector3 localPos, Quaternion localRot)> blockStartTransforms = new();
 
     public RoomBuilder roomBuilder;
 
@@ -29,16 +29,20 @@ public class ResettableStageController : MonoBehaviour
             playerRb = player.GetComponent<Rigidbody>();
         }
 
-        // ★ 最初のシーンにあるブロックのみ登録
+        // 初期 CarryBlock を local 座標で記録
         foreach (var block in FindObjectsOfType<PushableBlock>())
         {
 #if UNITY_EDITOR
-            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(block.gameObject);
+            var prefab =
+                PrefabUtility.GetCorrespondingObjectFromSource(block.gameObject);
             initialPrefabs.Add(prefab != null ? prefab : block.prefabReference);
 #else
             initialPrefabs.Add(block.prefabReference);
 #endif
-            blockStartTransforms.Add((block.transform.position, block.transform.rotation));
+            blockStartTransforms.Add((
+                block.transform.localPosition,
+                block.transform.localRotation
+            ));
         }
     }
 
@@ -51,8 +55,13 @@ public class ResettableStageController : MonoBehaviour
 
         for (int i = 0; i < initialPrefabs.Count; i++)
         {
-            var tf = blockStartTransforms[i];
-            Instantiate(initialPrefabs[i], tf.pos, tf.rot, roomBuilder.ContentRoot);
+            var data = blockStartTransforms[i];
+            var block = Instantiate(
+                initialPrefabs[i],
+                roomBuilder.ContentRoot
+            );
+            block.transform.localPosition = data.localPos;
+            block.transform.localRotation = data.localRot;
         }
 
         if (playerRb != null)

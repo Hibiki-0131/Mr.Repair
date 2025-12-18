@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class RoomBuilder : MonoBehaviour
 {
@@ -22,11 +23,15 @@ public class RoomBuilder : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
-    {
+    // ★ 自動 Build はしない（StageEditor / Reset からのみ呼ぶ）
+    private void Start(){
         BuildRoom();
     }
 
+    /// <summary>
+    /// CSV から Room を再構築する
+    /// （見た目・論理・Collider を local 座標で完全同期）
+    /// </summary>
     public void BuildRoom()
     {
         if (metadataHolder == null || metadataHolder.metadata == null)
@@ -35,7 +40,7 @@ public class RoomBuilder : MonoBehaviour
             return;
         }
 
-        // ★ 地形だけ破棄、PushableBlock は残す
+        // 既存の地形を削除（CarryBlock は残す）
         foreach (Transform child in contentRoot)
         {
             if (child.GetComponent<PushableBlock>() != null)
@@ -52,7 +57,9 @@ public class RoomBuilder : MonoBehaviour
         }
 
         string csv = metadataHolder.metadata.roomCsv.text.Replace("\r", "");
-        string[] layers = csv.Split(new string[] { "---" }, System.StringSplitOptions.RemoveEmptyEntries);
+        string[] layers = csv.Split(
+            new string[] { "---" },
+            System.StringSplitOptions.RemoveEmptyEntries);
 
         string[] firstLines = layers[0].Trim().Split('\n');
         int depth = firstLines.Length;
@@ -79,12 +86,12 @@ public class RoomBuilder : MonoBehaviour
                     Vector3 localPos =
                         new Vector3(x, y + yOffset, zr) * voxelSize;
 
-                    // CSV '3': CarryBlock（Collider 統合対象外）
+                    // CarryBlock（Collider 統合対象外）
                     if (code == '3')
                     {
                         if (prefab != null)
                         {
-                            GameObject block = Instantiate(prefab, contentRoot);
+                            var block = Instantiate(prefab, contentRoot);
                             block.transform.localPosition = localPos;
                             block.transform.localRotation = Quaternion.identity;
                         }
@@ -93,10 +100,10 @@ public class RoomBuilder : MonoBehaviour
                         continue;
                     }
 
-                    // Static Blocks
+                    // Static Block
                     if (prefab != null)
                     {
-                        GameObject block = Instantiate(prefab, contentRoot);
+                        var block = Instantiate(prefab, contentRoot);
                         block.transform.localPosition = localPos;
                         block.transform.localRotation = Quaternion.identity;
 
@@ -108,25 +115,38 @@ public class RoomBuilder : MonoBehaviour
                     }
                 }
             }
-        
-        y++;
+
+            y++;
         }
 
-        VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
+        // Collider を solid 配列から再生成（local）
+        VoxelColliderUtility.BuildColliders(
+            contentRoot, solid, voxelSize, yOffset);
+
         Debug.Log("Room Build Complete");
     }
 
+    /// <summary>
+    /// PushableBlock が穴に落ちたときに呼ばれる
+    /// </summary>
     public void FillHole(int x, int y, int z)
     {
+        if (solid == null)
+            return;
+
         solid[x, y, z] = true;
 
+        // Collider 再構築は安全なタイミングで
         StartCoroutine(RebuildLater());
     }
 
-    private System.Collections.IEnumerator RebuildLater()
+    private IEnumerator RebuildLater()
     {
         yield return new WaitForEndOfFrame();
-        VoxelColliderUtility.BuildColliders(contentRoot, solid, voxelSize, yOffset);
+
+        VoxelColliderUtility.BuildColliders(
+            contentRoot, solid, voxelSize, yOffset);
+
         Debug.Log("Collider Re-Built");
     }
 }

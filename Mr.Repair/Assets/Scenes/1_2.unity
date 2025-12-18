@@ -34487,7 +34487,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wallPrefab: {fileID: 3908338935509838689, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
   goalPrefab: {fileID: 1770000542969381143, guid: ba7005aad1726664694e4048b1d2631a, type: 3}
-  carryBlockPrefab: {fileID: 657907303210040374, guid: e6051c4aaa5e6564fafeb833ed4c5214, type: 3}
+  carryBlockPrefab: {fileID: 0}
 --- !u!54 &884881614
 Rigidbody:
   m_ObjectHideFlags: 0
