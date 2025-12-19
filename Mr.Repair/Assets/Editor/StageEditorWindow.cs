@@ -64,8 +64,11 @@ public class StageEditorWindow : EditorWindow
         Undo.RegisterCreatedObjectUndo(room, "Create Room");
 
         room.name = selectedMetadata.roomName;
+
+        // ★ RoomRoot を SpawnPosition に配置
         room.transform.position = spawnPosition;
         room.transform.rotation = Quaternion.identity;
+        room.transform.localScale = Vector3.one;
 
         var holder = room.GetComponentInChildren<RoomMetadataHolder>();
         if (holder == null)
@@ -82,7 +85,16 @@ public class StageEditorWindow : EditorWindow
             return;
         }
 
-        // Editor 生成時はここで明示的に Build（RoomBuilder.Start() は Editor で自動 Build しない）
+        // ★ contentRoot を必ずローカル原点に揃える
+        Transform contentRoot = builder.ContentRoot;
+        if (contentRoot != null)
+        {
+            contentRoot.localPosition = Vector3.zero;
+            contentRoot.localRotation = Quaternion.identity;
+            contentRoot.localScale = Vector3.one;
+        }
+
+        // ★ Editor 生成時は明示的に Build
         builder.BuildRoom();
 
         Selection.activeGameObject = room;

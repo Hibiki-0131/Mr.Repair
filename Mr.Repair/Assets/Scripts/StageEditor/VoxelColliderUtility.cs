@@ -2,9 +2,19 @@ using UnityEngine;
 
 public static class VoxelColliderUtility
 {
-    public static void BuildColliders(Transform contentRoot, bool[,,] solid, float voxelSize, int yOffset)
+    public static void BuildColliders(
+        Transform contentRoot,
+        bool[,,] solid,
+        float voxelSize,
+        int yOffset,
+        RoomBuilder owner)
     {
-        // 既存のコライダー削除
+        if (contentRoot == null || solid == null)
+            return;
+
+        // ============================
+        // ContentRoot に付いている Collider を全削除
+        // ============================
         foreach (var col in contentRoot.GetComponents<BoxCollider>())
         {
 #if UNITY_EDITOR
@@ -17,8 +27,15 @@ public static class VoxelColliderUtility
 #endif
         }
 
+        // ============================
+        // 子オブジェクトの Collider を削除
+        // ※ PushableBlock の Collider は残す
+        // ============================
         foreach (Transform child in contentRoot)
         {
+            if (child.GetComponent<PushableBlock>() != null)
+                continue;
+
             var childCol = child.GetComponent<BoxCollider>();
             if (childCol != null)
             {
@@ -39,7 +56,9 @@ public static class VoxelColliderUtility
 
         bool[,,] visited = new bool[width, height, depth];
 
-        // Greedy merge
+        // ============================
+        // Greedy Merge（X → Z → Y）
+        // ============================
         for (int y = 0; y < height; y++)
         {
             for (int z = 0; z < depth; z++)
@@ -50,7 +69,9 @@ public static class VoxelColliderUtility
                         continue;
 
                     int maxX = x;
-                    while (maxX + 1 < width && solid[maxX + 1, y, z] && !visited[maxX + 1, y, z])
+                    while (maxX + 1 < width &&
+                           solid[maxX + 1, y, z] &&
+                           !visited[maxX + 1, y, z])
                         maxX++;
 
                     int maxZ = z;
@@ -59,13 +80,15 @@ public static class VoxelColliderUtility
                     {
                         for (int xi = x; xi <= maxX; xi++)
                         {
-                            if (!solid[xi, y, maxZ + 1] || visited[xi, y, maxZ + 1])
+                            if (!solid[xi, y, maxZ + 1] ||
+                                visited[xi, y, maxZ + 1])
                             {
                                 canExpandZ = false;
                                 break;
                             }
                         }
-                        if (canExpandZ) maxZ++;
+                        if (canExpandZ)
+                            maxZ++;
                     }
 
                     int maxY = y;
@@ -76,42 +99,67 @@ public static class VoxelColliderUtility
                         {
                             for (int xi = x; xi <= maxX; xi++)
                             {
-                                if (!solid[xi, maxY + 1, zi] || visited[xi, maxY + 1, zi])
+                                if (!solid[xi, maxY + 1, zi] ||
+                                    visited[xi, maxY + 1, zi])
                                 {
                                     canExpandY = false;
                                     break;
                                 }
                             }
-                            if (!canExpandY) break;
+                            if (!canExpandY)
+                                break;
                         }
-                        if (canExpandY) maxY++;
+                        if (canExpandY)
+                            maxY++;
                     }
 
+                    // visited マーク
                     for (int yy = y; yy <= maxY; yy++)
                         for (int zz = z; zz <= maxZ; zz++)
                             for (int xx = x; xx <= maxX; xx++)
                                 visited[xx, yy, zz] = true;
 
-                    CreateCollider(contentRoot, x, maxX, y, maxY, z, maxZ, voxelSize, yOffset);
+                    CreateCollider(
+                        contentRoot,
+                        x, maxX,
+                        y, maxY,
+                        z, maxZ,
+                        voxelSize,
+                        yOffset
+                    );
                 }
             }
         }
+
+        // ============================
+        // RoomColliderOwner を contentRoot に 1 つだけ
+        // ============================
+        var ownerTag = contentRoot.GetComponent<RoomColliderOwner>();
+        if (ownerTag == null)
+            ownerTag = contentRoot.gameObject.AddComponent<RoomColliderOwner>();
+
+        ownerTag.Owner = owner;
     }
 
+    // ============================
+    // Collider 生成（contentRoot ローカル基準）
+    // ============================
     private static void CreateCollider(
         Transform parent,
         int minX, int maxX,
         int minY, int maxY,
         int minZ, int maxZ,
-        float voxelSize, int yOffset)
+        float voxelSize,
+        int yOffset)
     {
         float sizeX = (maxX - minX + 1) * voxelSize;
         float sizeY = (maxY - minY + 1) * voxelSize;
         float sizeZ = (maxZ - minZ + 1) * voxelSize;
 
-        float centerX = ((minX + maxX) / 2f) * voxelSize;
-        float centerY = ((minY + maxY) / 2f) * voxelSize + yOffset;
-        float centerZ = ((minZ + maxZ) / 2f) * voxelSize;
+        // ★ RoomBuilder の mesh 生成と完全一致するセル中心
+        float centerX = (minX + maxX + 1) * 0.5f * voxelSize;
+        float centerY = ((minY + maxY + 1) * 0.5f + yOffset) * voxelSize;
+        float centerZ = (minZ + maxZ + 1) * 0.5f * voxelSize;
 
         var col = parent.gameObject.AddComponent<BoxCollider>();
         col.center = new Vector3(centerX, centerY, centerZ);

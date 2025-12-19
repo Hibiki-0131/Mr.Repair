@@ -1,49 +1,42 @@
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class PushableBlock : MonoBehaviour
 {
-    [Header("Prefab Reference（固定）")]
-    public GameObject prefabReference;
-
     [SerializeField] private float gravityMultiplier = 5f;
 
     private Rigidbody rb;
     private bool isSettled = false;
 
+    private RoomBuilder ownerBuilder;
+
+    // RoomBuilder から注入
+    public void SetOwner(RoomBuilder builder)
+    {
+        ownerBuilder = builder;
+    }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
         rb.useGravity = false;
+        rb.isKinematic = false;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+        rb.mass = 20f;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-        rb.mass = 20f;
-
-#if UNITY_EDITOR
-        // Editor時のみ PrefabReference を初期設定
-        if (prefabReference == null)
-        {
-            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-            if (prefab != null)
-                prefabReference = prefab;
-        }
-#endif
     }
 
     private void FixedUpdate()
     {
-        if (!isSettled)
-        {
-            rb.AddForce(
-                Physics.gravity * gravityMultiplier,
-                ForceMode.Acceleration
-            );
-        }
+        if (isSettled) return;
+
+        rb.AddForce(
+            Physics.gravity * gravityMultiplier,
+            ForceMode.Acceleration
+        );
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -51,53 +44,52 @@ public class PushableBlock : MonoBehaviour
         if (isSettled)
             return;
 
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            TrySettleIntoHole();
-        }
+        if (!collision.gameObject.CompareTag("Ground"))
+            return;
+
+        var ownerTag =
+            collision.collider.GetComponent<RoomColliderOwner>();
+
+        if (ownerTag == null || ownerTag.Owner == null)
+            return;
+
+        ownerBuilder = ownerTag.Owner;
+        TrySettleIntoHole();
     }
 
-    /// <summary>
-    /// ★ local 座標前提で穴埋め判定を行う
-    /// </summary>
     private void TrySettleIntoHole()
     {
-        var builder = RoomBuilder.Instance;
-        if (builder == null || builder.SolidGrid == null)
+        if (ownerBuilder == null || ownerBuilder.SolidGrid == null)
             return;
 
-        // ★ world ではなく local を使用
         Vector3 localPos = transform.localPosition;
 
-        int x = Mathf.RoundToInt(localPos.x / builder.VoxelSize);
-        int z = Mathf.RoundToInt(localPos.z / builder.VoxelSize);
-        int y = 0; // 現在は床レイヤー固定
+        int x = Mathf.FloorToInt(localPos.x / ownerBuilder.VoxelSize);
+        int y = Mathf.FloorToInt(localPos.y / ownerBuilder.VoxelSize) - ownerBuilder.YOffset;
+        int z = Mathf.FloorToInt(localPos.z / ownerBuilder.VoxelSize);
 
-        // 安全な範囲チェック
-        if (x < 0 || z < 0 ||
-            x >= builder.SolidGrid.GetLength(0) ||
-            z >= builder.SolidGrid.GetLength(2))
+        if (x < 0 || y < 0 || z < 0 ||
+            x >= ownerBuilder.SolidGrid.GetLength(0) ||
+            y >= ownerBuilder.SolidGrid.GetLength(1) ||
+            z >= ownerBuilder.SolidGrid.GetLength(2))
             return;
 
-        // 穴なら埋める
-        if (!builder.SolidGrid[x, y, z])
-        {
-            builder.FillHole(x, y, z);
+        if (ownerBuilder.SolidGrid[x, y, z])
+            return;
 
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = true;
-            rb.constraints = RigidbodyConstraints.FreezeAll;
+        ownerBuilder.FillHole(x, y, z);
 
-            // ★ 穴の中心へ正確にスナップ
-            transform.localPosition =
-                new Vector3(
-                    x,
-                    y + builder.YOffset,
-                    z
-                ) * builder.VoxelSize;
+        rb.velocity = Vector3.zero;
+        rb.isKinematic = true;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
 
-            isSettled = true;
-        }
+        // ★ 完全にセル中心へ固定
+        transform.localPosition = new Vector3(
+            (x + 0.5f) * ownerBuilder.VoxelSize,
+            (y + ownerBuilder.YOffset + 0.5f) * ownerBuilder.VoxelSize,
+            (z + 0.5f) * ownerBuilder.VoxelSize
+        );
+
+        isSettled = true;
     }
 }

@@ -1,152 +1,252 @@
+using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
 
 public class RoomBuilder : MonoBehaviour
 {
-    public static RoomBuilder Instance { get; private set; }
-
-    [SerializeField] private Transform contentRoot;
-    [SerializeField] private RoomMetadataHolder metadataHolder;
-
+    [Header("Room Settings")]
     [SerializeField] private float voxelSize = 1f;
     [SerializeField] private int yOffset = 0;
 
-    private bool[,,] solid;
+    [Header("References")]
+    [SerializeField] private Transform contentRoot;
+    [SerializeField] private RoomMetadataHolder metadataHolder;
 
-    public bool[,,] SolidGrid => solid;
+    public bool[,,] SolidGrid { get; private set; }
     public float VoxelSize => voxelSize;
     public int YOffset => yOffset;
     public Transform ContentRoot => contentRoot;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+    private bool colliderDirty;
 
-    // ★ 自動 Build はしない（StageEditor / Reset からのみ呼ぶ）
-    private void Start(){
-        BuildRoom();
-    }
+    // CSV 3D
+    private int[,,] csvGrid;
 
-    /// <summary>
-    /// CSV から Room を再構築する
-    /// （見た目・論理・Collider を local 座標で完全同期）
-    /// </summary>
+    // ================================
+    // Build
+    // ================================
     public void BuildRoom()
     {
-        if (metadataHolder == null || metadataHolder.metadata == null)
+        if (!ValidateReferences())
+            return;
+
+        ClearContent();
+        LoadCsv3D();
+
+        if (csvGrid == null)
         {
-            Debug.LogWarning("RoomMetadata が設定されていません");
+            Debug.LogError("[RoomBuilder] csvGrid is NULL", this);
             return;
         }
 
-        // 既存の地形を削除（CarryBlock は残す）
-        foreach (Transform child in contentRoot)
+        int width = csvGrid.GetLength(0);
+        int height = csvGrid.GetLength(1);
+        int depth = csvGrid.GetLength(2);
+
+        SolidGrid = new bool[width, height, depth];
+
+        for (int y = 0; y < height; y++)
         {
-            if (child.GetComponent<PushableBlock>() != null)
-                continue;
-
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
-                DestroyImmediate(child.gameObject);
-            else
-                Destroy(child.gameObject);
-#else
-            Destroy(child.gameObject);
-#endif
-        }
-
-        string csv = metadataHolder.metadata.roomCsv.text.Replace("\r", "");
-        string[] layers = csv.Split(
-            new string[] { "---" },
-            System.StringSplitOptions.RemoveEmptyEntries);
-
-        string[] firstLines = layers[0].Trim().Split('\n');
-        int depth = firstLines.Length;
-        int width = firstLines[0].Trim().Length;
-        int height = layers.Length;
-
-        solid = new bool[width, height, depth];
-
-        int y = 0;
-        foreach (var layer in layers)
-        {
-            string[] lines = layer.Trim().Split('\n');
-
-            for (int z = 0; z < lines.Length; z++)
+            for (int z = 0; z < depth; z++)
             {
-                string line = lines[z].Trim();
-                int zr = (lines.Length - 1) - z;
-
-                for (int x = 0; x < line.Length; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    char code = line[x];
-                    GameObject prefab = BlockFactory.GetPrefab(code);
+                    int csv = csvGrid[x, y, z];
+                    if (csv == 0) continue;
 
-                    Vector3 localPos =
-                        new Vector3(x, y + yOffset, zr) * voxelSize;
+                    // ★ collider と完全一致する localPosition（セル中心）
+                    Vector3 localPos = new Vector3(
+                        (x + 0.5f) * voxelSize,
+                        (y + yOffset + 0.5f) * voxelSize,
+                        (z + 0.5f) * voxelSize
+                    );
 
-                    // CarryBlock（Collider 統合対象外）
-                    if (code == '3')
+                    GameObject prefab =
+                        BlockFactory.GetPrefab((char)('0' + csv));
+                    if (prefab == null) continue;
+
+                    // ★ 親のみ指定 → localPosition で揃える
+                    var obj = Instantiate(prefab, contentRoot);
+                    obj.transform.localPosition = localPos;
+                    obj.transform.localRotation = Quaternion.identity;
+
+                    switch (csv)
                     {
-                        if (prefab != null)
-                        {
-                            var block = Instantiate(prefab, contentRoot);
-                            block.transform.localPosition = localPos;
-                            block.transform.localRotation = Quaternion.identity;
-                        }
+                        case 1: // ground
+                        case 2: // goal
+                        case 4: // hole bottom（地面扱い）
+                            SolidGrid[x, y, z] = true;
 
-                        solid[x, y, zr] = false;
-                        continue;
-                    }
+                            if (csv == 4)
+                                obj.tag = "Ground";
+                            break;
 
-                    // Static Block
-                    if (prefab != null)
-                    {
-                        var block = Instantiate(prefab, contentRoot);
-                        block.transform.localPosition = localPos;
-                        block.transform.localRotation = Quaternion.identity;
-
-                        solid[x, y, zr] = true;
-                    }
-                    else
-                    {
-                        solid[x, y, zr] = false;
+                        case 3: // carry block
+                            var pushable = obj.GetComponent<PushableBlock>();
+                            if (pushable != null)
+                                pushable.SetOwner(this);
+                            break;
                     }
                 }
             }
-
-            y++;
         }
 
-        // Collider を solid 配列から再生成（local）
-        VoxelColliderUtility.BuildColliders(
-            contentRoot, solid, voxelSize, yOffset);
-
-        Debug.Log("Room Build Complete");
+        RebuildColliders();
     }
 
-    /// <summary>
-    /// PushableBlock が穴に落ちたときに呼ばれる
-    /// </summary>
+    // ================================
+    // CSV 3D 読み込み
+    // ================================
+    private void LoadCsv3D()
+    {
+        TextAsset csv = metadataHolder.metadata.roomCsv;
+
+        string[] rawLines = csv.text
+            .Replace("\r", "")
+            .Split('\n');
+
+        var layers = new List<List<string>>();
+        var current = new List<string>();
+
+        foreach (var line in rawLines)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            if (line.StartsWith("---"))
+            {
+                if (current.Count > 0)
+                {
+                    layers.Add(current);
+                    current = new List<string>();
+                }
+                continue;
+            }
+
+            current.Add(line);
+        }
+
+        if (current.Count > 0)
+            layers.Add(current);
+
+        if (layers.Count == 0)
+        {
+            Debug.LogError("[RoomBuilder] CSV has no layers", this);
+            return;
+        }
+
+        int height = layers.Count;
+        int depth = layers[0].Count;
+        int width = layers[0][0].Length;
+
+        csvGrid = new int[width, height, depth];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int z = 0; z < depth; z++)
+            {
+                string line = layers[y][z];
+
+                if (line.Length != width)
+                {
+                    Debug.LogError(
+                        $"[RoomBuilder] CSV width mismatch at layer {y}, row {z}",
+                        this
+                    );
+                    return;
+                }
+
+                for (int x = 0; x < width; x++)
+                {
+                    csvGrid[x, y, depth - 1 - z] = line[x] - '0';
+                }
+            }
+        }
+
+        Debug.Log(
+            $"[RoomBuilder] CSV Loaded {width} x {height} x {depth}",
+            this
+        );
+    }
+
+    // ================================
+    // Hole fill
+    // ================================
     public void FillHole(int x, int y, int z)
     {
-        if (solid == null)
+        if (SolidGrid[x, y, z])
             return;
 
-        solid[x, y, z] = true;
+        SolidGrid[x, y, z] = true;
 
-        // Collider 再構築は安全なタイミングで
-        StartCoroutine(RebuildLater());
+        Vector3 localPos = new Vector3(
+            (x + 0.5f) * voxelSize,
+            (y + yOffset + 0.5f) * voxelSize,
+            (z + 0.5f) * voxelSize
+        );
+
+        GameObject groundPrefab = BlockFactory.GetPrefab('1');
+        if (groundPrefab != null)
+        {
+            var obj = Instantiate(groundPrefab, contentRoot);
+            obj.transform.localPosition = localPos;
+            obj.transform.localRotation = Quaternion.identity;
+        }
+
+        colliderDirty = true;
     }
 
-    private IEnumerator RebuildLater()
+    private void LateUpdate()
     {
-        yield return new WaitForEndOfFrame();
+        if (!colliderDirty) return;
+        colliderDirty = false;
+        RebuildColliders();
+    }
 
+    private void RebuildColliders()
+    {
         VoxelColliderUtility.BuildColliders(
-            contentRoot, solid, voxelSize, yOffset);
+            contentRoot,
+            SolidGrid,
+            voxelSize,
+            yOffset,
+            this
+        );
 
-        Debug.Log("Collider Re-Built");
+        EnsureRoomColliderOwner();
+    }
+
+    private void EnsureRoomColliderOwner()
+    {
+        var owner = contentRoot.GetComponent<RoomColliderOwner>();
+        if (owner == null)
+            owner = contentRoot.gameObject.AddComponent<RoomColliderOwner>();
+
+        owner.Owner = this;
+    }
+
+    private void ClearContent()
+    {
+        for (int i = contentRoot.childCount - 1; i >= 0; i--)
+            DestroyImmediate(contentRoot.GetChild(i).gameObject);
+    }
+
+    private bool ValidateReferences()
+    {
+        if (contentRoot == null)
+        {
+            Debug.LogError("[RoomBuilder] contentRoot is NULL", this);
+            return false;
+        }
+
+        if (metadataHolder == null)
+            metadataHolder = GetComponentInChildren<RoomMetadataHolder>();
+
+        if (metadataHolder == null || metadataHolder.metadata == null)
+        {
+            Debug.LogError("[RoomBuilder] metadata missing", this);
+            return false;
+        }
+
+        return true;
     }
 }
