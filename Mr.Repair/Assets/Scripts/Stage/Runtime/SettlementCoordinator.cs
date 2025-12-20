@@ -21,31 +21,31 @@ public class SettlementCoordinator : MonoBehaviour
             TrySettle(block);
 
         pending.Clear();
-        colliderScheduler.RequestRebuild();
     }
 
     private void TrySettle(PushableBlock block)
     {
-        if (!terrain.TryFillFromCarryBlock(
-            block.transform.localPosition,
-            out Vector3 snapped))
+        var rb = block.GetComponent<Rigidbody>();
+        if (rb.velocity.sqrMagnitude > 0.01f)
+            return;
+
+        Vector3 localPos = block.transform.localPosition;
+
+        if (!terrain.TryFillFromCarryBlock(localPos, out Vector3 snapped))
+            return;
+
+        // ★ 中心判定（0.25マス以内）
+        if ((localPos - snapped).sqrMagnitude > 0.0625f)
             return;
 
         block.transform.localPosition = snapped;
         block.Freeze();
 
-        // ★ このフレームでは再構築しない
         colliderScheduler.RequestRebuild();
     }
-
-
-    // ================================
-    // Reset / Rebind API
-    // ================================
 
     public void SetTerrain(TerrainState terrain)
     {
         this.terrain = terrain;
     }
-
 }

@@ -64,43 +64,24 @@ public class RoomBuilder : MonoBehaviour
         SolidGrid = new bool[w, h, d];
 
         for (int y = 0; y < h; y++)
-        {
             for (int z = 0; z < d; z++)
-            {
                 for (int x = 0; x < w; x++)
                 {
                     int csv = csvGrid[x, y, z];
-                    if (csv == 0)
+                    if (csv != 1 && csv != 2)
                         continue;
 
                     Vector3 pos = GridToLocal(x, y, z);
 
-                    switch (csv)
-                    {
-                        case 1: // floor
-                        case 2: // wall
-                            Instantiate(
-                                BlockFactory.GetPrefab((char)('0' + csv)),
-                                contentRoot
-                            ).transform.localPosition = pos;
+                    // 壁・通常床の見た目
+                    Instantiate(
+                        BlockFactory.GetPrefab((char)('0' + csv)),
+                        contentRoot
+                    ).transform.localPosition = pos;
 
-                            SolidGrid[x, y, z] = true;
-                            break;
-
-                        case 4: // hole bottom (mesh only)
-                            Instantiate(
-                                BlockFactory.GetPrefab('4'),
-                                contentRoot
-                            ).transform.localPosition = pos;
-                            break;
-
-                        case 3:
-                            // ★ carryblock はここでは生成しない
-                            break;
-                    }
+                    // ★ 穴ルール（高さ）
+                    SolidGrid[x, y, z] = (csv == 1 && y != 0) || csv == 2;
                 }
-            }
-        }
 
         RebuildColliders();
     }

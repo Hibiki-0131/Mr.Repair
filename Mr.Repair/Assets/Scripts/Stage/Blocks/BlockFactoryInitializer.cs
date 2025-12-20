@@ -33,9 +33,9 @@ public class BlockFactoryInitializer : MonoBehaviour
             { '1', wallPrefab },
             { '2', goalPrefab },
             { '3', carryBlockPrefab },
-            { '4', holeBottomPrefab }, // Åö
             { '0', null },
         };
+
 
         BlockFactory.Initialize(map);
         Debug.Log("BlockFactory initialized.");

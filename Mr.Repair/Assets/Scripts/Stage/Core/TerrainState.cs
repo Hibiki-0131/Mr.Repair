@@ -20,10 +20,6 @@ public class TerrainState
         this.yOffset = yOffset;
     }
 
-    /// <summary>
-    /// CarryBlock が穴に落ちたかを判定し、
-    /// 成立すれば SolidGrid を更新する
-    /// </summary>
     public bool TryFillFromCarryBlock(
         Vector3 localPos,
         out Vector3 snappedPos)
@@ -37,19 +33,14 @@ public class TerrainState
         if (!IsInside(x, y, z))
             return false;
 
-        // すでに埋まっている
+        // 床候補でなければ不可
+        if (csvGrid[x, y, z] != 1)
+            return false;
+
+        // すでに床なら不可
         if (SolidGrid[x, y, z])
             return false;
 
-        int belowY = y - 1;
-        if (belowY < 0)
-            return false;
-
-        // csv=4（穴底）でなければ不可
-        if (csvGrid[x, belowY, z] != 4)
-            return false;
-
-        // ===== 地形確定 =====
         SolidGrid[x, y, z] = true;
 
         snappedPos = new Vector3(
