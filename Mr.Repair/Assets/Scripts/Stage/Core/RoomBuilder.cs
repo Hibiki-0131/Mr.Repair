@@ -7,52 +7,33 @@ using UnityEditor;
 
 public class RoomBuilder : MonoBehaviour
 {
-    // ================================
-    // Settings
-    // ================================
     [Header("Room Settings")]
     [SerializeField] private float voxelSize = 1f;
     [SerializeField] private int yOffset = 0;
 
-    // ================================
-    // References
-    // ================================
     [Header("References")]
     [SerializeField] private Transform contentRoot;
     [SerializeField] private RoomMetadataHolder metadataHolder;
 
-    // ================================
-    // Public API
-    // ================================
     public bool[,,] SolidGrid { get; private set; }
     public Transform ContentRoot => contentRoot;
     public float VoxelSize => voxelSize;
     public int YOffset => yOffset;
 
-    // ================================
-    // Internal
-    // ================================
     private int[,,] csvGrid;
 
-    // ================================
-    // ContentRoot 注入（Editor 用）
-    // ================================
     public void SetContentRoot(Transform root)
     {
         contentRoot = root;
     }
 
     // ================================
-    // Build（Runtime / Editor 共通）
+    // Build (Editor / Runtime 共通)
     // ================================
     public void BuildRoom()
     {
         if (!ValidateReferences())
             return;
-
-        contentRoot.localPosition = Vector3.zero;
-        contentRoot.localRotation = Quaternion.identity;
-        contentRoot.localScale = Vector3.one;
 
         ClearContent();
         LoadCsv3D();
@@ -68,75 +49,61 @@ public class RoomBuilder : MonoBehaviour
                 for (int x = 0; x < w; x++)
                 {
                     int csv = csvGrid[x, y, z];
-                    if (csv != 1 && csv != 2)
-                        continue;
 
-                    Vector3 pos = GridToLocal(x, y, z);
+                    switch (csv)
+                    {
+                        case 1: // 通常床
+                            Instantiate(
+                                BlockFactory.GetPrefab('1'),
+                                contentRoot
+                            ).transform.localPosition = GridToLocal(x, y, z);
 
-                    // 壁・通常床の見た目
-                    Instantiate(
-                        BlockFactory.GetPrefab((char)('0' + csv)),
-                        contentRoot
-                    ).transform.localPosition = pos;
+                            SolidGrid[x, y, z] = true;
+                            break;
 
-                    // ★ 穴ルール（高さ）
-                    SolidGrid[x, y, z] = (csv == 1 && y != 0) || csv == 2;
+                        case 2: // ゴール床
+                            Instantiate(
+                                BlockFactory.GetPrefab('2'),
+                                contentRoot
+                            ).transform.localPosition = GridToLocal(x, y, z);
+
+                            SolidGrid[x, y, z] = true;
+                            break;
+
+                        default:
+                            // 0,3 は床なし
+                            SolidGrid[x, y, z] = false;
+                            break;
+                    }
                 }
 
         RebuildColliders();
     }
 
-    // ================================
-    // Runtime API
-    // ================================
     public TerrainState BuildTerrain()
     {
         BuildRoom();
         return new TerrainState(csvGrid, SolidGrid, voxelSize, yOffset);
     }
 
-    // ================================
-    // ★ 追加：carryblock 初期位置提供 API
-    // ================================
     public IEnumerable<Vector3> GetCarryBlockPositions()
     {
-        if (csvGrid == null)
-            yield break;
-
         int w = csvGrid.GetLength(0);
         int h = csvGrid.GetLength(1);
         int d = csvGrid.GetLength(2);
 
         for (int y = 0; y < h; y++)
-        {
             for (int z = 0; z < d; z++)
-            {
                 for (int x = 0; x < w; x++)
-                {
                     if (csvGrid[x, y, z] == 3)
-                    {
                         yield return GridToLocal(x, y, z);
-                    }
-                }
-            }
-        }
     }
 
 #if UNITY_EDITOR
-    // ================================
-    // Editor 専用 API
-    // ================================
     public void BuildForEditor(RoomMetadata metadata)
     {
         if (metadataHolder == null)
-        {
             metadataHolder = GetComponentInChildren<RoomMetadataHolder>();
-            if (metadataHolder == null)
-            {
-                Debug.LogError("[RoomBuilder] RoomMetadataHolder not found", this);
-                return;
-            }
-        }
 
         metadataHolder.metadata = metadata;
         BuildRoom();
@@ -170,19 +137,14 @@ public class RoomBuilder : MonoBehaviour
 
             if (line.StartsWith("---"))
             {
-                if (current.Count > 0)
-                {
-                    layers.Add(current);
-                    current = new List<string>();
-                }
+                layers.Add(current);
+                current = new List<string>();
                 continue;
             }
 
             current.Add(line);
         }
-
-        if (current.Count > 0)
-            layers.Add(current);
+        layers.Add(current);
 
         int h = layers.Count;
         int d = layers[0].Count;
@@ -230,7 +192,6 @@ public class RoomBuilder : MonoBehaviour
         if (metadataHolder == null)
             metadataHolder = GetComponentInChildren<RoomMetadataHolder>();
 
-        return metadataHolder != null &&
-               metadataHolder.metadata != null;
+        return metadataHolder != null && metadataHolder.metadata != null;
     }
 }

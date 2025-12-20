@@ -8,7 +8,6 @@ public class StageInitializer : MonoBehaviour
 
     private bool initialized;
 
-    // EditorWindow から呼ばれる
     public void SetDependencies(
         RoomBuilder builder,
         StageContext context
@@ -20,7 +19,6 @@ public class StageInitializer : MonoBehaviour
 
     private void Awake()
     {
-        // Play 時に Inspector に残っていなければ自動探索
         if (roomBuilder == null)
             roomBuilder = GetComponent<RoomBuilder>();
 
@@ -35,7 +33,10 @@ public class StageInitializer : MonoBehaviour
 
         if (roomBuilder == null || stageContext == null)
         {
-            Debug.LogError("[StageInitializer] Dependencies not set", this);
+            Debug.LogError(
+                "[StageInitializer] Dependencies not set",
+                this
+            );
             return;
         }
 
@@ -45,26 +46,69 @@ public class StageInitializer : MonoBehaviour
 
     private void InitializeStage()
     {
-        // Terrain 構築
+        // ============================
+        // 1. Terrain 構築
+        // ============================
         TerrainState terrain = roomBuilder.BuildTerrain();
+
+        // StageContext に配線
         stageContext.SetTerrain(terrain);
 
-        // carryblock 生成
+        // ============================
+        // 2. SettlementCoordinator 取得
+        // ============================
+        var settlement = GetComponent<SettlementCoordinator>();
+        if (settlement == null)
+        {
+            Debug.LogError(
+                "[StageInitializer] SettlementCoordinator not found",
+                this
+            );
+            return;
+        }
+
+        // ★ Terrain / RoomBuilder を明示的に注入
+        settlement.SetTerrain(terrain);
+        settlement.SetRoomBuilder(roomBuilder);
+
+        // ============================
+        // 3. CarryBlock 生成
+        // ============================
         GameObject carryPrefab = BlockFactory.GetPrefab('3');
         if (carryPrefab == null)
         {
-            Debug.LogError("[StageInitializer] CarryBlock prefab not found", this);
+            Debug.LogError(
+                "[StageInitializer] CarryBlock prefab not found",
+                this
+            );
             return;
         }
 
         foreach (Vector3 pos in roomBuilder.GetCarryBlockPositions())
         {
-            Instantiate(
+            var block = Instantiate(
                 carryPrefab,
                 pos,
                 Quaternion.identity,
                 roomBuilder.ContentRoot
             );
+
+            // ============================
+            // 4. BlockSettlementSensor 配線
+            // ============================
+            var sensor = block.GetComponent<BlockSettlementSensor>();
+            if (sensor == null)
+            {
+                Debug.LogError(
+                    "[StageInitializer] BlockSettlementSensor missing on CarryBlock",
+                    block
+                );
+                continue;
+            }
+
+            sensor.SetCoordinator(settlement);
         }
+
+        Debug.Log("[StageInitializer] InitializeStage completed", this);
     }
 }
