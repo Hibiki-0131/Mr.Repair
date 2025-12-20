@@ -18,13 +18,23 @@ public class StageEditorWindow : EditorWindow
         GUILayout.Label("Room Placement", EditorStyles.boldLabel);
 
         roomPrefab = (GameObject)EditorGUILayout.ObjectField(
-            "RoomRoot Prefab", roomPrefab, typeof(GameObject), false);
+            "RoomRoot Prefab",
+            roomPrefab,
+            typeof(GameObject),
+            false
+        );
 
         selectedMetadata = (RoomMetadata)EditorGUILayout.ObjectField(
-            "Room Metadata", selectedMetadata, typeof(RoomMetadata), false);
+            "Room Metadata",
+            selectedMetadata,
+            typeof(RoomMetadata),
+            false
+        );
 
         spawnPosition = EditorGUILayout.Vector3Field(
-            "Spawn Position", spawnPosition);
+            "Spawn Position",
+            spawnPosition
+        );
 
         GUILayout.Space(10);
 
@@ -42,7 +52,9 @@ public class StageEditorWindow : EditorWindow
         if (selectedMetadata != null && selectedMetadata.roomCsv != null)
         {
             EditorGUILayout.TextArea(
-                selectedMetadata.roomCsv.text, GUILayout.Height(200));
+                selectedMetadata.roomCsv.text,
+                GUILayout.Height(200)
+            );
         }
     }
 
@@ -54,6 +66,9 @@ public class StageEditorWindow : EditorWindow
             return;
         }
 
+        // ----------------------------
+        // Prefab Instantiate
+        // ----------------------------
         var room = (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
         if (room == null)
         {
@@ -65,11 +80,16 @@ public class StageEditorWindow : EditorWindow
 
         room.name = selectedMetadata.roomName;
 
-        // ★ RoomRoot を SpawnPosition に配置
+        // ----------------------------
+        // Transform 初期化
+        // ----------------------------
         room.transform.position = spawnPosition;
         room.transform.rotation = Quaternion.identity;
         room.transform.localScale = Vector3.one;
 
+        // ----------------------------
+        // Metadata 設定
+        // ----------------------------
         var holder = room.GetComponentInChildren<RoomMetadataHolder>();
         if (holder == null)
         {
@@ -78,6 +98,9 @@ public class StageEditorWindow : EditorWindow
         }
         holder.metadata = selectedMetadata;
 
+        // ----------------------------
+        // RoomBuilder 取得
+        // ----------------------------
         var builder = room.GetComponentInChildren<RoomBuilder>();
         if (builder == null)
         {
@@ -85,7 +108,9 @@ public class StageEditorWindow : EditorWindow
             return;
         }
 
-        // ★ contentRoot を必ずローカル原点に揃える
+        // ----------------------------
+        // contentRoot 正規化
+        // ----------------------------
         Transform contentRoot = builder.ContentRoot;
         if (contentRoot != null)
         {
@@ -94,9 +119,14 @@ public class StageEditorWindow : EditorWindow
             contentRoot.localScale = Vector3.one;
         }
 
-        // ★ Editor 生成時は明示的に Build
-        builder.BuildRoom();
+        // ----------------------------
+        // ★ Editor 専用 API を使用
+        // ----------------------------
+        builder.BuildForEditor(selectedMetadata);
 
+        // ----------------------------
+        // Selection
+        // ----------------------------
         Selection.activeGameObject = room;
         EditorGUIUtility.PingObject(room);
     }

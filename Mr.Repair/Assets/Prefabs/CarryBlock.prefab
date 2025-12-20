@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5531669399956539085}
   - component: {fileID: 7593133029121366585}
   - component: {fileID: 7690933176413877709}
+  - component: {fileID: 3307473097040696681}
   m_Layer: 0
   m_Name: CarryBlock
   m_TagString: Untagged
@@ -146,5 +147,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 843f555910388f1419d4103bc4358b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabReference: {fileID: 657907303210040374}
   gravityMultiplier: 5
+--- !u!114 &3307473097040696681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657907303210040374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db1e68d45abb6b948a92376bd3b0d65b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coordinator: {fileID: 0}

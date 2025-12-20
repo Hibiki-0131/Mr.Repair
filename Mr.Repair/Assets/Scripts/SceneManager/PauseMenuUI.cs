@@ -4,6 +4,9 @@ public class PauseMenuUI : MonoBehaviour
 {
     [SerializeField] private GameObject pauseUI;
 
+    [Header("Stage Reset")]
+    [SerializeField] private ResettableStageController resetController;
+
     public void Pause()
     {
         pauseUI.SetActive(true);
@@ -24,14 +27,23 @@ public class PauseMenuUI : MonoBehaviour
     }
 
     /// <summary>
-    /// ★ Reset ボタンから呼ばれる
+    /// Reset ボタンから呼ばれる
     /// </summary>
     public void Reset()
     {
-        // Pause 解除してから Reset すると安全
         GameStateManager.Instance.ResumeGame();
         pauseUI.SetActive(false);
 
-        ResettableStageController.Instance.ResetStage();
+        if (resetController != null)
+        {
+            resetController.ResetStage();
+        }
+        else
+        {
+            Debug.LogError(
+                "[PauseMenuUI] ResettableStageController が設定されていません",
+                this
+            );
+        }
     }
 }

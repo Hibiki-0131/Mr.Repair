@@ -3,30 +3,18 @@ using UnityEngine;
 
 public class ResettableStageController : MonoBehaviour
 {
-    public static ResettableStageController Instance { get; private set; }
+    [SerializeField] private Transform player;
+    [SerializeField] private RoomBuilder roomBuilder;
+    [SerializeField] private StageContext stageContext;
 
-    [Header("Player")]
-    public Transform player;
     private Vector3 playerStartPos;
     private Quaternion playerStartRot;
     private Rigidbody playerRb;
 
-    [Header("Room")]
-    public RoomBuilder roomBuilder;
-
-    // ================================
-    // 初期 CarryBlock 情報
-    // ================================
-    private readonly List<(Vector3 localPos, Quaternion localRot)> blockStartTransforms
-        = new();
+    private readonly List<(Vector3 pos, Quaternion rot)> blockStarts = new();
 
     private void Awake()
     {
-        Instance = this;
-
-        // ----------------
-        // Player 初期位置
-        // ----------------
         if (player != null)
         {
             playerStartPos = player.position;
@@ -34,76 +22,59 @@ public class ResettableStageController : MonoBehaviour
             playerRb = player.GetComponent<Rigidbody>();
         }
 
-        // ----------------
-        // 初期 CarryBlock を記録
-        // （Prefabは保持しない）
-        // ----------------
-        foreach (var block in FindObjectsOfType<PushableBlock>())
-        {
-            blockStartTransforms.Add((
-                block.transform.localPosition,
-                block.transform.localRotation
-            ));
-        }
+        foreach (var b in FindObjectsOfType<PushableBlock>())
+            blockStarts.Add((b.transform.localPosition, b.transform.localRotation));
     }
 
-    /// <summary>
-    /// ステージを CSV 初期状態に完全リセット
-    /// </summary>
     public void ResetStage()
     {
-        if (roomBuilder == null)
+        // -----------------------------
+        // 既存 CarryBlock 削除
+        // -----------------------------
+        foreach (var b in FindObjectsOfType<PushableBlock>())
+            Destroy(b.gameObject);
+
+        // -----------------------------
+        // Terrain 再構築
+        // -----------------------------
+        if (roomBuilder == null || stageContext == null)
         {
-            Debug.LogError("[ResettableStageController] RoomBuilder is NULL");
+            Debug.LogError("[ResettableStageController] Missing references", this);
             return;
         }
 
-        // ================================
-        // 1. 既存 CarryBlock を削除
-        // ================================
-        foreach (var b in FindObjectsOfType<PushableBlock>())
+        TerrainState terrain = roomBuilder.BuildTerrain();
+        if (terrain == null)
         {
-            Destroy(b.gameObject);
+            Debug.LogError("[ResettableStageController] Terrain build failed", this);
+            return;
         }
 
-        // ================================
-        // 2. Room を CSV から再構築
-        //    （床・壁・Collider を含む）
-        // ================================
-        roomBuilder.BuildRoom();
+        stageContext.SetTerrain(terrain);
 
-        // ================================
-        // 3. CarryBlock を再生成
-        // ================================
+        // -----------------------------
+        // CarryBlock 再生成
+        // -----------------------------
         GameObject carryPrefab = BlockFactory.GetPrefab('3');
         if (carryPrefab == null)
         {
             Debug.LogError(
-                "[ResettableStageController] CarryBlock prefab not found (csv=3)"
+                "[ResettableStageController] CarryBlock prefab not found in BlockFactory",
+                this
             );
             return;
         }
 
-        foreach (var data in blockStartTransforms)
+        foreach (var t in blockStarts)
         {
-            var block = Instantiate(
-                carryPrefab,
-                roomBuilder.ContentRoot
-            );
-
-            block.transform.localPosition = data.localPos;
-            block.transform.localRotation = data.localRot;
-
-            var pushable = block.GetComponent<PushableBlock>();
-            if (pushable != null)
-            {
-                pushable.SetOwner(roomBuilder);
-            }
+            var b = Instantiate(carryPrefab, roomBuilder.ContentRoot);
+            b.transform.localPosition = t.pos;
+            b.transform.localRotation = t.rot;
         }
 
-        // ================================
-        // 4. Player を初期位置に戻す
-        // ================================
+        // -----------------------------
+        // Player リセット
+        // -----------------------------
         if (playerRb != null)
         {
             playerRb.velocity = Vector3.zero;
@@ -113,7 +84,6 @@ public class ResettableStageController : MonoBehaviour
         }
 
         Physics.SyncTransforms();
-
-        Debug.Log("[ResettableStageController] ResetStage completed");
     }
+
 }
