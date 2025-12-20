@@ -45,27 +45,10 @@ public class StageEditorWindow : EditorWindow
                 CreateRoomInScene();
             }
         }
-
-        GUILayout.Space(15);
-        GUILayout.Label("CSV Preview", EditorStyles.boldLabel);
-
-        if (selectedMetadata != null && selectedMetadata.roomCsv != null)
-        {
-            EditorGUILayout.TextArea(
-                selectedMetadata.roomCsv.text,
-                GUILayout.Height(200)
-            );
-        }
     }
 
     private void CreateRoomInScene()
     {
-        if (roomPrefab == null || selectedMetadata == null)
-        {
-            Debug.LogWarning("Prefab または Metadata が未設定です");
-            return;
-        }
-
         // ----------------------------
         // Prefab Instantiate
         // ----------------------------
@@ -79,48 +62,90 @@ public class StageEditorWindow : EditorWindow
         Undo.RegisterCreatedObjectUndo(room, "Create Room");
 
         room.name = selectedMetadata.roomName;
-
-        // ----------------------------
-        // Transform 初期化
-        // ----------------------------
         room.transform.position = spawnPosition;
         room.transform.rotation = Quaternion.identity;
         room.transform.localScale = Vector3.one;
 
         // ----------------------------
-        // Metadata 設定
+        // 必須コンポーネント（RoomRoot 直下）
+        // ----------------------------
+        var builder =
+            room.GetComponent<RoomBuilder>() ??
+            room.AddComponent<RoomBuilder>();
+
+        var context =
+            room.GetComponent<StageContext>() ??
+            room.AddComponent<StageContext>();
+
+        var initializer =
+            room.GetComponent<StageInitializer>() ??
+            room.AddComponent<StageInitializer>();
+
+        var resetController =
+            room.GetComponent<ResettableStageController>() ??
+            room.AddComponent<ResettableStageController>();
+
+        var settlementCoordinator =
+            room.GetComponent<SettlementCoordinator>() ??
+            room.AddComponent<SettlementCoordinator>();
+
+        var colliderScheduler =
+            room.GetComponent<ColliderRebuildScheduler>() ??
+            room.AddComponent<ColliderRebuildScheduler>();
+
+        // ----------------------------
+        // RoomMetadataHolder
         // ----------------------------
         var holder = room.GetComponentInChildren<RoomMetadataHolder>();
         if (holder == null)
         {
-            Debug.LogError("RoomMetadataHolder が RoomPrefab 内に見つかりません");
-            return;
+            var holderGO = new GameObject("RoomMetadataHolder");
+            holderGO.transform.SetParent(room.transform);
+            holderGO.transform.localPosition = Vector3.zero;
+            holderGO.transform.localRotation = Quaternion.identity;
+            holderGO.transform.localScale = Vector3.one;
+
+            holder = holderGO.AddComponent<RoomMetadataHolder>();
         }
         holder.metadata = selectedMetadata;
 
         // ----------------------------
-        // RoomBuilder 取得
+        // ContentRoot（★必ず 1 つだけ）
         // ----------------------------
-        var builder = room.GetComponentInChildren<RoomBuilder>();
-        if (builder == null)
+        if (builder.ContentRoot == null)
         {
-            Debug.LogError("RoomBuilder が RoomPrefab 内に見つかりません");
-            return;
+            // 既存 ContentRoot を探索
+            Transform existing = room.transform.Find("ContentRoot");
+
+            if (existing != null)
+            {
+                builder.SetContentRoot(existing);
+            }
+            else
+            {
+                var contentRootGO = new GameObject("ContentRoot");
+                contentRootGO.transform.SetParent(room.transform);
+                contentRootGO.transform.localPosition = Vector3.zero;
+                contentRootGO.transform.localRotation = Quaternion.identity;
+                contentRootGO.transform.localScale = Vector3.one;
+
+                builder.SetContentRoot(contentRootGO.transform);
+            }
         }
 
         // ----------------------------
-        // contentRoot 正規化
+        // 相互参照の自動配線
         // ----------------------------
-        Transform contentRoot = builder.ContentRoot;
-        if (contentRoot != null)
-        {
-            contentRoot.localPosition = Vector3.zero;
-            contentRoot.localRotation = Quaternion.identity;
-            contentRoot.localScale = Vector3.one;
-        }
+        initializer.SetDependencies(builder, context);
+        resetController.SetDependencies(builder, context);
+
+        context.SetSettlementCoordinator(settlementCoordinator);
+        context.SetColliderRebuildScheduler(colliderScheduler);
+
+        colliderScheduler.SetOwner(builder);
 
         // ----------------------------
-        // ★ Editor 専用 API を使用
+        // Editor 用ビルド（※ carryblock は生成しない）
         // ----------------------------
         builder.BuildForEditor(selectedMetadata);
 

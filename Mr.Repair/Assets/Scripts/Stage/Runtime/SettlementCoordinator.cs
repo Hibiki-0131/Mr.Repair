@@ -26,14 +26,18 @@ public class SettlementCoordinator : MonoBehaviour
 
     private void TrySettle(PushableBlock block)
     {
-        Vector3 localPos = block.transform.localPosition;
-
-        if (!terrain.TryFillAt(localPos, out Vector3 snappedPos))
+        if (!terrain.TryFillFromCarryBlock(
+            block.transform.localPosition,
+            out Vector3 snapped))
             return;
 
-        block.transform.localPosition = snappedPos;
+        block.transform.localPosition = snapped;
         block.Freeze();
+
+        // Åö Ç±ÇÃÉtÉåÅ[ÉÄÇ≈ÇÕçƒç\ízÇµÇ»Ç¢
+        colliderScheduler.RequestRebuild();
     }
+
 
     // ================================
     // Reset / Rebind API

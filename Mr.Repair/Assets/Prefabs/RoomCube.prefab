@@ -88,6 +88,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3929802935108212455}
+  - component: {fileID: 5042847887464144223}
+  - component: {fileID: -2199611285494148688}
   m_Layer: 0
   m_Name: ContentRoot
   m_TagString: Untagged
@@ -110,6 +112,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3578209204979645993}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5042847887464144223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4444310254860703092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c8fd9d43417cde419d0ef895a146665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-2199611285494148688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4444310254860703092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 645ca1d2d4f075348a5f4046138f2588, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Owner: {fileID: 70644157412834190}
 --- !u!1 &4784938468068242350
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,6 +147,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6727436590441975655}
   - component: {fileID: 70644157412834190}
+  - component: {fileID: -8303911909821382738}
   m_Layer: 0
   m_Name: RoomBuilder
   m_TagString: Untagged
@@ -154,5 +182,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 198a9c29b421f5d43b82ae569520695b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  voxelSize: 1
+  yOffset: 0
   contentRoot: {fileID: 3929802935108212455}
   metadataHolder: {fileID: 2446629858865718893}
+--- !u!114 &-8303911909821382738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4784938468068242350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afac17d04149cbc498e4ea5203ca0528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomBuilder: {fileID: 0}
+  settlementCoordinator: {fileID: 0}
+  colliderRebuildScheduler: {fileID: 0}

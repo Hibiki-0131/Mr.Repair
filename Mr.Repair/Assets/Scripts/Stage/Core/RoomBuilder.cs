@@ -25,10 +25,9 @@ public class RoomBuilder : MonoBehaviour
     // Public API
     // ================================
     public bool[,,] SolidGrid { get; private set; }
+    public Transform ContentRoot => contentRoot;
     public float VoxelSize => voxelSize;
     public int YOffset => yOffset;
-    public Transform ContentRoot => contentRoot;
-    public bool IsBuildCompleted { get; private set; }
 
     // ================================
     // Internal
@@ -36,16 +35,21 @@ public class RoomBuilder : MonoBehaviour
     private int[,,] csvGrid;
 
     // ================================
-    // Build (Runtime / Editor 共通)
+    // ContentRoot 注入（Editor 用）
+    // ================================
+    public void SetContentRoot(Transform root)
+    {
+        contentRoot = root;
+    }
+
+    // ================================
+    // Build（Runtime / Editor 共通）
     // ================================
     public void BuildRoom()
     {
-        IsBuildCompleted = false;
-
         if (!ValidateReferences())
             return;
 
-        // ContentRoot は必ずローカル原点
         contentRoot.localPosition = Vector3.zero;
         contentRoot.localRotation = Quaternion.identity;
         contentRoot.localScale = Vector3.one;
@@ -53,67 +57,45 @@ public class RoomBuilder : MonoBehaviour
         ClearContent();
         LoadCsv3D();
 
-        if (csvGrid == null)
+        int w = csvGrid.GetLength(0);
+        int h = csvGrid.GetLength(1);
+        int d = csvGrid.GetLength(2);
+
+        SolidGrid = new bool[w, h, d];
+
+        for (int y = 0; y < h; y++)
         {
-            Debug.LogError("[RoomBuilder] csvGrid is NULL", this);
-            return;
-        }
-
-        int width = csvGrid.GetLength(0);
-        int height = csvGrid.GetLength(1);
-        int depth = csvGrid.GetLength(2);
-
-        SolidGrid = new bool[width, height, depth];
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int z = 0; z < depth; z++)
+            for (int z = 0; z < d; z++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < w; x++)
                 {
                     int csv = csvGrid[x, y, z];
                     if (csv == 0)
                         continue;
 
-                    Vector3 localPos = new Vector3(
-                        (x + 0.5f) * voxelSize,
-                        (y + yOffset + 0.5f) * voxelSize,
-                        (z + 0.5f) * voxelSize
-                    );
+                    Vector3 pos = GridToLocal(x, y, z);
 
                     switch (csv)
                     {
-                        case 1: // 床
-                        case 2: // 壁
-                            {
-                                GameObject prefab =
-                                    BlockFactory.GetPrefab((char)('0' + csv));
-                                if (prefab == null)
-                                    break;
+                        case 1: // floor
+                        case 2: // wall
+                            Instantiate(
+                                BlockFactory.GetPrefab((char)('0' + csv)),
+                                contentRoot
+                            ).transform.localPosition = pos;
 
-                                var obj = Instantiate(prefab, contentRoot);
-                                obj.transform.localPosition = localPos;
-                                obj.transform.localRotation = Quaternion.identity;
+                            SolidGrid[x, y, z] = true;
+                            break;
 
-                                SolidGrid[x, y, z] = true;
-                                break;
-                            }
-
-                        case 4: // 穴底（見た目のみ）
-                            {
-                                GameObject prefab = BlockFactory.GetPrefab('4');
-                                if (prefab == null)
-                                    break;
-
-                                var obj = Instantiate(prefab, contentRoot);
-                                obj.transform.localPosition = localPos;
-                                obj.transform.localRotation = Quaternion.identity;
-                                break;
-                            }
+                        case 4: // hole bottom (mesh only)
+                            Instantiate(
+                                BlockFactory.GetPrefab('4'),
+                                contentRoot
+                            ).transform.localPosition = pos;
+                            break;
 
                         case 3:
-                            // ★ carryblock は生成しない
-                            // ResettableStageController が管理する
+                            // ★ carryblock はここでは生成しない
                             break;
                     }
                 }
@@ -121,11 +103,10 @@ public class RoomBuilder : MonoBehaviour
         }
 
         RebuildColliders();
-        IsBuildCompleted = true;
     }
 
     // ================================
-    // Runtime 用 API
+    // Runtime API
     // ================================
     public TerrainState BuildTerrain()
     {
@@ -133,14 +114,37 @@ public class RoomBuilder : MonoBehaviour
         return new TerrainState(csvGrid, SolidGrid, voxelSize, yOffset);
     }
 
+    // ================================
+    // ★ 追加：carryblock 初期位置提供 API
+    // ================================
+    public IEnumerable<Vector3> GetCarryBlockPositions()
+    {
+        if (csvGrid == null)
+            yield break;
+
+        int w = csvGrid.GetLength(0);
+        int h = csvGrid.GetLength(1);
+        int d = csvGrid.GetLength(2);
+
+        for (int y = 0; y < h; y++)
+        {
+            for (int z = 0; z < d; z++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    if (csvGrid[x, y, z] == 3)
+                    {
+                        yield return GridToLocal(x, y, z);
+                    }
+                }
+            }
+        }
+    }
+
 #if UNITY_EDITOR
     // ================================
     // Editor 専用 API
     // ================================
-    /// <summary>
-    /// Editor 専用：Metadata を差し替えて部屋を構築する
-    /// Runtime からは呼ばない
-    /// </summary>
     public void BuildForEditor(RoomMetadata metadata)
     {
         if (metadataHolder == null)
@@ -159,17 +163,26 @@ public class RoomBuilder : MonoBehaviour
 #endif
 
     // ================================
-    // CSV Loader
+    // Internal
     // ================================
+    private Vector3 GridToLocal(int x, int y, int z)
+    {
+        return new Vector3(
+            (x + 0.5f) * voxelSize,
+            (y + yOffset + 0.5f) * voxelSize,
+            (z + 0.5f) * voxelSize
+        );
+    }
+
     private void LoadCsv3D()
     {
         TextAsset csv = metadataHolder.metadata.roomCsv;
-        string[] rawLines = csv.text.Replace("\r", "").Split('\n');
+        string[] lines = csv.text.Replace("\r", "").Split('\n');
 
         var layers = new List<List<string>>();
         var current = new List<string>();
 
-        foreach (var line in rawLines)
+        foreach (var line in lines)
         {
             if (string.IsNullOrWhiteSpace(line))
                 continue;
@@ -190,28 +203,18 @@ public class RoomBuilder : MonoBehaviour
         if (current.Count > 0)
             layers.Add(current);
 
-        int height = layers.Count;
-        int depth = layers[0].Count;
-        int width = layers[0][0].Length;
+        int h = layers.Count;
+        int d = layers[0].Count;
+        int w = layers[0][0].Length;
 
-        csvGrid = new int[width, height, depth];
+        csvGrid = new int[w, h, d];
 
-        for (int y = 0; y < height; y++)
-        {
-            for (int z = 0; z < depth; z++)
-            {
-                string line = layers[y][z];
-                for (int x = 0; x < width; x++)
-                {
-                    csvGrid[x, y, depth - 1 - z] = line[x] - '0';
-                }
-            }
-        }
+        for (int y = 0; y < h; y++)
+            for (int z = 0; z < d; z++)
+                for (int x = 0; x < w; x++)
+                    csvGrid[x, y, d - 1 - z] = layers[y][z][x] - '0';
     }
 
-    // ================================
-    // Collider
-    // ================================
     private void RebuildColliders()
     {
         VoxelColliderUtility.BuildColliders(
@@ -223,9 +226,6 @@ public class RoomBuilder : MonoBehaviour
         );
     }
 
-    // ================================
-    // Utility
-    // ================================
     private void ClearContent()
     {
         for (int i = contentRoot.childCount - 1; i >= 0; i--)
