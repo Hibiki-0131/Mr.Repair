@@ -31,12 +31,14 @@ public class TerrainState
     /// to existing ground.
     /// </summary>
     public bool TryFillFromCarryBlock(
-        Vector3 localPos,
-        out Vector3 snappedPos)
+    Vector3 localPos,
+    out Vector3 snappedPos)
     {
         snappedPos = Vector3.zero;
 
-        // Convert local position to grid position
+        // -------------------------
+        // 1. ローカル座標 → グリッド座標
+        // -------------------------
         int x = Mathf.FloorToInt(localPos.x / voxelSize);
         int y = Mathf.FloorToInt(localPos.y / voxelSize) - yOffset;
         int z = Mathf.FloorToInt(localPos.z / voxelSize);
@@ -44,29 +46,39 @@ public class TerrainState
         if (!IsInside(x, y, z))
             return false;
 
-        // Condition 1: must be a hole (csv = 0)
+        // -------------------------
+        // 2. 穴セルであること
+        // -------------------------
         if (csvGrid[x, y, z] != 0)
             return false;
 
         if (SolidGrid[x, y, z])
             return false;
 
-        // Condition 2: must be supported from below
+        // -------------------------
+        // 3. 下方向に支えがあること
+        // -------------------------
         int belowY = y - 1;
         if (belowY < 0 || !SolidGrid[x, belowY, z])
             return false;
 
-        // Condition 3: must connect to existing ground
-        bool connected =
-            IsSolid(x - 1, y, z) ||
-            IsSolid(x + 1, y, z) ||
-            IsSolid(x, y, z - 1) ||
-            IsSolid(x, y, z + 1);
+        // -------------------------
+        // 4. 四方向の囲まれ判定（重要）
+        // -------------------------
+        int solidCount = 0;
 
-        if (!connected)
+        if (IsSolid(x - 1, y, z)) solidCount++;
+        if (IsSolid(x + 1, y, z)) solidCount++;
+        if (IsSolid(x, y, z - 1)) solidCount++;
+        if (IsSolid(x, y, z + 1)) solidCount++;
+
+        // 3方向以上に囲まれていなければ地面化しない
+        if (solidCount < 3)
             return false;
 
-        // Confirm ground
+        // -------------------------
+        // 5. 地面として確定
+        // -------------------------
         SolidGrid[x, y, z] = true;
 
         snappedPos = new Vector3(
