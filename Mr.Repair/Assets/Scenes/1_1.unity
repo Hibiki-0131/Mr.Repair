@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2195,10 +2195,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cba9f79724643e142abedb6bfe2d4392, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallPrefab: {fileID: 3908338935509838689, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
+  floorPrefab: {fileID: 3908338935509838689, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
   goalPrefab: {fileID: 1770000542969381143, guid: ba7005aad1726664694e4048b1d2631a, type: 3}
   carryBlockPrefab: {fileID: 657907303210040374, guid: e6051c4aaa5e6564fafeb833ed4c5214, type: 3}
-  holeBottomPrefab: {fileID: 8103968741949969577, guid: 7a3a9c9dec7debc4da7e5632540a65fe, type: 3}
 --- !u!54 &84935502
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -25270,6 +25269,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8fd9d43417cde419d0ef895a146665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  contentRoot: {fileID: 1620466055}
+  owner: {fileID: 731983996}
 --- !u!114 &731984000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25283,6 +25284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colliderScheduler: {fileID: 731983999}
+  roomBuilder: {fileID: 731983996}
 --- !u!114 &731984001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25296,8 +25298,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 760423968}
-  roomBuilder: {fileID: 731984004}
-  stageContext: {fileID: 731984003}
 --- !u!114 &731984002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25324,9 +25324,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afac17d04149cbc498e4ea5203ca0528, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomBuilder: {fileID: 731984004}
-  settlementCoordinator: {fileID: 731984000}
-  colliderRebuildScheduler: {fileID: 731983999}
 --- !u!114 &731984004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49818,6 +49815,51 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1358593612}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1362147737
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1362147739}
+  - component: {fileID: 1362147738}
+  m_Layer: 0
+  m_Name: StageResetController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1362147738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362147737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 760423968}
+--- !u!4 &1362147739
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362147737}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 794.3218, y: 815.49164, z: 83.76196}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1367647415
 GameObject:
   m_ObjectHideFlags: 0
@@ -60614,6 +60656,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1617474398}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1620466055 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3929802935108212455, guid: 3da1f2f7439f49247bb1b197ff62ee59, type: 3}
+  m_PrefabInstance: {fileID: 731983994}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1624530247
 GameObject:
   m_ObjectHideFlags: 0
@@ -78613,3 +78660,4 @@ SceneRoots:
   - {fileID: 796232177}
   - {fileID: 372071727}
   - {fileID: 731983994}
+  - {fileID: 1362147739}

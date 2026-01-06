@@ -30290,6 +30290,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
+--- !u!1 &762273830 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3908338935509838689, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
+  m_PrefabInstance: {fileID: 762273829}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &763162798
 GameObject:
   m_ObjectHideFlags: 0
@@ -31161,7 +31166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1307660772}
-  roomBuilder: {fileID: 0}
 --- !u!4 &802730181
 Transform:
   m_ObjectHideFlags: 0
@@ -34586,7 +34590,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cba9f79724643e142abedb6bfe2d4392, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallPrefab: {fileID: 3908338935509838689, guid: dc41bbb5f1770704aa175612bfeb5f11, type: 3}
+  floorPrefab: {fileID: 762273830}
   goalPrefab: {fileID: 1770000542969381143, guid: ba7005aad1726664694e4048b1d2631a, type: 3}
   carryBlockPrefab: {fileID: 657907303210040374, guid: e6051c4aaa5e6564fafeb833ed4c5214, type: 3}
 --- !u!54 &884881614
@@ -44288,6 +44292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseUI: {fileID: 1815120558}
+  resetController: {fileID: 0}
 --- !u!224 &1142561920
 RectTransform:
   m_ObjectHideFlags: 0

@@ -13,12 +13,22 @@ public class BlockFactoryInitializer : MonoBehaviour
 
     private void Init()
     {
-        BlockFactory.Initialize(new Dictionary<char, GameObject>()
+        if (floorPrefab == null || goalPrefab == null || carryBlockPrefab == null)
         {
-            { '1', floorPrefab },
-            { '2', goalPrefab },
-            { '3', carryBlockPrefab },
-            { '0', null },
-        });
+            Debug.LogError(
+                "[BlockFactoryInitializer] One or more prefabs are not assigned",
+                this
+            );
+            return;
+        }
+
+        BlockFactory.Initialize(new Dictionary<char, GameObject>()
+    {
+        { '1', floorPrefab },
+        { '2', goalPrefab },
+        { '3', carryBlockPrefab },
+        { '0', null },
+    });
     }
+
 }

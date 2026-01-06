@@ -54,11 +54,6 @@ public class ColliderRebuildScheduler : MonoBehaviour
         if (contentRoot == null && owner != null)
             contentRoot = owner.ContentRoot;
 
-        // terrain ‚ÍŠO•”’“ü‚ªŠî–{‚¾‚ªA
-        // “¯ˆê GameObject ‚É‚ ‚ê‚Î•âŠ®
-        if (terrain == null)
-            terrain = GetComponent<TerrainState>();
-
         dependencyResolved =
             owner != null &&
             terrain != null &&

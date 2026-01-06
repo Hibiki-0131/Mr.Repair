@@ -12,6 +12,23 @@ public class ResettableStageController : MonoBehaviour
     private Rigidbody playerRb;
 
     // ================================
+    // Unity Lifecycle
+    // ================================
+    private void Awake()
+    {
+        // プレイヤー初期状態保存
+        if (player != null)
+        {
+            playerStartPos = player.position;
+            playerStartRot = player.rotation;
+            playerRb = player.GetComponent<Rigidbody>();
+        }
+
+        // ★ 自動依存解決（重要）
+        ResolveDependencies();
+    }
+
+    // ================================
     // Dependency Injection
     // ================================
     public void SetDependencies(RoomBuilder builder, StageContext context)
@@ -20,14 +37,13 @@ public class ResettableStageController : MonoBehaviour
         stageContext = context;
     }
 
-    private void Awake()
+    private void ResolveDependencies()
     {
-        if (player != null)
-        {
-            playerStartPos = player.position;
-            playerStartRot = player.rotation;
-            playerRb = player.GetComponent<Rigidbody>();
-        }
+        if (roomBuilder == null)
+            roomBuilder = FindObjectOfType<RoomBuilder>();
+
+        if (stageContext == null)
+            stageContext = FindObjectOfType<StageContext>();
     }
 
     // ================================
@@ -35,21 +51,39 @@ public class ResettableStageController : MonoBehaviour
     // ================================
     public void ResetStage()
     {
+        // 念のため再解決
+        ResolveDependencies();
+
         if (roomBuilder == null || stageContext == null)
         {
-            Debug.LogError("[ResettableStageController] Dependencies not set", this);
+            Debug.LogError(
+                "[ResettableStageController] Dependencies not set",
+                this
+            );
             return;
         }
 
-        // CarryBlock 削除
-        foreach (var b in FindObjectsOfType<PushableBlock>())
-            Destroy(b.gameObject);
+        // -------------------------
+        // 1. CarryBlock 削除
+        // -------------------------
+        foreach (var block in FindObjectsOfType<PushableBlock>())
+        {
+            Destroy(block.gameObject);
+        }
 
-        // Terrain 再構築
-        TerrainState terrain = roomBuilder.BuildTerrain();
-        stageContext.SetTerrain(terrain);
+        // -------------------------
+        // 2. Terrain 再構築（CSV起点）
+        // -------------------------
+        TerrainState newTerrain = roomBuilder.BuildTerrain();
 
-        // Player リセット
+        // -------------------------
+        // 3. Context 再注入
+        // -------------------------
+        stageContext.SetTerrain(newTerrain);
+
+        // -------------------------
+        // 4. Player リセット
+        // -------------------------
         if (playerRb != null)
         {
             playerRb.velocity = Vector3.zero;
