@@ -86,6 +86,53 @@ public class RoomBuilder : MonoBehaviour
         return new TerrainState(csvGrid, SolidGrid, voxelSize, yOffset);
     }
 
+    // ================================
+    // CarryBlock 初期生成（★追加）
+    // ================================
+    public void SpawnInitialCarryBlocks(
+        GameObject carryBlockPrefab,
+        SettlementCoordinator settlementCoordinator
+    )
+    {
+        if (carryBlockPrefab == null)
+        {
+            Debug.LogError("[RoomBuilder] CarryBlock prefab is null", this);
+            return;
+        }
+
+        if (settlementCoordinator == null)
+        {
+            Debug.LogError("[RoomBuilder] SettlementCoordinator is null", this);
+            return;
+        }
+
+        foreach (Vector3 pos in GetCarryBlockPositions())
+        {
+            var block = Instantiate(
+                carryBlockPrefab,
+                pos,
+                Quaternion.identity,
+                contentRoot
+            );
+
+            var sensor = block.GetComponent<BlockSettlementSensor>();
+            if (sensor != null)
+            {
+                sensor.SetCoordinator(settlementCoordinator);
+            }
+            else
+            {
+                Debug.LogError(
+                    "[RoomBuilder] BlockSettlementSensor missing on CarryBlock",
+                    block
+                );
+            }
+        }
+    }
+
+    // ================================
+    // CSV 解釈（CarryBlock 用）
+    // ================================
     public IEnumerable<Vector3> GetCarryBlockPositions()
     {
         int w = csvGrid.GetLength(0);
@@ -179,7 +226,7 @@ public class RoomBuilder : MonoBehaviour
             else
                 Destroy(contentRoot.GetChild(i).gameObject);
 #else
-            Destroy(contentRoot.GetChild(i).gameObject);
+            Destroy(contentRoot.GetChild(i).gameobject);
 #endif
         }
     }

@@ -6,6 +6,7 @@ public class ResettableStageController : MonoBehaviour
 
     private RoomBuilder roomBuilder;
     private StageContext stageContext;
+    private SettlementCoordinator settlementCoordinator;
 
     private Vector3 playerStartPos;
     private Quaternion playerStartRot;
@@ -24,17 +25,21 @@ public class ResettableStageController : MonoBehaviour
             playerRb = player.GetComponent<Rigidbody>();
         }
 
-        // ★ 自動依存解決（重要）
         ResolveDependencies();
     }
 
     // ================================
     // Dependency Injection
     // ================================
-    public void SetDependencies(RoomBuilder builder, StageContext context)
+    public void SetDependencies(
+        RoomBuilder builder,
+        StageContext context,
+        SettlementCoordinator settlement
+    )
     {
         roomBuilder = builder;
         stageContext = context;
+        settlementCoordinator = settlement;
     }
 
     private void ResolveDependencies()
@@ -44,6 +49,9 @@ public class ResettableStageController : MonoBehaviour
 
         if (stageContext == null)
             stageContext = FindObjectOfType<StageContext>();
+
+        if (settlementCoordinator == null)
+            settlementCoordinator = FindObjectOfType<SettlementCoordinator>();
     }
 
     // ================================
@@ -51,10 +59,11 @@ public class ResettableStageController : MonoBehaviour
     // ================================
     public void ResetStage()
     {
-        // 念のため再解決
         ResolveDependencies();
 
-        if (roomBuilder == null || stageContext == null)
+        if (roomBuilder == null ||
+            stageContext == null ||
+            settlementCoordinator == null)
         {
             Debug.LogError(
                 "[ResettableStageController] Dependencies not set",
@@ -64,7 +73,7 @@ public class ResettableStageController : MonoBehaviour
         }
 
         // -------------------------
-        // 1. CarryBlock 削除
+        // 1. 動的エンティティ破棄
         // -------------------------
         foreach (var block in FindObjectsOfType<PushableBlock>())
         {
@@ -82,7 +91,16 @@ public class ResettableStageController : MonoBehaviour
         stageContext.SetTerrain(newTerrain);
 
         // -------------------------
-        // 4. Player リセット
+        // 4. CarryBlock 再生成（★追加）
+        // -------------------------
+        GameObject carryPrefab = BlockFactory.GetPrefab('3');
+        roomBuilder.SpawnInitialCarryBlocks(
+            carryPrefab,
+            settlementCoordinator
+        );
+
+        // -------------------------
+        // 5. Player リセット
         // -------------------------
         if (playerRb != null)
         {

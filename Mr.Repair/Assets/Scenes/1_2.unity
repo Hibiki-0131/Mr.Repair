@@ -43508,7 +43508,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseUI: {fileID: 1815120558}
-  resetController: {fileID: 0}
+  resetController: {fileID: 290623536}
 --- !u!224 &1142561920
 RectTransform:
   m_ObjectHideFlags: 0

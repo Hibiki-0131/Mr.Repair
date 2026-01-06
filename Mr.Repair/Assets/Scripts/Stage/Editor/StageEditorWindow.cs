@@ -137,7 +137,7 @@ public class StageEditorWindow : EditorWindow
         // ‘ŠŒİQÆ‚Ì©“®”zü
         // ----------------------------
         initializer.SetDependencies(builder, context);
-        resetController.SetDependencies(builder, context);
+        resetController.SetDependencies(builder, context, settlementCoordinator);
 
         context.SetSettlementCoordinator(settlementCoordinator);
         context.SetColliderRebuildScheduler(colliderScheduler);
