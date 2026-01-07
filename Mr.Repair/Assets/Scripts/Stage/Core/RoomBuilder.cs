@@ -226,7 +226,7 @@ public class RoomBuilder : MonoBehaviour
             else
                 Destroy(contentRoot.GetChild(i).gameObject);
 #else
-            Destroy(contentRoot.GetChild(i).gameobject);
+        Destroy(contentRoot.GetChild(i).gameObject);
 #endif
         }
     }
