@@ -49243,10 +49243,10 @@ MonoBehaviour:
   partsSpeed: 1
   rotationSpeed: 5
   cameraTransform: {fileID: 0}
-  normalColliderSize: {x: 0.2835368, y: 0.8214075, z: 0.3949669}
-  partsColliderSize: {x: 0.2835368, y: 0.3732042, z: 0.3949669}
-  normalColliderCenter: {x: 0.03514297, y: -0.1083117, z: 0.001366297}
-  partsColliderCenter: {x: 0.03514297, y: -0.3246311, z: 0.001366297}
+  normalColliderSize: {x: 0.4413155, y: 0.8214075, z: 0.5845758}
+  partsColliderSize: {x: 0.4413155, y: 0.3732042, z: 0.5845758}
+  normalColliderCenter: {x: 0.02984945, y: -0.1083117, z: 0.06187689}
+  partsColliderCenter: {x: 0.02984945, y: -0.3246311, z: 0.06187689}
   gravityMultiplier: 5
 --- !u!114 &1307660768
 MonoBehaviour:
@@ -49353,8 +49353,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.28353676, y: 0.37320423, z: 0.46355438}
-  m_Center: {x: 0.035142966, y: -0.32463107, z: 0.0013662975}
+  m_Size: {x: 0.4413155, y: 0.37320423, z: 0.5845758}
+  m_Center: {x: 0.029849451, y: -0.32463107, z: 0.061876893}
 --- !u!95 &1307660770
 Animator:
   serializedVersion: 5
