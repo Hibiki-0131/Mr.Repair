@@ -72,8 +72,13 @@ public class StageManager : MonoBehaviour
 
     public void RetryCurrentStage()
     {
-        Debug.Log("Retry Stage: " + GetCurrentStageName());
+        GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
+        SceneController.Instance.LoadSceneAsync(stageOrder[currentStageIndex]);
+    }
 
+    public void RetryFromBeginning()
+    {
+        currentStageIndex = 0;
         GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
         SceneController.Instance.LoadSceneAsync(stageOrder[currentStageIndex]);
     }

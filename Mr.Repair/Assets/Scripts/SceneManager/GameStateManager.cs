@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameStateManager : MonoBehaviour
 {
@@ -22,20 +23,40 @@ public class GameStateManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        Debug.Log($"[GameState] Initialized -> {CurrentState}");
     }
 
     public void SetState(GameState newState)
     {
+        if (CurrentState == newState)
+        {
+            Debug.Log($"[GameState] State unchanged: {CurrentState}");
+            return;
+        }
+
+        GameState prevState = CurrentState;
         CurrentState = newState;
+
+        Debug.Log(
+            $"[GameState] {prevState} -> {newState} " +
+            $"(Scene: {SceneManager.GetActiveScene().name}, Frame: {Time.frameCount})"
+        );
     }
 
     public bool IsPaused => CurrentState == GameState.Paused;
 
     public void PauseGame()
     {
-        if (IsPaused) return;
+        if (IsPaused)
+        {
+            Debug.Log("[GameState] PauseGame ignored (already paused)");
+            return;
+        }
+
         Time.timeScale = 0f;
         SetState(GameState.Paused);
     }

@@ -4,7 +4,7 @@ public class ResultUI : MonoBehaviour
 {
     public void OnRetry()
     {
-        StageManager.Instance.RetryCurrentStage();
+        StageManager.Instance.RetryFromBeginning();
     }
 
     public void OnReturnToTitle()
@@ -12,5 +12,6 @@ public class ResultUI : MonoBehaviour
         GameStateManager.Instance.SetState(GameStateManager.GameState.Title);
         SceneController.Instance.LoadSceneAsync("Title");
     }
+
 }
 
