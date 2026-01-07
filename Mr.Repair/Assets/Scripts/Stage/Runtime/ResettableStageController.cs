@@ -17,7 +17,6 @@ public class ResettableStageController : MonoBehaviour
     // ================================
     private void Awake()
     {
-        // プレイヤー初期状態保存
         if (player != null)
         {
             playerStartPos = player.position;
@@ -29,19 +28,8 @@ public class ResettableStageController : MonoBehaviour
     }
 
     // ================================
-    // Dependency Injection
+    // Dependency Resolution
     // ================================
-    public void SetDependencies(
-        RoomBuilder builder,
-        StageContext context,
-        SettlementCoordinator settlement
-    )
-    {
-        roomBuilder = builder;
-        stageContext = context;
-        settlementCoordinator = settlement;
-    }
-
     private void ResolveDependencies()
     {
         if (roomBuilder == null)
@@ -81,17 +69,23 @@ public class ResettableStageController : MonoBehaviour
         }
 
         // -------------------------
-        // 2. Terrain 再構築（CSV起点）
+        // 2. Terrain 再構築
         // -------------------------
         TerrainState newTerrain = roomBuilder.BuildTerrain();
 
         // -------------------------
-        // 3. Context 再注入
+        // 3. StageContext 再配線（★重要）
         // -------------------------
+        stageContext.SetRoomBuilder(roomBuilder);
+        stageContext.SetSettlementCoordinator(settlementCoordinator);
+        stageContext.SetColliderRebuildScheduler(
+            roomBuilder.GetComponent<ColliderRebuildScheduler>()
+        );
+
         stageContext.SetTerrain(newTerrain);
 
         // -------------------------
-        // 4. CarryBlock 再生成（★追加）
+        // 4. CarryBlock 再生成
         // -------------------------
         GameObject carryPrefab = BlockFactory.GetPrefab('3');
         roomBuilder.SpawnInitialCarryBlocks(

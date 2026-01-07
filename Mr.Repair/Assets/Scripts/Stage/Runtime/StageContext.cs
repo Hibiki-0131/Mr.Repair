@@ -8,16 +8,15 @@ public class StageContext : MonoBehaviour
 {
     private SettlementCoordinator settlementCoordinator;
     private ColliderRebuildScheduler colliderRebuildScheduler;
+    private RoomBuilder roomBuilder;
 
     public TerrainState Terrain { get; private set; }
-
-    // ================================
-    // 配線 API（Editor / Runtime 共通）
-    // ================================
+    public RoomBuilder RoomBuilder => roomBuilder;
 
     public void SetSettlementCoordinator(SettlementCoordinator coordinator)
     {
         settlementCoordinator = coordinator;
+        coordinator.SetContext(this);
     }
 
     public void SetColliderRebuildScheduler(ColliderRebuildScheduler scheduler)
@@ -25,18 +24,19 @@ public class StageContext : MonoBehaviour
         colliderRebuildScheduler = scheduler;
     }
 
-    // ================================
-    // Terrain 配線
-    // ================================
+    public void SetRoomBuilder(RoomBuilder builder)
+    {
+        roomBuilder = builder;
+    }
 
     public void SetTerrain(TerrainState terrain)
     {
         Terrain = terrain;
+    }
 
-        if (settlementCoordinator != null)
-            settlementCoordinator.SetTerrain(terrain);
-
-        if (colliderRebuildScheduler != null)
-            colliderRebuildScheduler.SetTerrain(terrain);
+    public void RequestColliderRebuild()
+    {
+        colliderRebuildScheduler?.RequestRebuild();
     }
 }
+

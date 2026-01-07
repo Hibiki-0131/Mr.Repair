@@ -3,17 +3,21 @@ using UnityEngine;
 
 public class SettlementCoordinator : MonoBehaviour
 {
-    [SerializeField] private TerrainState terrain;
-    [SerializeField] private ColliderRebuildScheduler colliderScheduler;
-    [SerializeField] private RoomBuilder roomBuilder;
+    private StageContext context;
 
     private readonly List<PushableBlock> pending = new();
     private bool pendingRebuild;
 
+    // ================================
+    // Injection
+    // ================================
+    public void SetContext(StageContext context)
+    {
+        this.context = context;
+    }
+
     public void Enqueue(PushableBlock block)
     {
-        Debug.Log($"[Settlement] Enqueue {block.name}");
-
         if (!pending.Contains(block))
             pending.Add(block);
     }
@@ -23,8 +27,6 @@ public class SettlementCoordinator : MonoBehaviour
         if (pending.Count == 0)
             return;
 
-        Debug.Log($"[Settlement] LateUpdate pending={pending.Count}");
-
         foreach (var block in pending)
             TrySettle(block);
 
@@ -32,68 +34,27 @@ public class SettlementCoordinator : MonoBehaviour
 
         if (pendingRebuild)
         {
-            Debug.Log("[Settlement] Request collider rebuild");
-            colliderScheduler.RequestRebuild();
+            context.RequestColliderRebuild();
             pendingRebuild = false;
         }
     }
 
     private void TrySettle(PushableBlock block)
     {
-        Debug.Log($"[Settlement] TrySettle start {block.name}");
-
-        if (terrain == null)
-        {
-            Debug.LogError(
-                "[Settlement] TerrainState is null",
-                this
-            );
-            return;
-        }
-
-        if (roomBuilder == null)
-        {
-            Debug.LogError(
-                "[Settlement] RoomBuilder is null",
-                this
-            );
-            return;
-        }
-
         if (block.IsSettled)
-        {
-            Debug.Log("[Settlement] Å® already settled");
             return;
-        }
+
+        if (context == null || context.Terrain == null)
+            return;
 
         Rigidbody rb = block.GetComponent<Rigidbody>();
-        Debug.Log($"[Settlement] velocity={rb.velocity}");
-
         if (rb.velocity.sqrMagnitude > 0.01f)
-        {
-            Debug.Log("[Settlement] Å® still moving");
             return;
-        }
 
         Vector3 localPos = block.transform.localPosition;
-        Debug.Log($"[Settlement] localPos={localPos}");
 
-        if (!terrain.TryFillFromCarryBlock(localPos, out Vector3 snapped))
-        {
-            Debug.Log("[Settlement] Å® TryFillFromCarryBlock FAILED");
+        if (!context.Terrain.TryFillFromCarryBlock(localPos, out Vector3 snapped))
             return;
-        }
-
-        float dist = (localPos - snapped).sqrMagnitude;
-        Debug.Log($"[Settlement] center diff sqr={dist}");
-
-        if (dist > 0.0625f)
-        {
-            Debug.Log("[Settlement] Å® center too far");
-            return;
-        }
-
-        Debug.Log("[Settlement] Åö SETTLED");
 
         block.transform.localPosition = snapped;
         block.Freeze();
@@ -101,28 +62,10 @@ public class SettlementCoordinator : MonoBehaviour
 
         Instantiate(
             BlockFactory.GetPrefab('1'),
-            roomBuilder.ContentRoot
+            context.RoomBuilder.ContentRoot
         ).transform.localPosition = snapped;
 
         pendingRebuild = true;
     }
-
-    // ================================
-    // Dependency Injection
-    // ================================
-
-    public void SetTerrain(TerrainState terrain)
-    {
-        Debug.Log("[Settlement] SetTerrain");
-        this.terrain = terrain;
-    }
-
-    public void SetRoomBuilder(RoomBuilder builder)
-    {
-        Debug.Log(
-            $"[Settlement] SetRoomBuilder: {builder.name}",
-            this
-        );
-        roomBuilder = builder;
-    }
 }
+

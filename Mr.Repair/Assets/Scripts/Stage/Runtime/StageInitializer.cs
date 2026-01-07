@@ -51,12 +51,12 @@ public class StageInitializer : MonoBehaviour
         // ============================
         TerrainState terrain = roomBuilder.BuildTerrain();
 
-        // StageContext に配線
+        // ============================
+        // 2. Context に集約
+        // ============================
         stageContext.SetTerrain(terrain);
+        stageContext.SetRoomBuilder(roomBuilder);
 
-        // ============================
-        // 2. SettlementCoordinator 取得
-        // ============================
         var settlement = GetComponent<SettlementCoordinator>();
         if (settlement == null)
         {
@@ -67,48 +67,21 @@ public class StageInitializer : MonoBehaviour
             return;
         }
 
-        // ★ Terrain / RoomBuilder を明示的に注入
-        settlement.SetTerrain(terrain);
-        settlement.SetRoomBuilder(roomBuilder);
+        stageContext.SetSettlementCoordinator(settlement);
+
+        // ★ Coordinator には Context だけ渡す
+        settlement.SetContext(stageContext);
 
         // ============================
-        // 3. CarryBlock 生成
+        // 3. CarryBlock 生成は RoomBuilder に委譲
         // ============================
         GameObject carryPrefab = BlockFactory.GetPrefab('3');
-        if (carryPrefab == null)
-        {
-            Debug.LogError(
-                "[StageInitializer] CarryBlock prefab not found",
-                this
-            );
-            return;
-        }
-
-        foreach (Vector3 pos in roomBuilder.GetCarryBlockPositions())
-        {
-            var block = Instantiate(
-                carryPrefab,
-                pos,
-                Quaternion.identity,
-                roomBuilder.ContentRoot
-            );
-
-            // ============================
-            // 4. BlockSettlementSensor 配線
-            // ============================
-            var sensor = block.GetComponent<BlockSettlementSensor>();
-            if (sensor == null)
-            {
-                Debug.LogError(
-                    "[StageInitializer] BlockSettlementSensor missing on CarryBlock",
-                    block
-                );
-                continue;
-            }
-
-            sensor.SetCoordinator(settlement);
-        }
+        roomBuilder.SpawnInitialCarryBlocks(
+            carryPrefab,
+            settlement
+        );
 
         Debug.Log("[StageInitializer] InitializeStage completed", this);
     }
+
 }
