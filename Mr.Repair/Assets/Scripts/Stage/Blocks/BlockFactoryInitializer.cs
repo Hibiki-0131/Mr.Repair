@@ -13,22 +13,29 @@ public class BlockFactoryInitializer : MonoBehaviour
 
     private void Init()
     {
+        // プレハブの割り当てチェック
         if (floorPrefab == null || goalPrefab == null || carryBlockPrefab == null)
         {
-            Debug.LogError(
-                "[BlockFactoryInitializer] One or more prefabs are not assigned",
-                this
-            );
+            // ビルド時（エディタでない時）または再生中にのみエラーを出す
+            // これにより、編集中のインスペクター未設定によるビルド失敗を防ぎやすくなります
+            if (Application.isPlaying)
+            {
+                Debug.LogError(
+                    $"[BlockFactoryInitializer] 割り当てられていないプレハブがあります: " +
+                    $"Floor: {floorPrefab}, Goal: {goalPrefab}, Carry: {carryBlockPrefab}",
+                    this
+                );
+            }
             return;
         }
 
+        // 全て揃っている場合のみ辞書を初期化
         BlockFactory.Initialize(new Dictionary<char, GameObject>()
-    {
-        { '1', floorPrefab },
-        { '2', goalPrefab },
-        { '3', carryBlockPrefab },
-        { '0', null },
-    });
+        {
+            { '1', floorPrefab },
+            { '2', goalPrefab },
+            { '3', carryBlockPrefab },
+            { '0', null },
+        });
     }
-
 }

@@ -10,12 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2786d9026ef41b47864dce35ce8c095, type: 3}
-  m_Name: 1-4B
+  m_Name: 1-4
   m_EditorClassIdentifier: 
-  roomName: 1-4B
+  roomName: 1-4
   description: 
-  roomCsv: {fileID: 4900000, guid: e41cc06b11019a1439fd0e27d4497c3d, type: 3}
-  roomColor: {r: 1, g: 1, b: 1, a: 1}
+  roomCsv: {fileID: 4900000, guid: 8c8129d3c022f5f44b867ad2855fead2, type: 3}
+  colorCsv: {fileID: 4900000, guid: 100a1dc4750b55949b54ba398a075800, type: 3}
+  defaultFloorColor: {r: 1, g: 1, b: 1, a: 1}
+  floorPalette:
+  - {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 0}
   traps: []
   decorations: []
   autoBuildOnLoad: 1
