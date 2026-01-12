@@ -11,8 +11,9 @@ public class RoomMetadata : ScriptableObject
     [Header("CSV Layout (11 layers)")]
     public TextAsset roomCsv;
 
-    [Header("Visual")]
+    [Header("Visual Settings")]
     public Color roomColor = Color.white;
+    public Color floorColor = Color.white; // ★追加：床(csv=1)のデフォルト色
 
     [Header("Room Objects")]
     public GameObject[] traps;

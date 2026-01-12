@@ -4,13 +4,9 @@ using UnityEngine;
 public class SettlementCoordinator : MonoBehaviour
 {
     private StageContext context;
-
     private readonly List<PushableBlock> pending = new();
     private bool pendingRebuild;
 
-    // ================================
-    // Injection
-    // ================================
     public void SetContext(StageContext context)
     {
         this.context = context;
@@ -60,12 +56,16 @@ public class SettlementCoordinator : MonoBehaviour
         block.Freeze();
         block.MarkSettled();
 
-        Instantiate(
+        // è∞ÇÃê∂ê¨
+        var newFloor = Instantiate(
             BlockFactory.GetPrefab('1'),
             context.RoomBuilder.ContentRoot
-        ).transform.localPosition = snapped;
+        );
+        newFloor.transform.localPosition = snapped;
+
+        // Åöê∂ê¨Ç≥ÇÍÇΩè∞Ç…êFÇìKóp
+        context.RoomBuilder.ApplyFloorColor(newFloor);
 
         pendingRebuild = true;
     }
 }
-

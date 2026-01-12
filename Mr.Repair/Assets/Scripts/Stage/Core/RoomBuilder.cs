@@ -27,9 +27,6 @@ public class RoomBuilder : MonoBehaviour
         contentRoot = root;
     }
 
-    // ================================
-    // Build (Editor / Runtime 共通)
-    // ================================
     public void BuildRoom()
     {
         if (!ValidateReferences())
@@ -53,10 +50,14 @@ public class RoomBuilder : MonoBehaviour
                     switch (csv)
                     {
                         case 1: // 通常床
-                            Instantiate(
+                            var floorGO = Instantiate(
                                 BlockFactory.GetPrefab('1'),
                                 contentRoot
-                            ).transform.localPosition = GridToLocal(x, y, z);
+                            );
+                            floorGO.transform.localPosition = GridToLocal(x, y, z);
+
+                            // ★色の適用
+                            ApplyFloorColor(floorGO);
 
                             SolidGrid[x, y, z] = true;
                             break;
@@ -71,7 +72,6 @@ public class RoomBuilder : MonoBehaviour
                             break;
 
                         default:
-                            // 0,3 は床なし
                             SolidGrid[x, y, z] = false;
                             break;
                     }
@@ -80,59 +80,38 @@ public class RoomBuilder : MonoBehaviour
         RebuildColliders();
     }
 
+    // ★色適用の共通メソッド
+    public void ApplyFloorColor(GameObject target)
+    {
+        if (metadataHolder == null || metadataHolder.metadata == null) return;
+
+        var renderer = target.GetComponentInChildren<Renderer>();
+        if (renderer != null)
+        {
+            MaterialPropertyBlock prop = new MaterialPropertyBlock();
+            prop.SetColor("_Color", metadataHolder.metadata.floorColor);
+            renderer.SetPropertyBlock(prop);
+        }
+    }
+
     public TerrainState BuildTerrain()
     {
         BuildRoom();
         return new TerrainState(csvGrid, SolidGrid, voxelSize, yOffset);
     }
 
-    // ================================
-    // CarryBlock 初期生成（★追加）
-    // ================================
-    public void SpawnInitialCarryBlocks(
-        GameObject carryBlockPrefab,
-        SettlementCoordinator settlementCoordinator
-    )
+    public void SpawnInitialCarryBlocks(GameObject carryBlockPrefab, SettlementCoordinator settlementCoordinator)
     {
-        if (carryBlockPrefab == null)
-        {
-            Debug.LogError("[RoomBuilder] CarryBlock prefab is null", this);
-            return;
-        }
-
-        if (settlementCoordinator == null)
-        {
-            Debug.LogError("[RoomBuilder] SettlementCoordinator is null", this);
-            return;
-        }
+        if (carryBlockPrefab == null || settlementCoordinator == null) return;
 
         foreach (Vector3 pos in GetCarryBlockPositions())
         {
-            var block = Instantiate(
-                carryBlockPrefab,
-                pos,
-                Quaternion.identity,
-                contentRoot
-            );
-
+            var block = Instantiate(carryBlockPrefab, pos, Quaternion.identity, contentRoot);
             var sensor = block.GetComponent<BlockSettlementSensor>();
-            if (sensor != null)
-            {
-                sensor.SetCoordinator(settlementCoordinator);
-            }
-            else
-            {
-                Debug.LogError(
-                    "[RoomBuilder] BlockSettlementSensor missing on CarryBlock",
-                    block
-                );
-            }
+            if (sensor != null) sensor.SetCoordinator(settlementCoordinator);
         }
     }
 
-    // ================================
-    // CSV 解釈（CarryBlock 用）
-    // ================================
     public IEnumerable<Vector3> GetCarryBlockPositions()
     {
         int w = csvGrid.GetLength(0);
@@ -157,9 +136,6 @@ public class RoomBuilder : MonoBehaviour
     }
 #endif
 
-    // ================================
-    // Internal
-    // ================================
     private Vector3 GridToLocal(int x, int y, int z)
     {
         return new Vector3(
@@ -173,22 +149,18 @@ public class RoomBuilder : MonoBehaviour
     {
         TextAsset csv = metadataHolder.metadata.roomCsv;
         string[] lines = csv.text.Replace("\r", "").Split('\n');
-
         var layers = new List<List<string>>();
         var current = new List<string>();
 
         foreach (var line in lines)
         {
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
-
+            if (string.IsNullOrWhiteSpace(line)) continue;
             if (line.StartsWith("---"))
             {
                 layers.Add(current);
                 current = new List<string>();
                 continue;
             }
-
             current.Add(line);
         }
         layers.Add(current);
@@ -198,7 +170,6 @@ public class RoomBuilder : MonoBehaviour
         int w = layers[0][0].Length;
 
         csvGrid = new int[w, h, d];
-
         for (int y = 0; y < h; y++)
             for (int z = 0; z < d; z++)
                 for (int x = 0; x < w; x++)
@@ -207,13 +178,7 @@ public class RoomBuilder : MonoBehaviour
 
     private void RebuildColliders()
     {
-        VoxelColliderUtility.BuildColliders(
-            contentRoot,
-            SolidGrid,
-            voxelSize,
-            yOffset,
-            this
-        );
+        VoxelColliderUtility.BuildColliders(contentRoot, SolidGrid, voxelSize, yOffset, this);
     }
 
     private void ClearContent()
@@ -226,19 +191,15 @@ public class RoomBuilder : MonoBehaviour
             else
                 Destroy(contentRoot.GetChild(i).gameObject);
 #else
-        Destroy(contentRoot.GetChild(i).gameObject);
+            Destroy(contentRoot.GetChild(i).gameObject);
 #endif
         }
     }
 
     private bool ValidateReferences()
     {
-        if (contentRoot == null)
-            return false;
-
-        if (metadataHolder == null)
-            metadataHolder = GetComponentInChildren<RoomMetadataHolder>();
-
+        if (contentRoot == null) return false;
+        if (metadataHolder == null) metadataHolder = GetComponentInChildren<RoomMetadataHolder>();
         return metadataHolder != null && metadataHolder.metadata != null;
     }
 }
