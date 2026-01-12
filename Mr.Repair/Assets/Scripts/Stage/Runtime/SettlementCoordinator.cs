@@ -7,25 +7,17 @@ public class SettlementCoordinator : MonoBehaviour
     private readonly List<PushableBlock> pending = new();
     private bool pendingRebuild;
 
-    public void SetContext(StageContext context)
-    {
-        this.context = context;
-    }
+    public void SetContext(StageContext context) => this.context = context;
 
     public void Enqueue(PushableBlock block)
     {
-        if (!pending.Contains(block))
-            pending.Add(block);
+        if (!pending.Contains(block)) pending.Add(block);
     }
 
     private void LateUpdate()
     {
-        if (pending.Count == 0)
-            return;
-
-        foreach (var block in pending)
-            TrySettle(block);
-
+        if (pending.Count == 0) return;
+        foreach (var block in pending) TrySettle(block);
         pending.Clear();
 
         if (pendingRebuild)
@@ -37,34 +29,29 @@ public class SettlementCoordinator : MonoBehaviour
 
     private void TrySettle(PushableBlock block)
     {
-        if (block.IsSettled)
-            return;
-
-        if (context == null || context.Terrain == null)
-            return;
+        if (block.IsSettled || context?.Terrain == null) return;
 
         Rigidbody rb = block.GetComponent<Rigidbody>();
-        if (rb.velocity.sqrMagnitude > 0.01f)
-            return;
+        if (rb.velocity.sqrMagnitude > 0.01f) return;
 
         Vector3 localPos = block.transform.localPosition;
+        if (!context.Terrain.TryFillFromCarryBlock(localPos, out Vector3 snapped)) return;
 
-        if (!context.Terrain.TryFillFromCarryBlock(localPos, out Vector3 snapped))
-            return;
-
+        // 物理ブロックの確定
         block.transform.localPosition = snapped;
         block.Freeze();
         block.MarkSettled();
 
-        // 床の生成
+        // 代わりの「床」を生成
         var newFloor = Instantiate(
             BlockFactory.GetPrefab('1'),
             context.RoomBuilder.ContentRoot
         );
         newFloor.transform.localPosition = snapped;
 
-        // ★生成された床に色を適用
-        context.RoomBuilder.ApplyFloorColor(newFloor);
+        // ★RoomBuilderに問い合わせて、その座標に指定された色を塗る
+        int colorIdx = context.RoomBuilder.GetColorIndexAt(snapped);
+        context.RoomBuilder.ApplyColorByIndex(newFloor, colorIdx);
 
         pendingRebuild = true;
     }

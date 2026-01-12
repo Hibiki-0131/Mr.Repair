@@ -15,7 +15,11 @@ MonoBehaviour:
   roomName: 1-1A
   description: "Player\u306E\u6700\u521D\u306E\u30C1\u30E5\u30FC\u30C8\u30EA\u30A2\u30EB\u90E8\u5C4B"
   roomCsv: {fileID: 4900000, guid: 4734790abef153f45b8ad87312653534, type: 3}
-  roomColor: {r: 1, g: 1, b: 1, a: 1}
+  colorCsv: {fileID: 4900000, guid: cd976ac387d6afa4aa308d0dca40eae4, type: 3}
+  defaultFloorColor: {r: 1, g: 1, b: 1, a: 1}
+  floorPalette:
+  - {r: 0.3679245, g: 0.3679245, b: 0.3679245, a: 0}
+  - {r: 1, g: 1, b: 1, a: 0}
   traps: []
   decorations: []
   autoBuildOnLoad: 1
