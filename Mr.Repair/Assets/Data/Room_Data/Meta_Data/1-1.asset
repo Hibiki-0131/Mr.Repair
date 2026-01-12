@@ -19,7 +19,8 @@ MonoBehaviour:
   defaultFloorColor: {r: 1, g: 1, b: 1, a: 1}
   floorPalette:
   - {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 0}
-  - {r: 1, g: 1, b: 1, a: 0}
+  - {r: 1, g: 0.3820755, b: 0.3820755, a: 0}
+  - {r: 0.3803922, g: 0.5499266, b: 1, a: 0}
   traps: []
   decorations: []
   autoBuildOnLoad: 1
