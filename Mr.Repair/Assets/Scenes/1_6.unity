@@ -59748,12 +59748,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groupID: A
   moveSpeed: 20
-  wallMask:
-    serializedVersion: 2
-    m_Bits: 1
-  powerBlockMask:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!1 &1673866375
 GameObject:
   m_ObjectHideFlags: 0
