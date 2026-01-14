@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.34244603, g: 0.33457103, b: 0.3499297, a: 1}
+  m_IndirectSpecularColor: {r: 0.342446, g: 0.33457085, b: 0.3499295, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5618,6 +5618,7 @@ GameObject:
   - component: {fileID: 197050548}
   - component: {fileID: 197050547}
   - component: {fileID: 197050546}
+  - component: {fileID: 197050551}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -5751,6 +5752,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 197050544}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &197050551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 197050544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db1e68d45abb6b948a92376bd3b0d65b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coordinator: {fileID: 0}
 --- !u!1 &199674748
 GameObject:
   m_ObjectHideFlags: 0
@@ -14551,6 +14565,7 @@ GameObject:
   - component: {fileID: 528083166}
   - component: {fileID: 528083165}
   - component: {fileID: 528083169}
+  - component: {fileID: 528083170}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -14684,6 +14699,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityMultiplier: 10
+--- !u!114 &528083170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528083163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db1e68d45abb6b948a92376bd3b0d65b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coordinator: {fileID: 0}
 --- !u!1 &531590762
 GameObject:
   m_ObjectHideFlags: 0
@@ -24523,6 +24551,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseUI: {fileID: 122082973}
+  resetController: {fileID: 0}
 --- !u!1 &868908662
 GameObject:
   m_ObjectHideFlags: 0
@@ -25408,7 +25437,7 @@ Transform:
   m_GameObject: {fileID: 901713621}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.06, y: 1.21, z: 1.91}
+  m_LocalPosition: {x: 4.06, y: 1.21, z: 8.29}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -34040,6 +34069,7 @@ GameObject:
   - component: {fileID: 1240549378}
   - component: {fileID: 1240549377}
   - component: {fileID: 1240549381}
+  - component: {fileID: 1240549382}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -34173,6 +34203,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityMultiplier: 10
+--- !u!114 &1240549382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240549375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db1e68d45abb6b948a92376bd3b0d65b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coordinator: {fileID: 0}
 --- !u!1 &1240688751
 GameObject:
   m_ObjectHideFlags: 0
