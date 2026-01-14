@@ -1,19 +1,17 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class PowerBlock : MonoBehaviour
 {
     [SerializeField] private string groupID;
     private Rigidbody rb;
     private Vector3 lastPosition;
-
     public string GroupID => groupID;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
 
     private void Start()
@@ -24,18 +22,21 @@ public class PowerBlock : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // 毎フレーム、移動量を計算
         Vector3 delta = transform.position - lastPosition;
 
-        if (delta.sqrMagnitude > 0.0001f)
+        if (delta.sqrMagnitude > 0.00001f)
         {
-            // 同じIDのFollowerたちに移動を伝える
             BlockLinkManager.Instance.SyncFollowerMovement(groupID, delta);
+            lastPosition = transform.position;
         }
+    }
 
-        lastPosition = transform.position;
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-
+    // Managerから呼ばれる補正処理
+    public void ForceReposition(Vector3 finalDelta)
+    {
+        // Followerが動けた分だけしかPowerも動かさない
+        Vector3 correctedPos = lastPosition + finalDelta;
+        rb.position = correctedPos;
+        lastPosition = correctedPos;
     }
 }
