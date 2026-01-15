@@ -213333,7 +213333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 1307660772}
 --- !u!114 &971573778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239015,7 +239015,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1.5
-  m_Range: 52.92886
+  m_Range: 60
   m_SpotAngle: 110.12
   m_InnerSpotAngle: 1
   m_CookieSize: 10
