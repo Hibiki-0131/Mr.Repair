@@ -1240,6 +1240,7 @@ MonoBehaviour:
   - 1_5
   - 1_6
   - 1_7
+  - 1_8
   - GameClear
 --- !u!4 &1075133928
 Transform:
