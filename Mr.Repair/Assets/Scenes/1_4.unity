@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.35568884, g: 0.3502638, b: 0.3740369, a: 1}
+  m_IndirectSpecularColor: {r: 0.3556889, g: 0.35026392, b: 0.3740371, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4381,9 +4381,9 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
-  m_Range: 100
-  m_SpotAngle: 65.2
-  m_InnerSpotAngle: 21.80208
+  m_Range: 30
+  m_SpotAngle: 148.274
+  m_InnerSpotAngle: 1
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -4439,7 +4439,7 @@ Transform:
   m_GameObject: {fileID: 99693773}
   serializedVersion: 2
   m_LocalRotation: {x: 0.6670105, y: -0.23472767, z: -0.23472767, w: 0.6670105}
-  m_LocalPosition: {x: 8.25, y: 3.9710588, z: 6.54}
+  m_LocalPosition: {x: 12.09, y: 8.75, z: 6.54}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44694,10 +44694,10 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
-  m_Range: 60
-  m_SpotAngle: 76.68188
-  m_InnerSpotAngle: 21.80208
+  m_Intensity: 1.5
+  m_Range: 52.92886
+  m_SpotAngle: 110.12
+  m_InnerSpotAngle: 1
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -52048,9 +52048,9 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
-  m_Range: 30
-  m_SpotAngle: 76.68188
-  m_InnerSpotAngle: 21.80208
+  m_Range: 40
+  m_SpotAngle: 114.4
+  m_InnerSpotAngle: 1
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -52105,13 +52105,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1290342411}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 6.09, y: 11.354, z: 5.97}
+  m_LocalRotation: {x: 0.30716574, y: 0.63690597, z: -0.30716574, w: 0.63690597}
+  m_LocalPosition: {x: 1.19, y: 12.51, z: 6.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 51.494, y: 90, z: 0}
 --- !u!1 &1291530788
 GameObject:
   m_ObjectHideFlags: 0
