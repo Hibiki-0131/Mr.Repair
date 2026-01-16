@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class SoundPlayer : MonoBehaviour
+public class InstantAudioSource : MonoBehaviour
 {
-    public static SoundPlayer Instance { get; private set; }
+    public static InstantAudioSource Instance { get; private set; }
 
     [SerializeField] private GameObject audioSourcePrefab;
 

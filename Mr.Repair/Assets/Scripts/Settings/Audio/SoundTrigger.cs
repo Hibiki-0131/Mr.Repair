@@ -19,6 +19,6 @@ public class SoundTrigger : MonoBehaviour
             return;
         }
 
-        SoundPlayer.Instance.PlaySound(sound.clip, sound.category, position);
+        InstantAudioSource.Instance.PlaySound(sound.clip, sound.category, position);
     }
 }

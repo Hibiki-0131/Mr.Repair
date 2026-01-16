@@ -16,7 +16,7 @@ public class PlayerFootstepController : MonoBehaviour
 
     private void Update()
     {
-        if (movement == null || SoundPlayer.Instance == null) return;
+        if (movement == null || InstantAudioSource.Instance == null) return;
 
         // 移動中かつ部品化していないときのみ歩行音を鳴らす
         bool isWalking = movement.IsMoving && !movement.IsPartsMode;
@@ -28,7 +28,7 @@ public class PlayerFootstepController : MonoBehaviour
             {
                 var sound = database.GetSound("walk");
                 if (sound != null)
-                    SoundPlayer.Instance.PlaySound(sound.clip, sound.category, transform.position);
+                    InstantAudioSource.Instance.PlaySound(sound.clip, sound.category, transform.position);
 
                 stepTimer = stepInterval; // タイマーをリセット
             }

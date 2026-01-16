@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-public class BGMPlayer : MonoBehaviour
+public class PersistentAudioSource: MonoBehaviour
 {
     private AudioSource audioSource;
     [SerializeField] private SoundCategory category = SoundCategory.BGM;

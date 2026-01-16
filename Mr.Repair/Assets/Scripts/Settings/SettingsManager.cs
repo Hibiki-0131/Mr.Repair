@@ -33,7 +33,6 @@ public class SettingsManager : MonoBehaviour
     {
         mainMenu.SetActive(false);
         settingsPanel.SetActive(true);
-        ShowAudioSettings(); // デフォルトでAudioを表示
     }
 
     public void ShowAudioSettings()
