@@ -12,19 +12,19 @@ public class SettingsManager : MonoBehaviour
     [Header("Audio Sliders")]
     public Slider masterSlider;
     public Slider bgmSlider;
-    public Slider envSlider;
+    public Slider sfxSlider;
 
     void Start()
     {
         // 初期値をスライダーに反映
         masterSlider.value = SoundManager.Instance.masterVolume;
         bgmSlider.value = SoundManager.Instance.bgmVolume;
-        envSlider.value = SoundManager.Instance.environmentVolume;
+        sfxSlider.value = SoundManager.Instance.environmentVolume;
 
         // スライダーが動いた時のイベント登録
         masterSlider.onValueChanged.AddListener(SoundManager.Instance.SetMasterVolume);
         bgmSlider.onValueChanged.AddListener(SoundManager.Instance.SetBgmVolume);
-        envSlider.onValueChanged.AddListener(SoundManager.Instance.SetEnvVolume);
+        sfxSlider.onValueChanged.AddListener(SoundManager.Instance.SetEnvVolume);
 
         ShowMainMenu();
     }
