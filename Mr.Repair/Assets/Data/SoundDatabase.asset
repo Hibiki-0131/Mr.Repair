@@ -28,3 +28,6 @@ MonoBehaviour:
   - key: switch_press
     clip: {fileID: 8300000, guid: 4f7f9c3349f86754cb8dee09747c3f55, type: 3}
     category: 0
+  - key: Title_BGM
+    clip: {fileID: 8300000, guid: a0bf44c26cd5e7b4599fc4548c5fc608, type: 3}
+    category: 1

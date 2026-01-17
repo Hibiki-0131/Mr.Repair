@@ -6,9 +6,10 @@ public class InstantAudioSource : MonoBehaviour
     public static InstantAudioSource Instance { get; private set; }
 
     [SerializeField] private GameObject audioSourcePrefab;
-
-    // 現在再生中のAudioSourceとそのカテゴリを追跡するためのリスト
     private List<(AudioSource source, SoundCategory category)> activeSources = new List<(AudioSource, SoundCategory)>();
+
+    // ★追加：前回の更新タイミングを記録する変数
+    private int lastUpdateCount = -1;
 
     private void Awake()
     {
@@ -17,12 +18,16 @@ public class InstantAudioSource : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
+    // ★修正：Startでのイベント登録を削除し、Updateで監視する
+    private void Update()
     {
-        // SoundManagerの音量変更イベントを購読
-        if (SoundManager.Instance != null)
+        if (SoundManager.Instance == null) return;
+
+        // SoundManager側のカウンターが増えていたら音量を一斉更新
+        if (lastUpdateCount != SoundManager.Instance.VolumeUpdateCount)
         {
-            SoundManager.Instance.OnVolumeChanged += UpdateAllActiveVolumes;
+            lastUpdateCount = SoundManager.Instance.VolumeUpdateCount;
+            UpdateAllActiveVolumes();
         }
     }
 
@@ -40,13 +45,8 @@ public class InstantAudioSource : MonoBehaviour
         source.spatialBlend = 1f;
         source.Play();
 
-        // リストに追加
-        var entry = (source, category);
-        activeSources.Add(entry);
-
-        // 再生終了後にリストから削除して破壊
-        float duration = clip.length;
-        StartCoroutine(DestroyAndRemove(obj, source, duration));
+        activeSources.Add((source, category));
+        StartCoroutine(DestroyAndRemove(obj, source, clip.length));
     }
 
     private System.Collections.IEnumerator DestroyAndRemove(GameObject obj, AudioSource source, float delay)
@@ -56,10 +56,8 @@ public class InstantAudioSource : MonoBehaviour
         Destroy(obj);
     }
 
-    // 音量が変更されたときに、再生中の全AudioSourceの音量を更新する
     private void UpdateAllActiveVolumes()
     {
-        // リストから無効になった（既に破壊された）ものを掃除しつつ更新
         activeSources.RemoveAll(x => x.source == null);
 
         foreach (var item in activeSources)
@@ -69,5 +67,7 @@ public class InstantAudioSource : MonoBehaviour
                 item.source.volume = SoundManager.Instance.GetVolume(item.category);
             }
         }
+        // デバッグ用（動いたら消してOK）
+        Debug.Log($"再生中の {activeSources.Count} 個のSE音量を更新しました");
     }
 }

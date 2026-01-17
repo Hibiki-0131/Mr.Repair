@@ -5,58 +5,49 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
 
-    // 音量が変更されたことを他のスクリプトに通知するイベント
-    public event Action OnVolumeChanged;
-
     [Range(0f, 1f)] public float masterVolume = 1f;
     [Range(0f, 1f)] public float bgmVolume = 0.8f;
     [Range(0f, 1f)] public float environmentVolume = 0.8f;
 
+    // イベントの代わりに「音量更新カウンター」を作る
+    public int VolumeUpdateCount { get; private set; }
+
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
-    // --- ここが重要：UIから呼び出されるメソッド群 ---
-
     public void SetMasterVolume(float value)
     {
+        // あまりに急激な変化（起動直後の0へのリセットなど）をログで追えるようにする
         masterVolume = value;
-        OnVolumeChanged?.Invoke(); // 「変わったよ！」と通知
+        VolumeUpdateCount++;
+        Debug.Log($"SoundManager: MasterVolumeが {value} にセットされました");
     }
 
     public void SetBgmVolume(float value)
     {
         bgmVolume = value;
-        OnVolumeChanged?.Invoke(); // 「変わったよ！」と通知
-    }
+        VolumeUpdateCount++;
 
+        // ★ここが重要！誰がこのメソッドを呼んだか特定します
+        System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
+        string callerName = stackTrace.GetFrame(1).GetMethod().DeclaringType.Name;
+        Debug.Log($"<color=red>【音量変更検知】</color> {callerName} が BGM音量を {value} にしました");
+    }
     public void SetEnvVolume(float value)
     {
         environmentVolume = value;
-        OnVolumeChanged?.Invoke(); // 「変わったよ！」と通知
+        VolumeUpdateCount++;
     }
 
-    // --- 既存の取得メソッド ---
     public float GetVolume(SoundCategory category)
     {
         float baseVolume = masterVolume;
-        switch (category)
-        {
-            case SoundCategory.BGM:
-                baseVolume *= bgmVolume;
-                break;
-            case SoundCategory.Environment:
-            case SoundCategory.SFX: // SFXもEnvironmentと同じ変数で制御するようにする
-                baseVolume *= environmentVolume;
-                break;
-        }
+        if (category == SoundCategory.BGM) baseVolume *= bgmVolume;
+        else baseVolume *= environmentVolume;
         return baseVolume;
     }
 }

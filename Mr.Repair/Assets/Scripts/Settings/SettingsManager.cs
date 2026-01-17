@@ -21,14 +21,18 @@ public class SettingsManager : MonoBehaviour
     public GameObject backToMainButton;  // BACKボタンをアサイン
     public GameObject startButton;
 
+    // SettingsManager.cs の Start内を修正
     void Start()
     {
-        // 音量初期値の反映
+        if (SoundManager.Instance == null) return;
+
+        // 1. まずリスナーを登録せずに、スライダーの「見た目」だけを現在の設定に合わせる
         masterSlider.value = SoundManager.Instance.masterVolume;
         bgmSlider.value = SoundManager.Instance.bgmVolume;
         sfxSlider.value = SoundManager.Instance.environmentVolume;
 
-        // イベント登録
+        // 2. 「見た目」が整った後に、リスナーを登録する
+        // これにより、起動時の「0から初期値への変化」でイベントが飛ぶのを防げます
         masterSlider.onValueChanged.AddListener(SoundManager.Instance.SetMasterVolume);
         bgmSlider.onValueChanged.AddListener(SoundManager.Instance.SetBgmVolume);
         sfxSlider.onValueChanged.AddListener(SoundManager.Instance.SetEnvVolume);

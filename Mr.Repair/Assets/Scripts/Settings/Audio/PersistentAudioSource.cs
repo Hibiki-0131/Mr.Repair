@@ -1,35 +1,33 @@
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-public class PersistentAudioSource: MonoBehaviour
+public class PersistentAudioSource : MonoBehaviour
 {
     private AudioSource audioSource;
     [SerializeField] private SoundCategory category = SoundCategory.BGM;
+    private int lastUpdateCount = -1;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
     }
 
-    private void OnEnable()
+    private void Update()
     {
-        // SoundManagerの音量変更イベントを購読
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.OnVolumeChanged += UpdateVolume;
-    }
+        if (SoundManager.Instance == null) return;
 
-    private void OnDisable()
-    {
-        // 解除を忘れずに
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.OnVolumeChanged -= UpdateVolume;
+        // SoundManagerの更新カウントが変わっていたら、音量を更新する
+        if (lastUpdateCount != SoundManager.Instance.VolumeUpdateCount)
+        {
+            lastUpdateCount = SoundManager.Instance.VolumeUpdateCount;
+            UpdateVolume();
+        }
     }
 
     private void UpdateVolume()
     {
-        if (audioSource != null && SoundManager.Instance != null)
-        {
-            audioSource.volume = SoundManager.Instance.GetVolume(category);
-        }
+        float newVolume = SoundManager.Instance.GetVolume(category);
+        audioSource.volume = newVolume;
+        Debug.Log($"{gameObject.name} の音量を {newVolume} に更新しました！");
     }
 }
