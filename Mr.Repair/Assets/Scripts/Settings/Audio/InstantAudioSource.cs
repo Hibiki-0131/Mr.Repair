@@ -6,9 +6,10 @@ public class InstantAudioSource : MonoBehaviour
     public static InstantAudioSource Instance { get; private set; }
 
     [SerializeField] private GameObject audioSourcePrefab;
-    private List<(AudioSource source, SoundCategory category)> activeSources = new List<(AudioSource, SoundCategory)>();
 
-    // ★追加：前回の更新タイミングを記録する変数
+    private List<(AudioSource source, SoundCategory category, float multiplier)> activeSources =
+        new List<(AudioSource, SoundCategory, float)>();
+
     private int lastUpdateCount = -1;
 
     private void Awake()
@@ -18,12 +19,10 @@ public class InstantAudioSource : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    // ★修正：Startでのイベント登録を削除し、Updateで監視する
     private void Update()
     {
         if (SoundManager.Instance == null) return;
 
-        // SoundManager側のカウンターが増えていたら音量を一斉更新
         if (lastUpdateCount != SoundManager.Instance.VolumeUpdateCount)
         {
             lastUpdateCount = SoundManager.Instance.VolumeUpdateCount;
@@ -31,21 +30,26 @@ public class InstantAudioSource : MonoBehaviour
         }
     }
 
-    public void PlaySound(AudioClip clip, SoundCategory category, Vector3 position)
+    public void PlaySound(AudioClip clip, SoundCategory category, Vector3 position, float multiplier = 1f)
     {
         if (clip == null) return;
 
         GameObject obj = Instantiate(audioSourcePrefab, position, Quaternion.identity);
         AudioSource source = obj.GetComponent<AudioSource>();
 
-        float volume = SoundManager.Instance.GetVolume(category);
+        float baseVolume = SoundManager.Instance.GetVolume(category);
+        float finalVolume = baseVolume * multiplier;
 
         source.clip = clip;
-        source.volume = volume;
-        source.spatialBlend = 1f;
+        source.volume = finalVolume;
+        source.spatialBlend = 1f; // 3D音響
+        source.spatialBlend = 0f; // 1f から 0f に一時的に変更
         source.Play();
 
-        activeSources.Add((source, category));
+        // デバッグログ：音量の内訳を表示
+        Debug.Log($"[SE再生] {clip.name} | カテゴリ音量:{baseVolume:F2} | 倍率:{multiplier:F2} | 最終:{finalVolume:F2}");
+
+        activeSources.Add((source, category, multiplier));
         StartCoroutine(DestroyAndRemove(obj, source, clip.length));
     }
 
@@ -64,10 +68,8 @@ public class InstantAudioSource : MonoBehaviour
         {
             if (item.source != null)
             {
-                item.source.volume = SoundManager.Instance.GetVolume(item.category);
+                item.source.volume = SoundManager.Instance.GetVolume(item.category) * item.multiplier;
             }
         }
-        // デバッグ用（動いたら消してOK）
-        Debug.Log($"再生中の {activeSources.Count} 個のSE音量を更新しました");
     }
 }

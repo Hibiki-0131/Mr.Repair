@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3556889, g: 0.35026392, b: 0.3740371, a: 1}
+  m_IndirectSpecularColor: {r: 0.35568884, g: 0.3502638, b: 0.3740369, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -48276,7 +48276,7 @@ MonoBehaviour:
   partsColliderSize: {x: 0.4413155, y: 0.3732042, z: 0.5845758}
   normalColliderCenter: {x: 0.02984945, y: -0.1083117, z: 0.06187689}
   partsColliderCenter: {x: 0.02984945, y: -0.3246311, z: 0.06187689}
-  gravityMultiplier: 5
+  gravityMultiplier: 10
 --- !u!114 &1307660768
 MonoBehaviour:
   m_ObjectHideFlags: 0

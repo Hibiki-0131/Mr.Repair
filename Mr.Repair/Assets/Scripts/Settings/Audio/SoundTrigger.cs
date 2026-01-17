@@ -6,19 +6,17 @@ public class SoundTrigger : MonoBehaviour
 
     public void PlayByKey(string key, Vector3 position)
     {
-        if (database == null)
-        {
-            Debug.LogError("SoundTrigger: SoundDatabase が設定されていません。");
-            return;
-        }
+        if (database == null) return;
 
         var sound = database.GetSound(key);
-        if (sound == null)
-        {
-            Debug.LogWarning($"SoundTrigger: '{key}' に対応する音がデータベースに存在しません。");
-            return;
-        }
+        if (sound == null) return;
 
-        InstantAudioSource.Instance.PlaySound(sound.clip, sound.category, position);
+        // ★修正: データベースに設定された volumeMultiplier を渡す
+        InstantAudioSource.Instance.PlaySound(
+            sound.clip,
+            sound.category,
+            position,
+            sound.volumeMultiplier
+        );
     }
 }
