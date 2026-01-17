@@ -2922,7 +2922,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stageOrder:
-  - 1_1
+  - 1_7
   - 1_2
   - 1_3
   - 1_4
