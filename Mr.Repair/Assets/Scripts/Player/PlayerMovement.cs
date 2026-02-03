@@ -1,6 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
+// 1. BoxColliderからCapsuleColliderに変更
+[RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -11,17 +12,21 @@ public class PlayerMovement : MonoBehaviour
     [Header("Camera Reference")]
     [SerializeField] private Transform cameraTransform;
 
-    [Header("Collider Size")]
-    [SerializeField] private Vector3 normalColliderSize = new Vector3(0.51f, 0.82f, 0.52f);
-    [SerializeField] private Vector3 partsColliderSize = new Vector3(0.51f, 0.43f, 0.52f);
-    [SerializeField] private Vector3 normalColliderCenter = new Vector3(0.004f, -0.11f, 0.2f);
-    [SerializeField] private Vector3 partsColliderCenter = new Vector3(0.004f, -0.3045f, 0.2f);
+    [Header("Normal Capsule")]
+    [SerializeField] private Vector3 normalCenter = new(0.02037199f, -0.09777594f, 0.07615082f);
+    [SerializeField] private float normalHeight = 0.8783869f;
+    [SerializeField] private float normalRadius = 0.2765165f;
+
+    [Header("Parts Capsule (Crouch)")]
+    [SerializeField] private Vector3 partsCenter = new(0.02037199f, -0.2604529f, 0.07615082f);
+    [SerializeField] private float partsHeight = 0.5530331f;
+    [SerializeField] private float partsRadius = 0.2765165f;
 
     [Header("Gravity Settings")]
-    [SerializeField] private float gravityMultiplier = 3f; // ← これを追加（標準の重力の何倍か）
+    [SerializeField] private float gravityMultiplier = 3f;
 
     private Rigidbody rb;
-    private BoxCollider boxCollider;
+    private CapsuleCollider capsuleCollider; // 2. 変数を宣言
     private Vector2 moveInput;
     private bool isPartsMode = false;
     private bool isInNarrowSpace = false;
@@ -29,12 +34,12 @@ public class PlayerMovement : MonoBehaviour
     public bool IsPartsMode => isPartsMode;
     public bool IsMoving => moveInput.sqrMagnitude > 0.01f;
 
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        boxCollider = GetComponent<BoxCollider>();
-        rb.useGravity = false; // ← Unity標準重力を切る（自前で制御する）
+        capsuleCollider = GetComponent<CapsuleCollider>(); // 3. 取得
+        
+        rb.useGravity = false;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
@@ -44,13 +49,12 @@ public class PlayerMovement : MonoBehaviour
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
 
-        boxCollider.size = normalColliderSize;
-        boxCollider.center = normalColliderCenter;
+        // 初期サイズの適用
+        ApplyColliderSettings(false);
     }
 
     private void LateUpdate()
     {
-        // カメラ追従・Collider維持処理（省略同様）
         if (CameraManager.Instance != null)
         {
             Camera activeCam = CameraManager.Instance.GetActiveCamera();
@@ -58,15 +62,24 @@ public class PlayerMovement : MonoBehaviour
                 cameraTransform = activeCam.transform;
         }
 
-        if (isPartsMode)
+        // 毎フレームColliderの状態を反映
+        ApplyColliderSettings(isPartsMode);
+    }
+
+    // Colliderの数値を適用する処理を共通化
+    private void ApplyColliderSettings(bool toParts)
+    {
+        if (toParts)
         {
-            boxCollider.size = partsColliderSize;
-            boxCollider.center = partsColliderCenter;
+            capsuleCollider.center = partsCenter;
+            capsuleCollider.height = partsHeight;
+            capsuleCollider.radius = partsRadius;
         }
         else
         {
-            boxCollider.size = normalColliderSize;
-            boxCollider.center = normalColliderCenter;
+            capsuleCollider.center = normalCenter;
+            capsuleCollider.height = normalHeight;
+            capsuleCollider.radius = normalRadius;
         }
     }
 
@@ -80,7 +93,6 @@ public class PlayerMovement : MonoBehaviour
         if (!isPartsMode)
         {
             isPartsMode = true;
-            UpdateColliderSize(true);
         }
     }
 
@@ -89,22 +101,17 @@ public class PlayerMovement : MonoBehaviour
         if (!isInNarrowSpace)
         {
             isPartsMode = false;
-            UpdateColliderSize(false);
         }
     }
 
     private void FixedUpdate()
     {
-        ApplyCustomGravity();  // ← 重力を追加
+        ApplyCustomGravity();
         HandleMovement();
     }
 
-    /// <summary>
-    /// 通常より強い重力を加える
-    /// </summary>
     private void ApplyCustomGravity()
     {
-        // Unity標準のPhysics.gravityを拡張して適用
         Vector3 customGravity = Physics.gravity * gravityMultiplier;
         rb.AddForce(customGravity, ForceMode.Acceleration);
     }
@@ -131,20 +138,6 @@ public class PlayerMovement : MonoBehaviour
 
         float speed = isPartsMode ? partsSpeed : normalSpeed;
         rb.MovePosition(rb.position + moveDir * speed * Time.fixedDeltaTime);
-    }
-
-    private void UpdateColliderSize(bool toParts)
-    {
-        if (toParts)
-        {
-            boxCollider.size = partsColliderSize;
-            boxCollider.center = partsColliderCenter;
-        }
-        else
-        {
-            boxCollider.size = normalColliderSize;
-            boxCollider.center = normalColliderCenter;
-        }
     }
 
     private void OnTriggerEnter(Collider other)

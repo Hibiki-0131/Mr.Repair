@@ -2246,9 +2246,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.27651653
-  m_Height: 0.87838686
+  m_Height: 0.8783869
   m_Direction: 1
-  m_Center: {x: 0.020371994, y: -0.097775936, z: 0.07615082}
+  m_Center: {x: 0.020371994, y: -0.09777594, z: 0.07615082}
 --- !u!114 &57237214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2341,11 +2341,13 @@ MonoBehaviour:
   partsSpeed: 1
   rotationSpeed: 5
   cameraTransform: {fileID: 0}
-  normalColliderSize: {x: 0.2830947, y: 0.8214075, z: 0.3064525}
-  partsColliderSize: {x: 0.2830947, y: 0.3732042, z: 0.3064525}
-  normalColliderCenter: {x: 0.02131478, y: -0.1083117, z: 0.06113052}
-  partsColliderCenter: {x: 0.02131478, y: -0.3246311, z: 0.06113052}
-  gravityMultiplier: 10
+  normalCenter: {x: 0.02037199, y: -0.09777594, z: 0.07615082}
+  normalHeight: 0.8783869
+  normalRadius: 0.2765165
+  partsCenter: {x: 0.02037199, y: -0.2604529, z: 0.07615082}
+  partsHeight: 0.5530331
+  partsRadius: 0.2765165
+  gravityMultiplier: 3
 --- !u!114 &57237221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2510,7 +2512,7 @@ Transform:
   m_GameObject: {fileID: 57237212}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 2.57, y: 1.361, z: 10.546}
+  m_LocalPosition: {x: 2.57, y: 1.479, z: 10.179}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
