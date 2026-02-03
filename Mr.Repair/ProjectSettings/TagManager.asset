@@ -11,6 +11,7 @@ TagManager:
   - FollowerBlock
   - ClearCube
   - Ground
+  - GoalCamera
   layers:
   - Default
   - TransparentFX

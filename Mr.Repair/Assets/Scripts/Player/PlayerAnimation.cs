@@ -5,46 +5,74 @@ public class PlayerAnimation : MonoBehaviour
 {
     private Animator anim;
 
+    // ========= Hash =========
     private int hashIsWalking;
     private int hashIsParts;
     private int hashIsChanging;
     private int hashChangeToParts;
     private int hashChangeToNormal;
 
+    // ★追加
+    private int hashStart;
+    private int hashGoal;
+
+    // =========================================
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
 
-        // パラメータをキャッシュ（高速化）
         hashIsWalking = Animator.StringToHash("isWalking");
         hashIsParts = Animator.StringToHash("isParts");
         hashIsChanging = Animator.StringToHash("isChanging");
         hashChangeToParts = Animator.StringToHash("ChangeToParts");
         hashChangeToNormal = Animator.StringToHash("ChangeToNormal");
+
+        // ★追加
+        hashStart = Animator.StringToHash("Start");
+        hashGoal = Animator.StringToHash("Goal");
     }
+
+    // =========================================
+    // Gameplay
+    // =========================================
 
     public void SetIsWalking(bool isWalking)
     {
         anim.SetBool(hashIsWalking, isWalking);
     }
 
-    public void SetPartsState(bool isParts)
+    // =========================================
+    // ★ 追加：演出専用API
+    // =========================================
+
+    public void PlayStart()
     {
-        anim.SetBool(hashIsParts, isParts);
+        anim.ResetTrigger(hashGoal);
+        anim.SetTrigger(hashStart);
+
+        Debug.Log("[Animation] Start Trigger");
     }
 
-    /// <summary>
-    /// 変形アニメーションの開始
-    /// </summary>
+    public void PlayGoal()
+    {
+        anim.ResetTrigger(hashStart);
+        anim.SetTrigger(hashGoal);
+
+        Debug.Log("[Animation] Goal Trigger");
+    }
+
+    // =========================================
+    // 既存（変形）
+    // =========================================
+
     public void PlayTransformAnimation(bool toParts)
     {
-        // すでに変形中なら再発火しない
         if (anim.GetBool(hashIsChanging))
             return;
 
         anim.SetBool(hashIsChanging, true);
 
-        // トリガー発火前に両方リセット（前回の競合防止）
         anim.ResetTrigger(hashChangeToParts);
         anim.ResetTrigger(hashChangeToNormal);
 
@@ -52,22 +80,16 @@ public class PlayerAnimation : MonoBehaviour
         {
             anim.SetTrigger(hashChangeToParts);
             anim.SetBool(hashIsParts, true);
-            Debug.Log(" 通常 → 部品化 変形開始");
         }
         else
         {
             anim.SetTrigger(hashChangeToNormal);
             anim.SetBool(hashIsParts, false);
-            Debug.Log(" 部品 → 通常化 変形開始");
         }
     }
 
-    /// <summary>
-    /// アニメーションイベントで呼ばれる（終端）
-    /// </summary>
     public void OnTransformAnimationEnd()
     {
         anim.SetBool(hashIsChanging, false);
-        Debug.Log("変形アニメ完了 → isChanging=false");
     }
 }
