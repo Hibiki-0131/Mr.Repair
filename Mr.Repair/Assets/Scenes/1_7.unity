@@ -146278,7 +146278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 1863172015}
 --- !u!4 &802730181
 Transform:
   m_ObjectHideFlags: 0
@@ -333662,10 +333662,12 @@ MonoBehaviour:
   partsSpeed: 1
   rotationSpeed: 5
   cameraTransform: {fileID: 0}
-  normalColliderSize: {x: 0.2830947, y: 0.8214075, z: 0.3064525}
-  partsColliderSize: {x: 0.2830947, y: 0.3732042, z: 0.3064525}
-  normalColliderCenter: {x: 0.02131478, y: -0.1083117, z: 0.06113052}
-  partsColliderCenter: {x: 0.02131478, y: -0.3246311, z: 0.06113052}
+  normalCenter: {x: 0.02037199, y: -0.09777594, z: 0.07615082}
+  normalHeight: 0.8783869
+  normalRadius: 0.2765165
+  partsCenter: {x: 0.02037199, y: -0.2604529, z: 0.07615082}
+  partsHeight: 0.5530331
+  partsRadius: 0.2765165
   gravityMultiplier: 10
 --- !u!114 &1863172011
 MonoBehaviour:
