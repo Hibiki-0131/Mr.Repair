@@ -9,6 +9,18 @@ public class StageManager : MonoBehaviour
     [SerializeField] private List<string> stageOrder = new List<string>();
 
     private int currentStageIndex = 0;
+    private const string ClearKey = "ReachedStageIndex";
+
+    // クリア済みの最大ステージインデックスをPlayerPrefsで管理
+    public int ReachedStageIndex
+    {
+        get => PlayerPrefs.GetInt(ClearKey, 0);
+        private set
+        {
+            PlayerPrefs.SetInt(ClearKey, value);
+            PlayerPrefs.Save();
+        }
+    }
 
     private void Awake()
     {
@@ -27,15 +39,63 @@ public class StageManager : MonoBehaviour
         }
     }
 
+    // =========================================================
+    // 既存の機能 (TitleUI / ResultUI 等から呼ばれる)
+    // =========================================================
+
     public void StartFirstStage()
     {
         currentStageIndex = 0;
         LoadCurrentStage();
     }
 
+    public void RetryFromBeginning()
+    {
+        currentStageIndex = 0;
+        LoadCurrentStage();
+    }
+
+    public void RetryCurrentStage()
+    {
+        LoadCurrentStage();
+    }
+
+    public string GetCurrentStageName()
+    {
+        if (currentStageIndex < 0 || currentStageIndex >= stageOrder.Count)
+            return "Unknown";
+
+        return stageOrder[currentStageIndex];
+    }
+
+    // =========================================================
+    // 新機能 (ステージ選択画面用)
+    // =========================================================
+
+    public void SelectStage(int index)
+    {
+        if (index < 0 || index >= stageOrder.Count) return;
+        currentStageIndex = index;
+        LoadCurrentStage();
+    }
+
+    public int GetTotalStageCount() => stageOrder.Count;
+    public string GetStageNameAt(int index) => (index >= 0 && index < stageOrder.Count) ? stageOrder[index] : "";
+
+    // =========================================================
+    // 共通ロジック
+    // =========================================================
+
     public void ClearStage()
     {
-        currentStageIndex++;
+        // 進捗を更新
+        int nextIndex = currentStageIndex + 1;
+        if (nextIndex > ReachedStageIndex)
+        {
+            ReachedStageIndex = nextIndex;
+        }
+
+        currentStageIndex = nextIndex;
 
         if (currentStageIndex >= stageOrder.Count)
         {
@@ -61,26 +121,4 @@ public class StageManager : MonoBehaviour
         GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
         SceneController.Instance.LoadSceneAsync(sceneName);
     }
-
-    public string GetCurrentStageName()
-    {
-        if (currentStageIndex < 0 || currentStageIndex >= stageOrder.Count)
-            return "Unknown";
-
-        return stageOrder[currentStageIndex];
-    }
-
-    public void RetryCurrentStage()
-    {
-        GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
-        SceneController.Instance.LoadSceneAsync(stageOrder[currentStageIndex]);
-    }
-
-    public void RetryFromBeginning()
-    {
-        currentStageIndex = 0;
-        GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
-        SceneController.Instance.LoadSceneAsync(stageOrder[currentStageIndex]);
-    }
-
 }
