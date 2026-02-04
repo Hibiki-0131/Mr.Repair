@@ -5,18 +5,19 @@ public class PlayerAnimation : MonoBehaviour
 {
     private Animator anim;
 
-    // ========= Hash =========
+    // ========= Parameters =========
     private int hashIsWalking;
     private int hashIsParts;
     private int hashIsChanging;
+
     private int hashChangeToParts;
     private int hashChangeToNormal;
 
-    // ★追加
-    private int hashStart;
     private int hashGoal;
 
-    // =========================================
+    // =========================================================
+    // Setup
+    // =========================================================
 
     private void Awake()
     {
@@ -25,49 +26,32 @@ public class PlayerAnimation : MonoBehaviour
         hashIsWalking = Animator.StringToHash("isWalking");
         hashIsParts = Animator.StringToHash("isParts");
         hashIsChanging = Animator.StringToHash("isChanging");
+
         hashChangeToParts = Animator.StringToHash("ChangeToParts");
         hashChangeToNormal = Animator.StringToHash("ChangeToNormal");
 
-        // ★追加
-        hashStart = Animator.StringToHash("Start");
         hashGoal = Animator.StringToHash("Goal");
+
+        Debug.Log("<color=yellow>[Animation] Ready</color>");
     }
 
-    // =========================================
-    // Gameplay
-    // =========================================
+    // =========================================================
+    // Walking
+    // =========================================================
 
     public void SetIsWalking(bool isWalking)
     {
         anim.SetBool(hashIsWalking, isWalking);
     }
 
-    // =========================================
-    // ★ 追加：演出専用API
-    // =========================================
-
-    public void PlayStart()
-    {
-        anim.ResetTrigger(hashGoal);
-        anim.SetTrigger(hashStart);
-
-        Debug.Log("[Animation] Start Trigger");
-    }
-
-    public void PlayGoal()
-    {
-        anim.ResetTrigger(hashStart);
-        anim.SetTrigger(hashGoal);
-
-        Debug.Log("[Animation] Goal Trigger");
-    }
-
-    // =========================================
-    // 既存（変形）
-    // =========================================
+    // =========================================================
+    // Parts Transform  ← ★ここ復活（必須）
+    // =========================================================
 
     public void PlayTransformAnimation(bool toParts)
     {
+        Debug.Log($"<color=yellow>[Animation] Transform → {(toParts ? "Parts" : "Normal")}</color>");
+
         if (anim.GetBool(hashIsChanging))
             return;
 
@@ -88,8 +72,33 @@ public class PlayerAnimation : MonoBehaviour
         }
     }
 
+    // アニメーションイベントで呼ぶ
     public void OnTransformAnimationEnd()
     {
         anim.SetBool(hashIsChanging, false);
     }
+
+    // =========================================================
+    // Goal
+    // =========================================================
+
+    public void PlayGoal()
+    {
+        Debug.Log("<color=yellow>[Animation] Goal Trigger SET</color>");
+
+        anim.ResetTrigger(hashGoal);
+        anim.SetTrigger(hashGoal);
+    }
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            var info = anim.GetCurrentAnimatorClipInfo(0);
+            if (info.Length > 0)
+                Debug.Log($"<color=yellow>[Animation] Current : {info[0].clip.name}</color>");
+        }
+    }
+#endif
 }

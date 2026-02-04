@@ -14,11 +14,12 @@ public class PlayerPresentationController : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private string goalCameraID = "GoalCamera";
 
+    [Header("Goal Move")]
+    [SerializeField] private float goalMoveSpeed = 3f;   // ★追加
+
     public bool IsLocked { get; private set; }
 
-    // =========================================================
-    // Setup
-    // =========================================================
+    private System.Action onGoalAnimationCompleted;
 
     private void Reset()
     {
@@ -32,80 +33,112 @@ public class PlayerPresentationController : MonoBehaviour
     // =========================================================
 
     /// <summary>
-    /// 一定時間プレイヤー操作をロックする（Start演出用）
-    /// Animatorは触らない（DefaultState再生前提）
+    /// 旧API（互換維持）
     /// </summary>
-    public void LockControl(float duration)
+    public void PlayGoal(System.Action onCompleted = null)
     {
-        if (IsLocked) return;
-
-        Debug.Log($"[Presentation] LockControl {duration}s");
-
-        StartCoroutine(LockRoutine(duration));
+        PlayGoal(transform.position, onCompleted);
     }
 
     /// <summary>
-    /// ゴール演出（カメラ＋ロック）
-    /// GoalアニメはAnimator側Triggerで制御
+    /// ★新API：ゴール座標指定版
     /// </summary>
-    public void PlayGoal(float duration)
+    public void PlayGoal(Vector3 goalPosition, System.Action onCompleted = null)
     {
-        if (IsLocked) return;
+        Debug.Log("<color=cyan>[Presentation] >>> PlayGoal(with position)</color>");
 
-        Debug.Log("[Presentation] PlayGoal");
+        if (IsLocked)
+        {
+            Debug.Log("<color=cyan>[Presentation] Already Locked → Ignore</color>");
+            return;
+        }
 
-        StartCoroutine(GoalRoutine(duration));
+        onGoalAnimationCompleted = onCompleted;
+
+        StartCoroutine(GoalRoutine(goalPosition));
     }
 
     // =========================================================
     // Routines
     // =========================================================
 
-    private IEnumerator LockRoutine(float duration)
+    private IEnumerator GoalRoutine(Vector3 goalPos)
     {
+        Debug.Log("<color=cyan>[Presentation] GoalRoutine START</color>");
+
         BeginLock();
 
-        gameplayAnimation.PlayStart(); // ★追加（Controller遷移）
+        //----------------------------------
+        // ① ゴール位置へ自動移動
+        //----------------------------------
+        Debug.Log("<color=cyan>[Presentation] Move To Goal...</color>");
 
-        yield return new WaitForSeconds(duration);
+        goalPos.y = transform.position.y;
 
-        EndLock();
-    }
+        while (Vector3.Distance(transform.position, goalPos) > 0.05f)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                goalPos,
+                goalMoveSpeed * Time.deltaTime
+            );
 
-    private IEnumerator GoalRoutine(float duration)
-    {
-        BeginLock();
+            yield return null;
+        }
 
-        gameplayAnimation.PlayGoal(); // ★追加
+        Debug.Log("<color=cyan>[Presentation] Arrived Goal Position</color>");
 
+        //----------------------------------
+        // ② カメラ切替
+        //----------------------------------
         if (CameraManager.Instance != null)
         {
+            Debug.Log("<color=cyan>[Presentation] Switch Goal Camera</color>");
             CameraManager.Instance.SwitchToCamera(goalCameraID);
         }
 
-        yield return new WaitForSeconds(duration);
-
-        EndLock();
+        //----------------------------------
+        // ③ アニメ再生
+        //----------------------------------
+        Debug.Log("<color=cyan>[Presentation] Trigger Goal Animation</color>");
+        gameplayAnimation.PlayGoal();
     }
 
     // =========================================================
-    // Lock Control (最重要責務)
+    // Animation Event
+    // =========================================================
+
+    /// <summary>
+    /// Goalアニメ終了イベントから呼ぶ
+    /// </summary>
+    public void OnGoalAnimationEnd()
+    {
+        Debug.Log("<color=yellow>[Presentation] Goal Animation End Event</color>");
+
+        EndLock();
+
+        onGoalAnimationCompleted?.Invoke();
+        onGoalAnimationCompleted = null;
+    }
+
+    // =========================================================
+    // Lock Control
     // =========================================================
 
     private void BeginLock()
     {
-        Debug.Log("[Presentation] Disable player control");
+        Debug.Log("<color=cyan>[Presentation] BeginLock()</color>");
 
         IsLocked = true;
 
-        if (controller) controller.enabled = false;     // 入力停止（最重要）
-        if (movement) movement.enabled = false;         // 移動停止
-        if (gameplayAnimation) gameplayAnimation.enabled = false; // walk更新停止
+        if (controller) controller.enabled = false;
+        if (movement) movement.enabled = false;
+        if (gameplayAnimation) gameplayAnimation.enabled = true;
     }
 
     private void EndLock()
     {
-        Debug.Log("[Presentation] Enable player control");
+        Debug.Log("<color=cyan>[Presentation] EndLock()</color>");
 
         if (controller) controller.enabled = true;
         if (movement) movement.enabled = true;
@@ -113,4 +146,26 @@ public class PlayerPresentationController : MonoBehaviour
 
         IsLocked = false;
     }
+
+    public void LockControl(float duration)
+    {
+        StartCoroutine(LockRoutine(duration));
+    }
+
+    private IEnumerator LockRoutine(float duration)
+    {
+        BeginLock();
+        yield return new WaitForSeconds(duration);
+        EndLock();
+    }
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            Debug.Log($"<color=cyan>[Presentation] Debug → Locked:{IsLocked}</color>");
+        }
+    }
+#endif
 }

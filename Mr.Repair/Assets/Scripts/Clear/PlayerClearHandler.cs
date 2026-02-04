@@ -6,6 +6,7 @@ public class PlayerClearHandler : MonoBehaviour
 
     public void Clear()
     {
+        Debug.Log("<color=green>[ClearHandler] Clear() called!</color>");
         if (isCleared) return;
         isCleared = true;
 
@@ -14,9 +15,17 @@ public class PlayerClearHandler : MonoBehaviour
 
     private System.Collections.IEnumerator GoToNextStage()
     {
-        yield return new WaitForSeconds(0f);
+        Debug.Log("<color=green>[ClearHandler] GoToNextStage Coroutine Started</color>");
+        yield return new WaitForSeconds(0.5f); // 少し余裕を持たせる
 
-        // ★ここを変更：次のステージへ進む
-        StageManager.Instance.ClearStage();
+        if (StageManager.Instance != null)
+        {
+            Debug.Log("<color=green>[ClearHandler] Calling StageManager.ClearStage()</color>");
+            StageManager.Instance.ClearStage();
+        }
+        else
+        {
+            Debug.LogError("<color=red>[ClearHandler] StageManager.Instance is NULL!</color>");
+        }
     }
 }
