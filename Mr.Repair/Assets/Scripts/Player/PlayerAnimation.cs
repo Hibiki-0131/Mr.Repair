@@ -90,6 +90,8 @@ public class PlayerAnimation : MonoBehaviour
         anim.SetTrigger(hashGoal);
     }
 
+
+
 #if UNITY_EDITOR
     private void Update()
     {

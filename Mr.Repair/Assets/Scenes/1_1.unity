@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3556889, g: 0.35026392, b: 0.3740371, a: 1}
+  m_IndirectSpecularColor: {r: 0.35568884, g: 0.3502638, b: 0.3740369, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2513,7 +2513,7 @@ Transform:
   m_GameObject: {fileID: 57237212}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 2.563, y: 1.808, z: 10.5}
+  m_LocalPosition: {x: 2.57, y: 1.808, z: 10.5}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2536,11 +2536,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4757b9f0a794e3e47b456ba60ed4a461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 57237223}
+  controller: {fileID: 57237219}
   movement: {fileID: 57237220}
   gameplayAnimation: {fileID: 57237218}
-  controller: {fileID: 57237219}
   goalCameraID: GoalCamera
+  goalMoveSpeed: 3
 --- !u!1 &59305103
 GameObject:
   m_ObjectHideFlags: 0
@@ -18804,7 +18804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3771ef694e54944e9a599425ebb2705, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 2
+  lockDuration: 2
 --- !u!65 &503921506
 BoxCollider:
   m_ObjectHideFlags: 0

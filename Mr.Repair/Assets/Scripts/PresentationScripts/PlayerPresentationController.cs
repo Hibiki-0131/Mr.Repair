@@ -68,41 +68,26 @@ public class PlayerPresentationController : MonoBehaviour
 
         BeginLock();
 
-        //----------------------------------
-        // ① ゴール位置へ自動移動
-        //----------------------------------
-        Debug.Log("<color=cyan>[Presentation] Move To Goal...</color>");
+        //-----------------------------------
+        // ★ ここが重要
+        // Rigidbody/Controllerを無効にしてから座標セット
+        //-----------------------------------
+        transform.position = goalPos;
 
-        goalPos.y = transform.position.y;
+        yield return null; // 1frame待つ（物理安定化）
 
-        while (Vector3.Distance(transform.position, goalPos) > 0.05f)
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                goalPos,
-                goalMoveSpeed * Time.deltaTime
-            );
-
-            yield return null;
-        }
-
-        Debug.Log("<color=cyan>[Presentation] Arrived Goal Position</color>");
-
-        //----------------------------------
-        // ② カメラ切替
-        //----------------------------------
+        //-----------------------------------
+        // カメラ切替
+        //-----------------------------------
         if (CameraManager.Instance != null)
-        {
-            Debug.Log("<color=cyan>[Presentation] Switch Goal Camera</color>");
             CameraManager.Instance.SwitchToCamera(goalCameraID);
-        }
 
-        //----------------------------------
-        // ③ アニメ再生
-        //----------------------------------
-        Debug.Log("<color=cyan>[Presentation] Trigger Goal Animation</color>");
+        //-----------------------------------
+        // アニメ再生
+        //-----------------------------------
         gameplayAnimation.PlayGoal();
     }
+
 
     // =========================================================
     // Animation Event
