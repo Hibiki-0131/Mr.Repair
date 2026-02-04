@@ -32,26 +32,22 @@ public class SceneController : MonoBehaviour
 
     private IEnumerator LoadSceneCoroutine(string sceneName)
     {
-        // フェードアウト
-        yield return StartCoroutine(Fade(1));
+        yield return Fade(1);
 
         AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
         op.allowSceneActivation = false;
 
-        // 読み込み完了を待つ
-        while (!op.isDone)
-        {
-            if (op.progress >= 0.9f)
-            {
-                yield return new WaitForSeconds(0.2f);
-                op.allowSceneActivation = true;
-            }
+        while (op.progress < 0.9f)
             yield return null;
-        }
 
-        // シーン遷移後、フェードイン
-        yield return StartCoroutine(Fade(0));
+        op.allowSceneActivation = true;
+
+        while (!op.isDone)
+            yield return null;
+
+        yield return Fade(0);
     }
+
 
     private IEnumerator Fade(float targetAlpha)
     {
