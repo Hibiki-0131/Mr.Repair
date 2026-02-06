@@ -5,12 +5,11 @@ public class TitleUI : MonoBehaviour
     public void OnStartButton()
     {
         GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
-        StageManager.Instance.StartFirstStage();   // ← 追加！
+        StageManager.Instance.StartFirstStage();
     }
 
     public void OnStageSelectButton()
     {
-        // "StageSelectScene" の部分は、作成したシーン名に合わせてください
         SceneController.Instance.LoadSceneAsync("StageSelectScene");
     }
 
