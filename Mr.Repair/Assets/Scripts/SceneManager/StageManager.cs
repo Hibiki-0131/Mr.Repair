@@ -5,8 +5,11 @@ public class StageManager : MonoBehaviour
 {
     public static StageManager Instance { get; private set; }
 
-    [Header("ロードしたい順番でシーン名を並べる")]
+    [Header("ロード順（シーン名）")]
     [SerializeField] private List<string> stageOrder = new List<string>();
+
+    [Header("各ステージのプレビュー画像（同じ順番で並べる）")]
+    [SerializeField] private List<Sprite> stageSprites = new List<Sprite>(); // ★追加
 
     private int currentStageIndex = 0;
     private const string ClearKey = "ReachedStageIndex";
@@ -28,16 +31,33 @@ public class StageManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
         if (stageOrder.Count == 0)
-        {
-            Debug.LogError("StageManager にステージが1つも登録されていません！");
-        }
+            Debug.LogError("StageManager にステージが登録されていません");
+
+        // ★安全チェック（地味に超重要）
+        if (stageSprites.Count != stageOrder.Count)
+            Debug.LogWarning("stageOrder と stageSprites の数が一致していません！");
     }
 
-    // タイトルやリザルトから呼ばれる既存メソッド
+    // =========================
+    // 追加：Sprite取得API（超重要）
+    // =========================
+    public Sprite GetStageSprite(int index)
+    {
+        if (index < 0 || index >= stageSprites.Count)
+            return null;
+
+        return stageSprites[index];
+    }
+
+    // =========================
+    // 既存機能
+    // =========================
+
     public void StartFirstStage()
     {
         currentStageIndex = 0;
@@ -52,30 +72,29 @@ public class StageManager : MonoBehaviour
 
     public void RetryCurrentStage() => LoadCurrentStage();
 
-    public string GetCurrentStageName()
+    public int GetTotalStageCount() => stageOrder.Count;
+
+    public string GetStageNameAt(int index)
     {
-        if (currentStageIndex < 0 || currentStageIndex >= stageOrder.Count) return "Unknown";
-        return stageOrder[currentStageIndex];
+        return (index >= 0 && index < stageOrder.Count)
+            ? stageOrder[index]
+            : "";
     }
 
-    // ステージ選択用メソッド
     public void SelectStage(int index)
     {
         if (index < 0 || index >= stageOrder.Count) return;
+
         currentStageIndex = index;
         LoadCurrentStage();
     }
 
-    public int GetTotalStageCount() => stageOrder.Count;
-    public string GetStageNameAt(int index) => (index >= 0 && index < stageOrder.Count) ? stageOrder[index] : "";
-
     public void ClearStage()
     {
         int nextIndex = currentStageIndex + 1;
+
         if (nextIndex > ReachedStageIndex)
-        {
             ReachedStageIndex = nextIndex;
-        }
 
         currentStageIndex = nextIndex;
 
@@ -85,13 +104,16 @@ public class StageManager : MonoBehaviour
             SceneController.Instance.LoadSceneAsync("Result");
             return;
         }
+
         LoadCurrentStage();
     }
 
     private void LoadCurrentStage()
     {
         if (currentStageIndex < 0 || currentStageIndex >= stageOrder.Count) return;
+
         string sceneName = stageOrder[currentStageIndex];
+
         GameStateManager.Instance.SetState(GameStateManager.GameState.Playing);
         SceneController.Instance.LoadSceneAsync(sceneName);
     }

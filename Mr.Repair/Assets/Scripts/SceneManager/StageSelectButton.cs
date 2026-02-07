@@ -20,14 +20,13 @@ public class StageSelectButton : MonoBehaviour
         if (button == null)
             button = GetComponent<Button>();
 
-        // テキスト
         stageText.text = isUnlocked ? displayName : "???";
 
-        // 画像色
+        // ★ここ追加（画像差し替え）
+        previewImage.sprite = StageManager.Instance.GetStageSprite(index);
+
         previewImage.color = isUnlocked ? Color.white : Color.gray;
 
-        //  ここ重要
-        // interactableは常にtrue（選択は可能にする）
         button.interactable = true;
 
         if (lockOverlay != null)

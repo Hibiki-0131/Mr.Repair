@@ -112,7 +112,7 @@ public class StageSelectManager : MonoBehaviour
         float contentWidth = content.rect.width;
         float viewportWidth = viewport.rect.width;
 
-        if (contentWidth <= viewportWidth) return;
+        if (contentWidth <= viewportWidth / 2) return;
 
         // ƒ{ƒ^ƒ“ˆÊ’uŽæ“¾
         float targetPosX = Mathf.Abs(target.anchoredPosition.x);

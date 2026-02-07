@@ -292,7 +292,7 @@ GameObject:
   - component: {fileID: 99752752}
   - component: {fileID: 99752751}
   m_Layer: 5
-  m_Name: GraphicsButton
+  m_Name: PlayerColorButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1234,9 +1234,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GRAPHICS
-
-'
+  m_text: PLAYER COLOR
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 537eb1eef138da7489d2d0c861629654, type: 2}
   m_sharedMaterial: {fileID: -2009162042594335899, guid: 537eb1eef138da7489d2d0c861629654, type: 2}
@@ -1263,8 +1261,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1533,7 +1531,7 @@ GameObject:
   - component: {fileID: 732323125}
   - component: {fileID: 732323124}
   m_Layer: 5
-  m_Name: GraphicsPanel
+  m_Name: PlayerColorPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2485,8 +2483,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2733,8 +2731,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3020,8 +3018,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3110,6 +3108,17 @@ MonoBehaviour:
   - 1_8
   - 1_9
   - GameClear
+  stageSprites:
+  - {fileID: 21300000, guid: b620399579c27db499e4c5629896d7c4, type: 3}
+  - {fileID: 21300000, guid: 7da05a046a9179e4890be872b076142e, type: 3}
+  - {fileID: 21300000, guid: 6f7465528de3aba41b04cbbdd07f173d, type: 3}
+  - {fileID: 21300000, guid: 7093b7a07d5d4264d89ae408bc31caa4, type: 3}
+  - {fileID: 21300000, guid: 5aaec94c46171724ca1c9d187420bd85, type: 3}
+  - {fileID: 21300000, guid: 040115e29133247488fe2652f7e259a1, type: 3}
+  - {fileID: 21300000, guid: 665188d0431c53647a2e455a598d0b58, type: 3}
+  - {fileID: 21300000, guid: 8c302447f8d13cf468543ea14f5accb2, type: 3}
+  - {fileID: 21300000, guid: 7f10de5d49910b54fa3adf650851853f, type: 3}
+  - {fileID: 0}
 --- !u!4 &1075133928
 Transform:
   m_ObjectHideFlags: 0
@@ -4260,8 +4269,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4592,7 +4601,7 @@ GameObject:
   - component: {fileID: 1551062149}
   - component: {fileID: 1551062148}
   m_Layer: 5
-  m_Name: GraphicsText (TMP)
+  m_Name: PlaterColorText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4637,7 +4646,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: GRAPHICS
+  m_text: PLAYER COLOR
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5567,8 +5576,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5703,8 +5712,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
