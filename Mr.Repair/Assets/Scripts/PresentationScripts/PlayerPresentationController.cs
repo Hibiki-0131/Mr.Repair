@@ -100,7 +100,7 @@ public class PlayerPresentationController : MonoBehaviour
     {
         Debug.Log("<color=yellow>[Presentation] Goal Animation End Event</color>");
 
-        EndLock();
+        //EndLock();
 
         onGoalAnimationCompleted?.Invoke();
         onGoalAnimationCompleted = null;
