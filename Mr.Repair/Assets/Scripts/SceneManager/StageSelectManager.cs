@@ -12,6 +12,7 @@ public class StageSelectManager : MonoBehaviour
     [Header("Scroll設定")]
     [SerializeField] private bool smoothScroll = true;
     [SerializeField] private float scrollSpeed = 10f;
+    [SerializeField] private float buttonSize = 640;
 
     private bool generated = false;
 
@@ -103,40 +104,53 @@ public class StageSelectManager : MonoBehaviour
         GameObject selected = EventSystem.current.currentSelectedGameObject;
         if (selected == null) return;
 
-        RectTransform target = selected.GetComponent<RectTransform>();
-        if (target == null) return;
+        // 選択されているのがコンテナの子要素（ボタン）でない場合は無視
+        if (selected.transform.parent != container) return;
 
+        RectTransform target = selected.GetComponent<RectTransform>();
         RectTransform content = scrollRect.content;
         RectTransform viewport = scrollRect.viewport;
 
+        // ContentがViewportより小さい場合はスクロール不要
+        if (content.rect.width <= viewport.rect.width) return;
+
+        // --- ここから計算式を修正 ---
+
+        // 1. Content内におけるボタンのローカルX座標を取得
+        float targetPosX = target.anchoredPosition.x;
+
+        // 2. 求めたいのは「そのボタンが中央に来る時のContentのNormalizedPosition」
+        // 0.0 (左端) から 1.0 (右端) の範囲で、ボタンの位置を割合で算出します。
+        // 計算式： (ボタンの座標) / (Content全体の幅 - Viewportの幅) を反転させたもの
+        // ※UnityのHorizontalNormalizedPositionは 0が左、1が右です。
+
+        // アンカー設定が左端(0)の場合の計算：
         float contentWidth = content.rect.width;
         float viewportWidth = viewport.rect.width;
+        float scrollRange = contentWidth - viewportWidth;
 
-        if (contentWidth <= viewportWidth / 2) return;
+        // ボタンのX座標（正の値）をスクロール可能範囲で割る
+        // targetPosXが正の値か負の値かはRectTransformの設定によりますが、
+        // 通常のHorizontal Layout Groupであれば targetPosX / scrollRange で正規化できます。
+        float normalized = (targetPosX + buttonSize - (viewportWidth * 0.5f)) / scrollRange;
 
-        // ボタン位置取得
-        float targetPosX = Mathf.Abs(target.anchoredPosition.x);
-
-        float centerOffset = viewportWidth * 0.5f;
-
-        float normalized =
-            (targetPosX - centerOffset) / (contentWidth - viewportWidth);
-
+        // 範囲を 0~1 に制限
         normalized = Mathf.Clamp01(normalized);
 
-        // スムーズ or 即時
+        // スムーズスクロールの適用
         if (smoothScroll)
         {
-            scrollRect.horizontalNormalizedPosition =
-                Mathf.Lerp(scrollRect.horizontalNormalizedPosition, normalized,
-                           scrollSpeed * Time.unscaledDeltaTime);
+            scrollRect.horizontalNormalizedPosition = Mathf.Lerp(
+                scrollRect.horizontalNormalizedPosition,
+                normalized,
+                scrollSpeed * Time.unscaledDeltaTime
+            );
         }
         else
         {
             scrollRect.horizontalNormalizedPosition = normalized;
         }
     }
-
     // =========================================================
     // 戻るボタン
     // =========================================================
