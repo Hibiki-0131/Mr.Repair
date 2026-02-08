@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2786d9026ef41b47864dce35ce8c095, type: 3}
-  m_Name: 1-A
+  m_Name: 1-A_A
   m_EditorClassIdentifier: 
-  roomName: 1-A
+  roomName: 1-A_A
   description: 
   roomCsv: {fileID: 4900000, guid: d5ca8f0da71f59540bf189dab02e6991, type: 3}
   colorCsv: {fileID: 4900000, guid: b80000c16e67015449ef8b52b66f8082, type: 3}

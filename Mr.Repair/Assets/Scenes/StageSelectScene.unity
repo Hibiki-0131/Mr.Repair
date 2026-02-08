@@ -591,7 +591,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding:
     m_Left: 0
-    m_Right: 0
+    m_Right: 1280
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
@@ -1160,6 +1160,7 @@ MonoBehaviour:
   scrollRect: {fileID: 1984759961}
   smoothScroll: 1
   scrollSpeed: 10
+  buttonSize: 640
 --- !u!1 &1786249563
 GameObject:
   m_ObjectHideFlags: 0
