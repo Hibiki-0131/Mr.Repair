@@ -154,9 +154,13 @@ public class RoomBuilder : MonoBehaviour
 
     public void SpawnInitialCarryBlocks(GameObject prefab, SettlementCoordinator sc)
     {
-        foreach (var pos in GetCarryBlockPositions())
+        foreach (var localPos in GetCarryBlockPositions())
         {
-            var b = Instantiate(prefab, pos, Quaternion.identity, contentRoot);
+            // ★ local → world に変換して生成（これが超重要）
+            Vector3 worldPos = contentRoot.TransformPoint(localPos);
+
+            var b = Instantiate(prefab, worldPos, Quaternion.identity, contentRoot);
+
             b.GetComponent<BlockSettlementSensor>()?.SetCoordinator(sc);
         }
     }
