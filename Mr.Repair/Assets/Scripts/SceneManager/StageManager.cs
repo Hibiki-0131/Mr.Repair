@@ -9,10 +9,27 @@ public class StageManager : MonoBehaviour
     [SerializeField] private List<string> stageOrder = new List<string>();
 
     [Header("各ステージのプレビュー画像（同じ順番で並べる）")]
-    [SerializeField] private List<Sprite> stageSprites = new List<Sprite>(); // ★追加
+    [SerializeField] private List<Sprite> stageSprites = new List<Sprite>();
 
     private int currentStageIndex = 0;
+
     private const string ClearKey = "ReachedStageIndex";
+
+    // =========================================================
+    // ★ Debug（追加）
+    // =========================================================
+
+    private bool debugForceUnlock = false;
+    public bool IsDebugForceUnlock => debugForceUnlock;
+
+    public void ToggleDebugUnlockAll()
+    {
+        debugForceUnlock = !debugForceUnlock;
+
+        Debug.Log($"[DEBUG] Force Unlock = {debugForceUnlock}");
+    }
+
+    // =========================================================
 
     public int ReachedStageIndex
     {
@@ -23,6 +40,19 @@ public class StageManager : MonoBehaviour
             PlayerPrefs.Save();
         }
     }
+
+    // =========================================================
+    // ★ 解放判定を一元化（超重要）
+    // =========================================================
+    public bool IsStageUnlocked(int index)
+    {
+        if (debugForceUnlock)
+            return true;
+
+        return index <= ReachedStageIndex;
+    }
+
+    // =========================================================
 
     private void Awake()
     {
@@ -38,14 +68,14 @@ public class StageManager : MonoBehaviour
         if (stageOrder.Count == 0)
             Debug.LogError("StageManager にステージが登録されていません");
 
-        // ★安全チェック（地味に超重要）
         if (stageSprites.Count != stageOrder.Count)
             Debug.LogWarning("stageOrder と stageSprites の数が一致していません！");
     }
 
-    // =========================
-    // 追加：Sprite取得API（超重要）
-    // =========================
+    // =========================================================
+    // Sprite取得
+    // =========================================================
+
     public Sprite GetStageSprite(int index)
     {
         if (index < 0 || index >= stageSprites.Count)
@@ -54,9 +84,18 @@ public class StageManager : MonoBehaviour
         return stageSprites[index];
     }
 
-    // =========================
+    // =========================================================
     // 既存機能
-    // =========================
+    // =========================================================
+
+    public int GetTotalStageCount() => stageOrder.Count;
+
+    public string GetStageNameAt(int index)
+    {
+        return (index >= 0 && index < stageOrder.Count)
+            ? stageOrder[index]
+            : "";
+    }
 
     public void StartFirstStage()
     {
@@ -72,18 +111,9 @@ public class StageManager : MonoBehaviour
 
     public void RetryCurrentStage() => LoadCurrentStage();
 
-    public int GetTotalStageCount() => stageOrder.Count;
-
-    public string GetStageNameAt(int index)
-    {
-        return (index >= 0 && index < stageOrder.Count)
-            ? stageOrder[index]
-            : "";
-    }
-
     public void SelectStage(int index)
     {
-        if (index < 0 || index >= stageOrder.Count) return;
+        if (!IsStageUnlocked(index)) return; // ★安全対策追加
 
         currentStageIndex = index;
         LoadCurrentStage();
