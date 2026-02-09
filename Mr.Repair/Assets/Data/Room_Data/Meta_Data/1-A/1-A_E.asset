@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2786d9026ef41b47864dce35ce8c095, type: 3}
+  m_Name: 1-A_E
+  m_EditorClassIdentifier: 
+  roomName: 1-A_E
+  description: 
+  roomCsv: {fileID: 4900000, guid: a7395237dd4f0454aa8168e6d4fe159e, type: 3}
+  colorCsv: {fileID: 4900000, guid: b80000c16e67015449ef8b52b66f8082, type: 3}
+  defaultFloorColor: {r: 1, g: 1, b: 1, a: 1}
+  floorPalette:
+  - {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 0}
+  - {r: 1, g: 0.38039216, b: 0.38039216, a: 0}
+  - {r: 0.38039216, g: 0.5647059, b: 1, a: 0}
+  traps: []
+  decorations: []
+  autoBuildOnLoad: 1
