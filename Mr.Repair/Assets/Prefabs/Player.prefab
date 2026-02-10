@@ -208,7 +208,6 @@ GameObject:
   - component: {fileID: 8616784190852115458}
   - component: {fileID: 4699271685196252533}
   - component: {fileID: 8886965453099726250}
-  - component: {fileID: 7761874578808213728}
   - component: {fileID: 8775642818924372496}
   - component: {fileID: 6300021509378203314}
   - component: {fileID: 4355468495394074489}
@@ -294,27 +293,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!65 &7761874578808213728
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1100554391766722102}
-  m_Material: {fileID: 13400000, guid: a26035105ea5972419513e823522344c, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 0.28309473, y: 0.37320423, z: 0.30645245}
-  m_Center: {x: 0.021314781, y: -0.32463107, z: 0.061130524}
 --- !u!114 &8775642818924372496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -417,12 +395,12 @@ MonoBehaviour:
   partsSpeed: 1
   rotationSpeed: 5
   cameraTransform: {fileID: 0}
-  normalCenter: {x: 0.02037199, y: -0.09777594, z: 0.07615082}
-  normalHeight: 0.8783869
-  normalRadius: 0.2765165
-  partsCenter: {x: 0.02037199, y: -0.2604529, z: 0.07615082}
-  partsHeight: 0.5530331
-  partsRadius: 0.2765165
+  normalCenter: {x: -0.004472177, y: -0.1592379, z: 0.00197506}
+  normalHeight: 0.839894
+  normalRadius: 0.2659147
+  partsCenter: {x: -0.004472177, y: -0.3392527, z: 0.00197506}
+  partsHeight: 0.5318294
+  partsRadius: 0.2659147
   gravityMultiplier: 3
 --- !u!114 &4355468495394074489
 MonoBehaviour:
@@ -519,10 +497,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.27651653
-  m_Height: 0.8783869
+  m_Radius: 0.26591468
+  m_Height: 0.839894
   m_Direction: 1
-  m_Center: {x: 0.020371994, y: -0.09777594, z: 0.07615082}
+  m_Center: {x: -0.0044721765, y: -0.15923786, z: 0.0019750595}
 --- !u!114 &5861587339561990275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -673,7 +651,7 @@ Transform:
   m_GameObject: {fileID: 2894665348863557819}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
-  m_LocalPosition: {x: 0.015, y: -0.298, z: 0.308}
+  m_LocalPosition: {x: -0.056, y: -0.298, z: 0.308}
   m_LocalScale: {x: 0.6, y: 0.4, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1220,7 +1198,7 @@ Transform:
   m_GameObject: {fileID: 7859084716654787152}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.066, y: -0.247, z: 0.01566664}
+  m_LocalPosition: {x: 0, y: -0.247, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1362,7 +1340,7 @@ Transform:
   m_GameObject: {fileID: 9171367627274362508}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.02, y: -0.544, z: 0}
+  m_LocalPosition: {x: 0.071, y: -0.544, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
