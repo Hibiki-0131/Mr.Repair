@@ -2,8 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Logical terrain state.
-/// csvGrid  : original definition (potential ground)
-/// SolidGrid : current solid state
+/// CarryBlock が落ちた位置を地面化する責務のみ持つ
 /// </summary>
 public class TerrainState
 {
@@ -26,18 +25,17 @@ public class TerrainState
     }
 
     /// <summary>
-    /// Try to convert a hole cell into ground when a CarryBlock settles.
-    /// Ground is created only when the cell becomes connected
-    /// to existing ground.
+    /// CarryBlock が静止した位置を地面化する
+    /// 条件：下に床があるだけ
     /// </summary>
     public bool TryFillFromCarryBlock(
-    Vector3 localPos,
-    out Vector3 snappedPos)
+        Vector3 localPos,
+        out Vector3 snappedPos)
     {
         snappedPos = Vector3.zero;
 
         // -------------------------
-        // 1. ローカル座標 → グリッド座標
+        // 1. local → grid
         // -------------------------
         int x = Mathf.FloorToInt(localPos.x / voxelSize);
         int y = Mathf.FloorToInt(localPos.y / voxelSize) - yOffset;
@@ -47,7 +45,7 @@ public class TerrainState
             return false;
 
         // -------------------------
-        // 2. 穴セルであること
+        // 2. 穴セルのみ
         // -------------------------
         if (csvGrid[x, y, z] != 0)
             return false;
@@ -56,28 +54,15 @@ public class TerrainState
             return false;
 
         // -------------------------
-        // 3. 下方向に支えがあること
+        // ★ 3. 下に床があるだけチェック
         // -------------------------
         int belowY = y - 1;
+
         if (belowY < 0 || !SolidGrid[x, belowY, z])
             return false;
 
         // -------------------------
-        // 4. 四方向の囲まれ判定（重要）
-        // -------------------------
-        int solidCount = 0;
-
-        if (IsSolid(x - 1, y, z)) solidCount++;
-        if (IsSolid(x + 1, y, z)) solidCount++;
-        if (IsSolid(x, y, z - 1)) solidCount++;
-        if (IsSolid(x, y, z + 1)) solidCount++;
-
-        // 3方向以上に囲まれていなければ地面化しない
-        if (solidCount < 3)
-            return false;
-
-        // -------------------------
-        // 5. 地面として確定
+        // 4. 地面化確定
         // -------------------------
         SolidGrid[x, y, z] = true;
 
@@ -90,17 +75,7 @@ public class TerrainState
         return true;
     }
 
-    // -------------------------
-    // Internal helpers
-    // -------------------------
-
-    private bool IsSolid(int x, int y, int z)
-    {
-        if (!IsInside(x, y, z))
-            return false;
-
-        return SolidGrid[x, y, z];
-    }
+    // =========================
 
     private bool IsInside(int x, int y, int z)
     {

@@ -15,7 +15,7 @@ MonoBehaviour:
   roomName: 1-7
   description: 
   roomCsv: {fileID: 4900000, guid: a02126fcdfb8223439ebc770fd34b88b, type: 3}
-  colorCsv: {fileID: 4900000, guid: 8a8f38af8189b3442b865b4da6586e96, type: 3}
+  colorCsv: {fileID: 0}
   defaultFloorColor: {r: 1, g: 1, b: 1, a: 1}
   floorPalette:
   - {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 0}

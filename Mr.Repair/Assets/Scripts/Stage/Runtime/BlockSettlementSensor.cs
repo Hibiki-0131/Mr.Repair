@@ -1,12 +1,17 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(PushableBlock))]
 public class BlockSettlementSensor : MonoBehaviour
 {
     [SerializeField] private SettlementCoordinator coordinator;
 
+    private PushableBlock block;
+
     private void Awake()
     {
+        block = GetComponent<PushableBlock>();
+
         if (coordinator == null)
         {
             Debug.LogWarning(
@@ -17,7 +22,7 @@ public class BlockSettlementSensor : MonoBehaviour
     }
 
     /// <summary>
-    /// StageInitializer から注入される
+    /// StageInitializer から注入
     /// </summary>
     public void SetCoordinator(SettlementCoordinator coordinator)
     {
@@ -29,37 +34,29 @@ public class BlockSettlementSensor : MonoBehaviour
         );
     }
 
-    /// <summary>
-    /// PushableBlock から呼ばれる
-    /// </summary>
-    public void NotifyCollision(PushableBlock block)
+    // =========================
+    // ★ ここが最重要修正
+    // Ground のみ反応
+    // =========================
+    private void OnCollisionEnter(Collision collision)
     {
-        if (coordinator == null)
-        {
-            Debug.LogError(
-                "[BlockSettlementSensor] Coordinator is null. Injection missing.",
-                this
-            );
+        if (coordinator == null) return;
+
+        // Groundタグ以外は完全無視
+        if (!collision.collider.CompareTag("Ground"))
             return;
-        }
 
         Debug.Log(
-            $"[Sensor] NotifyCollision from {block.name}",
+            $"[Sensor] Ground collision → settlement request ({block.name})",
             this
         );
 
-        StartCoroutine(WaitAndReport(block));
+        StartCoroutine(WaitAndReport());
     }
 
-    private IEnumerator WaitAndReport(PushableBlock block)
+    private IEnumerator WaitAndReport()
     {
         yield return new WaitForFixedUpdate();
-
-        Debug.Log(
-            $"[Sensor] Report to SettlementCoordinator {block.name}",
-            this
-        );
-
         coordinator.Enqueue(block);
     }
 }
