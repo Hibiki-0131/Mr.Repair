@@ -17,15 +17,24 @@ public class SettlementCoordinator : MonoBehaviour
     private void LateUpdate()
     {
         if (pending.Count == 0) return;
-        foreach (var block in pending) TrySettle(block);
+
+        foreach (var block in pending)
+            TrySettle(block);
+
         pending.Clear();
 
         if (pendingRebuild)
         {
+            Debug.Log("[SettlementCoordinator] Rebuild requested"); // ★追加
+
+            if (context == null)
+                Debug.LogError("[SettlementCoordinator] context is NULL");
+
             context.RequestColliderRebuild();
             pendingRebuild = false;
         }
     }
+
 
     private void TrySettle(PushableBlock block)
     {
@@ -35,24 +44,16 @@ public class SettlementCoordinator : MonoBehaviour
         if (rb.velocity.sqrMagnitude > 0.01f) return;
 
         Vector3 localPos = block.transform.localPosition;
-        if (!context.Terrain.TryFillFromCarryBlock(localPos, out Vector3 snapped)) return;
 
-        // 物理ブロックの確定
+        if (!context.Terrain.TryFillFromCarryBlock(localPos, out Vector3 snapped))
+            return;
+
         block.transform.localPosition = snapped;
         block.Freeze();
         block.MarkSettled();
 
-        // 代わりの「床」を生成
-        var newFloor = Instantiate(
-            BlockFactory.GetPrefab('1'),
-            context.RoomBuilder.ContentRoot
-        );
-        newFloor.transform.localPosition = snapped;
-
-        // ★RoomBuilderに問い合わせて、その座標に指定された色を塗る
-        int colorIdx = context.RoomBuilder.GetColorIndexAt(snapped);
-        context.RoomBuilder.ApplyColorByIndex(newFloor, colorIdx);
-
+        // ★ Gridだけ更新。Prefab生成禁止
         pendingRebuild = true;
     }
+
 }

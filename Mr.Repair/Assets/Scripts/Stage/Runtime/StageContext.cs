@@ -36,7 +36,9 @@ public class StageContext : MonoBehaviour
 
     public void RequestColliderRebuild()
     {
-        colliderRebuildScheduler?.RequestRebuild();
+        Debug.Log("[StageContext] RequestColliderRebuild called"); // Åöí«â¡
+        RoomBuilder.BuildRoom();
     }
+
 }
 
