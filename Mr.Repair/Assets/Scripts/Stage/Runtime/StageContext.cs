@@ -36,9 +36,15 @@ public class StageContext : MonoBehaviour
 
     public void RequestColliderRebuild()
     {
-        Debug.Log("[StageContext] RequestColliderRebuild called"); // Åöí«â¡
-        RoomBuilder.BuildRoom();
-    }
+        Debug.Log("[StageContext] RequestColliderRebuild called");
 
+        VoxelColliderUtility.BuildColliders(
+            roomBuilder.ContentRoot,
+            Terrain.SolidGrid,     // Å© Ç†Ç»ÇΩÇÃ terrain îzóÒ
+            roomBuilder.VoxelSize,
+            roomBuilder.YOffset,
+            roomBuilder
+        );
+    }
 }
 

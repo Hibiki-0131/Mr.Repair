@@ -19,10 +19,6 @@ public class PushableBlock : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         rb.useGravity = false;
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
-        rb.mass = 20f;
-        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
 
         IsSettled = false;
     }
