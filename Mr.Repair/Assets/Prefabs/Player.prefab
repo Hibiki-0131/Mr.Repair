@@ -395,8 +395,8 @@ MonoBehaviour:
   partsSpeed: 1
   rotationSpeed: 5
   cameraTransform: {fileID: 0}
-  normalCenter: {x: -0.004472177, y: -0.1592379, z: 0.00197506}
-  normalHeight: 0.839894
+  normalCenter: {x: -0.004472177, y: -0.1398242, z: 0.00197506}
+  normalHeight: 0.8787216
   normalRadius: 0.2659147
   partsCenter: {x: -0.004472177, y: -0.3392527, z: 0.00197506}
   partsHeight: 0.5318294
@@ -498,9 +498,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.26591468
-  m_Height: 0.839894
+  m_Height: 0.8787216
   m_Direction: 1
-  m_Center: {x: -0.0044721765, y: -0.15923786, z: 0.0019750595}
+  m_Center: {x: -0.0044721765, y: -0.13982415, z: 0.0019750595}
 --- !u!114 &5861587339561990275
 MonoBehaviour:
   m_ObjectHideFlags: 0
