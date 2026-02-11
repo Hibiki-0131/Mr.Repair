@@ -37,3 +37,11 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: a0bf44c26cd5e7b4599fc4548c5fc608, type: 3}
     category: 1
     volumeMultiplier: 0.1
+  - key: StartSE
+    clip: {fileID: 8300000, guid: c8c191399b06882458fc0d9db37b9360, type: 3}
+    category: 0
+    volumeMultiplier: 10
+  - key: GoalSE
+    clip: {fileID: 8300000, guid: 78a4fac57e40fae41b325eac3653f07e, type: 3}
+    category: 0
+    volumeMultiplier: 10

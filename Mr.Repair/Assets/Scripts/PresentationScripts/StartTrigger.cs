@@ -4,6 +4,7 @@ using UnityEngine;
 public class StartTrigger : MonoBehaviour
 {
     [SerializeField] private float lockDuration = 2f;
+    [SerializeField] private SoundTrigger soundTrigger; // ★追加
 
     private bool triggered;
 
@@ -14,31 +15,22 @@ public class StartTrigger : MonoBehaviour
 
     private void Start()
     {
-        // シーン開始時に即ロックしたいなら
-        var player = GameObject.FindGameObjectWithTag("Player");
+        // ★ SoundTrigger 自動取得
+        if (soundTrigger == null)
+            soundTrigger = FindObjectOfType<SoundTrigger>();
 
+        var player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) return;
 
         var presentation = player.GetComponent<PlayerPresentationController>();
         if (presentation == null) return;
 
-        presentation.LockControl(lockDuration);
-
-        triggered = true;
-    }
-
-    // トリガー式にしたい場合はこちら
-    /*
-    private void OnTriggerEnter(Collider other)
-    {
-        if (triggered) return;
-        if (!other.CompareTag("Player")) return;
-
-        var presentation = other.GetComponent<PlayerPresentationController>();
-        if (presentation == null) return;
+        //-----------------------------------
+        // ★ StartSE再生
+        //-----------------------------------
+        soundTrigger?.PlayByKey("StartSE", player.transform.position);
 
         presentation.LockControl(lockDuration);
         triggered = true;
     }
-    */
 }

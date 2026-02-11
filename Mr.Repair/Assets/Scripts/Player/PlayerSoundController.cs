@@ -3,32 +3,44 @@ using UnityEngine;
 public class PlayerSoundController : MonoBehaviour
 {
     [Header("Sound System References")]
-    [SerializeField] private SoundTrigger soundTrigger; // ← Inspector未設定でもOK
+    [SerializeField] private SoundTrigger soundTrigger;
     [SerializeField] private float footstepInterval = 0.2f;
 
     private PlayerMovement movement;
+    private PlayerPresentationController presentation;
+
     private float footstepTimer;
     private bool lastPartsMode = false;
 
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
+        presentation = GetComponent<PlayerPresentationController>();
     }
 
     private void Start()
     {
-        // SoundTrigger が未設定なら自動検索（DontDestroyOnLoad対応）
         if (soundTrigger == null)
         {
             soundTrigger = FindObjectOfType<SoundTrigger>();
             if (soundTrigger == null)
-                Debug.LogWarning("SoundTrigger が見つかりません。SoundManager がロードされているか確認してください。");
+                Debug.LogWarning("SoundTrigger が見つかりません。");
         }
     }
 
     private void Update()
     {
-        if (movement == null || soundTrigger == null) return;
+        if (movement == null || soundTrigger == null)
+            return;
+
+        //----------------------------------
+        // ★ 演出中はSE停止
+        //----------------------------------
+        if (presentation != null && presentation.IsLocked)
+        {
+            footstepTimer = 0f;
+            return;
+        }
 
         HandleFootstepSound();
         HandlePartsTransformSound();
@@ -66,6 +78,7 @@ public class PlayerSoundController : MonoBehaviour
     private void HandlePartsTransformSound()
     {
         bool current = movement.IsPartsMode;
+
         if (current != lastPartsMode)
         {
             if (current)
@@ -73,10 +86,10 @@ public class PlayerSoundController : MonoBehaviour
             else
                 soundTrigger.PlayByKey("parts_restore", transform.position);
         }
+
         lastPartsMode = current;
     }
 
-    //  スイッチを押したときの音
     public void PlaySwitchSound(Vector3 position)
     {
         if (soundTrigger == null) return;

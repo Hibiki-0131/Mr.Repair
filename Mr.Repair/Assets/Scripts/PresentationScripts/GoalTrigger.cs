@@ -5,10 +5,17 @@ public class GoalTrigger : MonoBehaviour
 {
     private bool triggered = false;
 
+    [SerializeField] private SoundTrigger soundTrigger;
+
     private void Awake()
     {
         GetComponent<BoxCollider>().isTrigger = true;
-        Debug.Log("<color=red>[GoalTrigger] Ready</color>");
+    }
+
+    private void Start()
+    {
+        if (soundTrigger == null)
+            soundTrigger = FindObjectOfType<SoundTrigger>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -22,15 +29,17 @@ public class GoalTrigger : MonoBehaviour
         if (!presentation || !clear) return;
 
         //-----------------------------------
-        // ★ Trigger中心座標取得
+        // Trigger中心座標
         //-----------------------------------
         var col = GetComponent<BoxCollider>();
 
         Vector3 center = transform.TransformPoint(col.center);
-
-        // yは現在値を維持（床にめり込まないため）
         center.y = other.transform.position.y;
 
+        //-----------------------------------
+        // ★クリア演出終了後にSE再生
+        //-----------------------------------
+        soundTrigger?.PlayByKey("GoalSE", center);  // ←ここが追加ポイント
         presentation.PlayGoal(center, () =>
         {
             clear.Clear();
@@ -38,5 +47,4 @@ public class GoalTrigger : MonoBehaviour
 
         triggered = true;
     }
-
 }

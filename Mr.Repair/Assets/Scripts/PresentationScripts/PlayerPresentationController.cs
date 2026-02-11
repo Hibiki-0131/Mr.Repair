@@ -15,11 +15,17 @@ public class PlayerPresentationController : MonoBehaviour
     [SerializeField] private string goalCameraID = "GoalCamera";
 
     [Header("Goal Move")]
-    [SerializeField] private float goalMoveSpeed = 3f;   // ★追加
+    [SerializeField] private float goalMoveSpeed = 3f;
 
+    // ★ 外部から参照するロック状態
     public bool IsLocked { get; private set; }
 
     private System.Action onGoalAnimationCompleted;
+    private SoundTrigger soundTrigger;
+
+    // =========================================================
+    // 初期化
+    // =========================================================
 
     private void Reset()
     {
@@ -28,12 +34,17 @@ public class PlayerPresentationController : MonoBehaviour
         gameplayAnimation = GetComponent<PlayerAnimation>();
     }
 
+    private void Start()
+    {
+        soundTrigger = FindObjectOfType<SoundTrigger>();
+    }
+
     // =========================================================
     // Public API
     // =========================================================
 
     /// <summary>
-    /// 旧API（互換維持）
+    /// 旧API互換
     /// </summary>
     public void PlayGoal(System.Action onCompleted = null)
     {
@@ -41,7 +52,7 @@ public class PlayerPresentationController : MonoBehaviour
     }
 
     /// <summary>
-    /// ★新API：ゴール座標指定版
+    /// ゴール演出開始
     /// </summary>
     public void PlayGoal(Vector3 goalPosition, System.Action onCompleted = null)
     {
@@ -54,12 +65,11 @@ public class PlayerPresentationController : MonoBehaviour
         }
 
         onGoalAnimationCompleted = onCompleted;
-
         StartCoroutine(GoalRoutine(goalPosition));
     }
 
     // =========================================================
-    // Routines
+    // Goal Routine
     // =========================================================
 
     private IEnumerator GoalRoutine(Vector3 goalPos)
@@ -69,12 +79,11 @@ public class PlayerPresentationController : MonoBehaviour
         BeginLock();
 
         //-----------------------------------
-        // ★ ここが重要
-        // Rigidbody/Controllerを無効にしてから座標セット
+        // プレイヤーをゴール位置へ配置
         //-----------------------------------
         transform.position = goalPos;
 
-        yield return null; // 1frame待つ（物理安定化）
+        yield return null; // 物理安定用1フレーム待機
 
         //-----------------------------------
         // カメラ切替
@@ -83,27 +92,37 @@ public class PlayerPresentationController : MonoBehaviour
             CameraManager.Instance.SwitchToCamera(goalCameraID);
 
         //-----------------------------------
-        // アニメ再生
+        // アニメーション再生
         //-----------------------------------
         gameplayAnimation.PlayGoal();
     }
 
-
     // =========================================================
-    // Animation Event
+    // Animation Events
     // =========================================================
 
     /// <summary>
-    /// Goalアニメ終了イベントから呼ぶ
+    /// GoalSE再生（Animation Eventから呼ぶ）
+    /// </summary>
+    public void PlayGoalSE()
+    {
+        if (soundTrigger == null)
+            soundTrigger = FindObjectOfType<SoundTrigger>();
+
+        soundTrigger?.PlayByKey("GoalSE", transform.position);
+    }
+
+    /// <summary>
+    /// ゴールアニメ終了イベント
     /// </summary>
     public void OnGoalAnimationEnd()
     {
         Debug.Log("<color=yellow>[Presentation] Goal Animation End Event</color>");
 
-        //EndLock();
-
         onGoalAnimationCompleted?.Invoke();
         onGoalAnimationCompleted = null;
+
+        // ※ ゴール後はステージ遷移するためロック解除しない
     }
 
     // =========================================================
@@ -118,6 +137,8 @@ public class PlayerPresentationController : MonoBehaviour
 
         if (controller) controller.enabled = false;
         if (movement) movement.enabled = false;
+
+        // Animationは停止させない
         if (gameplayAnimation) gameplayAnimation.enabled = true;
     }
 
@@ -132,6 +153,9 @@ public class PlayerPresentationController : MonoBehaviour
         IsLocked = false;
     }
 
+    /// <summary>
+    /// スタート演出用ロック
+    /// </summary>
     public void LockControl(float duration)
     {
         StartCoroutine(LockRoutine(duration));
