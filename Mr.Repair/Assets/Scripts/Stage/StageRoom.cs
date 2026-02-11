@@ -1,17 +1,13 @@
 using UnityEngine;
 
-public class StageRoom : MonoBehaviour, IStageRoom
+[RequireComponent(typeof(ResettableStageController))]
+public class StageRoom : MonoBehaviour
 {
-    private ResettableStageController resetController;
-
     private void Awake()
     {
-        resetController = GetComponent<ResettableStageController>();
-    }
+        var resetController = GetComponent<ResettableStageController>();
 
-    public void ResetRoom()
-    {
-        // š RuntimeManager‚É“ˆê
-        StageRuntimeManager.Instance.ResetStage();
+        StageRuntimeManager.EnsureExists()
+            .RegisterRoom(resetController);
     }
 }

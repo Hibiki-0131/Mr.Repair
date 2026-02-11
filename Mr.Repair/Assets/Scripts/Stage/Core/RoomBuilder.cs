@@ -23,28 +23,90 @@ public class RoomBuilder : MonoBehaviour
     private int[,,] csvGrid;
     private int[,,] colorGrid;
 
-    // =========================
-    // ★ 安全キャッシュ
-    // =========================
+    // ================================
+    // ? Awake依存を排除
+    // ================================
     private void Awake()
     {
-        ResolveMetadataHolder();
+        // 何もしない
+    }
+
+    // ================================
+    // ? 参照保証
+    // ================================
+    private void EnsureReferences()
+    {
+        if (metadataHolder == null)
+            ResolveMetadataHolder();
+
+        if (contentRoot == null)
+        {
+            var found = transform.Find("ContentRoot");
+            if (found != null)
+                contentRoot = found;
+        }
     }
 
     private void ResolveMetadataHolder()
     {
-        if (metadataHolder == null)
-            metadataHolder = GetComponent<RoomMetadataHolder>();
+        metadataHolder = GetComponentInChildren<RoomMetadataHolder>();
 
         if (metadataHolder == null)
             Debug.LogError("[RoomBuilder] RoomMetadataHolder NOT FOUND", this);
     }
 
-    public void SetContentRoot(Transform root) => contentRoot = root;
+    // ================================
+    // ? 参照検証
+    // ================================
+    private bool ValidateReferences()
+    {
+        if (contentRoot == null)
+        {
+            Debug.LogError("[RoomBuilder] ContentRoot is NULL", this);
+            return false;
+        }
 
+        if (metadataHolder == null || metadataHolder.metadata == null)
+        {
+            Debug.LogError("[RoomBuilder] Metadata missing", this);
+            return false;
+        }
+
+        return true;
+    }
+
+    // ================================
+    // ? Editor / Runtime 共通API
+    // ================================
+    public void SetContentRoot(Transform root)
+    {
+        contentRoot = root;
+    }
+
+#if UNITY_EDITOR
+    public void BuildForEditor(RoomMetadata metadata)
+    {
+        EnsureReferences();
+
+        if (metadataHolder == null)
+            metadataHolder = GetComponentInChildren<RoomMetadataHolder>();
+
+        if (metadataHolder != null)
+            metadataHolder.metadata = metadata;
+
+        BuildRoom();
+    }
+#endif
+
+    // ================================
+    // BuildRoom
+    // ================================
     public void BuildRoom()
     {
-        if (!ValidateReferences()) return;
+        EnsureReferences();
+
+        if (!ValidateReferences())
+            return;
 
         ClearContent();
         LoadAllCsvs();
@@ -52,6 +114,7 @@ public class RoomBuilder : MonoBehaviour
         int w = csvGrid.GetLength(0);
         int h = csvGrid.GetLength(1);
         int d = csvGrid.GetLength(2);
+
         SolidGrid = new bool[w, h, d];
 
         for (int y = 0; y < h; y++)
@@ -64,10 +127,13 @@ public class RoomBuilder : MonoBehaviour
                     if (csv == 1 || csv == 2)
                     {
                         var prefab = BlockFactory.GetPrefab(csv == 1 ? '1' : '2');
+                        if (prefab == null) continue;
+
                         var go = Instantiate(prefab, contentRoot);
                         go.transform.localPosition = GridToLocal(x, y, z);
 
                         ApplyColorByIndex(go, colorIdx);
+
                         SolidGrid[x, y, z] = true;
                     }
                     else
@@ -79,47 +145,44 @@ public class RoomBuilder : MonoBehaviour
         RebuildColliders();
     }
 
-    // =========================
-    // Color Apply
-    // =========================
-    public void ApplyColorByIndex(GameObject target, int colorIdx)
+    public TerrainState BuildTerrain()
     {
-        if (metadataHolder?.metadata == null) return;
+        BuildRoom();
+        return new TerrainState(csvGrid, SolidGrid, voxelSize, yOffset);
+    }
 
-        var meta = metadataHolder.metadata;
+    // ================================
+    // CarryBlock生成
+    // ================================
+    public void SpawnInitialCarryBlocks(GameObject prefab, SettlementCoordinator sc)
+    {
+        if (prefab == null || contentRoot == null)
+            return;
 
-        Color targetColor = meta.defaultFloorColor;
-        if (colorIdx > 0 && colorIdx <= meta.floorPalette.Length)
+        foreach (var localPos in GetCarryBlockPositions())
         {
-            targetColor = meta.floorPalette[colorIdx - 1];
-        }
+            Vector3 worldPos = contentRoot.TransformPoint(localPos);
 
-        var renderer = target.GetComponentInChildren<Renderer>();
-        if (renderer != null)
-        {
-            MaterialPropertyBlock prop = new MaterialPropertyBlock();
-            prop.SetColor("_Color", targetColor);
-            renderer.SetPropertyBlock(prop);
+            var b = Instantiate(prefab, worldPos, Quaternion.identity, contentRoot);
+            b.GetComponent<BlockSettlementSensor>()?.SetCoordinator(sc);
         }
     }
 
-    public int GetColorIndexAt(Vector3 localPos)
+    public IEnumerable<Vector3> GetCarryBlockPositions()
     {
-        int x = Mathf.FloorToInt(localPos.x / voxelSize);
-        int y = Mathf.FloorToInt(localPos.y / voxelSize) - yOffset;
-        int z = Mathf.FloorToInt(localPos.z / voxelSize);
+        if (csvGrid == null)
+            yield break;
 
-        if (colorGrid != null &&
-            x >= 0 && x < colorGrid.GetLength(0) &&
-            y >= 0 && y < colorGrid.GetLength(1) &&
-            z >= 0 && z < colorGrid.GetLength(2))
-        {
-            return colorGrid[x, y, z];
-        }
-
-        return 0;
+        for (int y = 0; y < csvGrid.GetLength(1); y++)
+            for (int z = 0; z < csvGrid.GetLength(2); z++)
+                for (int x = 0; x < csvGrid.GetLength(0); x++)
+                    if (csvGrid[x, y, z] == 3)
+                        yield return GridToLocal(x, y, z);
     }
 
+    // ================================
+    // CSV
+    // ================================
     private void LoadAllCsvs()
     {
         var meta = metadataHolder.metadata;
@@ -129,7 +192,11 @@ public class RoomBuilder : MonoBehaviour
         if (meta.colorCsv != null)
             colorGrid = ParseCsv(meta.colorCsv);
         else
-            colorGrid = new int[csvGrid.GetLength(0), csvGrid.GetLength(1), csvGrid.GetLength(2)];
+            colorGrid = new int[
+                csvGrid.GetLength(0),
+                csvGrid.GetLength(1),
+                csvGrid.GetLength(2)
+            ];
     }
 
     private int[,,] ParseCsv(TextAsset csvAsset)
@@ -169,44 +236,25 @@ public class RoomBuilder : MonoBehaviour
         return grid;
     }
 
-    public TerrainState BuildTerrain()
+    // ================================
+    private void ApplyColorByIndex(GameObject target, int colorIdx)
     {
-        BuildRoom();
-        return new TerrainState(csvGrid, SolidGrid, voxelSize, yOffset);
-    }
+        var meta = metadataHolder.metadata;
 
-    public void SpawnInitialCarryBlocks(GameObject prefab, SettlementCoordinator sc)
-    {
-        foreach (var localPos in GetCarryBlockPositions())
+        Color targetColor = meta.defaultFloorColor;
+
+        if (colorIdx > 0 && colorIdx <= meta.floorPalette.Length)
+            targetColor = meta.floorPalette[colorIdx - 1];
+
+        var renderer = target.GetComponentInChildren<Renderer>();
+
+        if (renderer != null)
         {
-            Vector3 worldPos = contentRoot.TransformPoint(localPos);
-
-            var b = Instantiate(prefab, worldPos, Quaternion.identity, contentRoot);
-
-            b.GetComponent<BlockSettlementSensor>()?.SetCoordinator(sc);
+            MaterialPropertyBlock prop = new MaterialPropertyBlock();
+            prop.SetColor("_Color", targetColor);
+            renderer.SetPropertyBlock(prop);
         }
     }
-
-    public IEnumerable<Vector3> GetCarryBlockPositions()
-    {
-        for (int y = 0; y < csvGrid.GetLength(1); y++)
-            for (int z = 0; z < csvGrid.GetLength(2); z++)
-                for (int x = 0; x < csvGrid.GetLength(0); x++)
-                    if (csvGrid[x, y, z] == 3)
-                        yield return GridToLocal(x, y, z);
-    }
-
-#if UNITY_EDITOR
-    public void BuildForEditor(RoomMetadata m)
-    {
-        ResolveMetadataHolder();
-
-        if (metadataHolder != null)
-            metadataHolder.metadata = m;
-
-        BuildRoom();
-    }
-#endif
 
     private Vector3 GridToLocal(int x, int y, int z)
     {
@@ -219,6 +267,8 @@ public class RoomBuilder : MonoBehaviour
 
     private void RebuildColliders()
     {
+        if (SolidGrid == null) return;
+
         VoxelColliderUtility.BuildColliders(
             contentRoot,
             SolidGrid,
@@ -230,6 +280,8 @@ public class RoomBuilder : MonoBehaviour
 
     private void ClearContent()
     {
+        if (contentRoot == null) return;
+
         for (int i = contentRoot.childCount - 1; i >= 0; i--)
         {
             if (!Application.isPlaying)
@@ -237,24 +289,5 @@ public class RoomBuilder : MonoBehaviour
             else
                 Destroy(contentRoot.GetChild(i).gameObject);
         }
-    }
-
-    private bool ValidateReferences()
-    {
-        if (contentRoot == null)
-        {
-            Debug.LogError("[RoomBuilder] ContentRoot is NULL", this);
-            return false;
-        }
-
-        ResolveMetadataHolder();
-
-        if (metadataHolder == null || metadataHolder.metadata == null)
-        {
-            Debug.LogError("[RoomBuilder] Metadata missing", this);
-            return false;
-        }
-
-        return true;
     }
 }

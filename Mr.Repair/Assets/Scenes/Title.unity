@@ -3243,7 +3243,6 @@ MonoBehaviour:
   - 1_8
   - 1_9
   - 1_A
-  - GameClear
   stageSprites:
   - {fileID: 21300000, guid: b620399579c27db499e4c5629896d7c4, type: 3}
   - {fileID: 21300000, guid: 7da05a046a9179e4890be872b076142e, type: 3}
@@ -3254,7 +3253,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 665188d0431c53647a2e455a598d0b58, type: 3}
   - {fileID: 21300000, guid: 8c302447f8d13cf468543ea14f5accb2, type: 3}
   - {fileID: 21300000, guid: 7f10de5d49910b54fa3adf650851853f, type: 3}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 0076f80a2e8442c4cad67269de42ee41, type: 3}
 --- !u!4 &1075133928
 Transform:
   m_ObjectHideFlags: 0

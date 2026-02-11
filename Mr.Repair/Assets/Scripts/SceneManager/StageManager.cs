@@ -131,7 +131,7 @@ public class StageManager : MonoBehaviour
         if (currentStageIndex >= stageOrder.Count)
         {
             GameStateManager.Instance.SetState(GameStateManager.GameState.GameClear);
-            SceneController.Instance.LoadSceneAsync("Result");
+            SceneController.Instance.LoadSceneAsync("GameClear");
             return;
         }
 

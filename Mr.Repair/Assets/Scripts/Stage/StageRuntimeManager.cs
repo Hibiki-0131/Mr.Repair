@@ -7,9 +7,17 @@ public class StageRuntimeManager : MonoBehaviour
 
     private readonly List<ResettableStageController> rooms = new();
 
+    private Rigidbody playerRb;
+    private Vector3 playerStartPos;
+    private Quaternion playerStartRot;
+
+    private bool startPositionRecorded; // Åö èâä˙à íuÇ™ämíËÇµÇΩÇ©
+
+    // ================================
+    // Singleton
+    // ================================
     private void Awake()
     {
-        // Åö Singletonï€èÿ
         if (Instance != null)
         {
             Destroy(gameObject);
@@ -17,11 +25,11 @@ public class StageRuntimeManager : MonoBehaviour
         }
 
         Instance = this;
-
-        RegisterExistingRooms();
     }
 
-    // Åö ñ≥ÇØÇÍÇŒé©ìÆê∂ê¨
+    // ================================
+    // ñ≥ÇØÇÍÇŒê∂ê¨
+    // ================================
     public static StageRuntimeManager EnsureExists()
     {
         if (Instance != null)
@@ -31,15 +39,73 @@ public class StageRuntimeManager : MonoBehaviour
         return go.AddComponent<StageRuntimeManager>();
     }
 
-    private void RegisterExistingRooms()
+    // ================================
+    // Roomé©ìÆìoò^
+    // ================================
+    public void RegisterRoom(ResettableStageController room)
     {
-        rooms.Clear();
-        rooms.AddRange(FindObjectsOfType<ResettableStageController>());
+        if (room == null)
+            return;
+
+        if (rooms.Contains(room))
+            return;
+
+        rooms.Add(room);
     }
 
+    // ================================
+    // ? Playerìoò^Åièâä˙à íuämíËÅj
+    // ================================
+    public void RegisterPlayer(Transform player)
+    {
+        if (player == null)
+            return;
+
+        playerRb = player.GetComponent<Rigidbody>();
+
+        if (playerRb == null)
+        {
+            Debug.LogWarning("[StageRuntimeManager] Player Rigidbody missing");
+            return;
+        }
+
+        // Åö èââÒÇÃÇ›ãLò^
+        if (!startPositionRecorded)
+        {
+            playerStartPos = player.position;
+            playerStartRot = player.rotation;
+            startPositionRecorded = true;
+        }
+    }
+
+    // ================================
+    // Stage Reset
+    // ================================
     public void ResetStage()
     {
         foreach (var room in rooms)
-            room.ResetRoomInternal();
+        {
+            if (room != null)
+                room.ResetRoomInternal();
+        }
+
+        ResetPlayer();
+    }
+
+    // ================================
+    // Player Reset
+    // ================================
+    private void ResetPlayer()
+    {
+        if (!startPositionRecorded || playerRb == null)
+            return;
+
+        playerRb.velocity = Vector3.zero;
+        playerRb.angularVelocity = Vector3.zero;
+
+        playerRb.position = playerStartPos;
+        playerRb.rotation = playerStartRot;
+
+        Physics.SyncTransforms();
     }
 }

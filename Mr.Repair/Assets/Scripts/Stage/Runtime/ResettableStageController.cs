@@ -1,48 +1,34 @@
 using UnityEngine;
 using System.Collections;
-using System.Linq;
 
+[RequireComponent(typeof(RoomBuilder))]
+[RequireComponent(typeof(StageContext))]
+[RequireComponent(typeof(SettlementCoordinator))]
 public class ResettableStageController : MonoBehaviour
 {
-    [SerializeField] private Transform player;
-
     private RoomBuilder roomBuilder;
     private StageContext stageContext;
     private SettlementCoordinator settlementCoordinator;
-
-    private Vector3 playerStartPos;
-    private Quaternion playerStartRot;
-    private Rigidbody playerRb;
 
     private bool isResetting;
 
     // ================================
     private void Awake()
     {
-        if (player != null)
-        {
-            playerStartPos = player.position;
-            playerStartRot = player.rotation;
-            playerRb = player.GetComponent<Rigidbody>();
-        }
-
         ResolveDependencies();
+
+        // ? RuntimeManagerへ登録
+        StageRuntimeManager.EnsureExists()
+            .RegisterRoom(this);
     }
 
     private void ResolveDependencies()
     {
-        if (roomBuilder == null)
-            roomBuilder = GetComponent<RoomBuilder>();
-
-        if (stageContext == null)
-            stageContext = GetComponent<StageContext>();
-
-        if (settlementCoordinator == null)
-            settlementCoordinator = GetComponent<SettlementCoordinator>();
+        roomBuilder ??= GetComponent<RoomBuilder>();
+        stageContext ??= GetComponent<StageContext>();
+        settlementCoordinator ??= GetComponent<SettlementCoordinator>();
     }
 
-    // ================================
-    // ★ 外部公開（RuntimeManager用）
     // ================================
     public void ResetRoomInternal()
     {
@@ -51,7 +37,6 @@ public class ResettableStageController : MonoBehaviour
         StartCoroutine(ResetRoutine());
     }
 
-    // ================================
     private IEnumerator ResetRoutine()
     {
         isResetting = true;
@@ -62,38 +47,48 @@ public class ResettableStageController : MonoBehaviour
             stageContext == null ||
             settlementCoordinator == null)
         {
-            Debug.LogError("[ResettableStageController] Dependencies not set");
+            Debug.LogError($"{name} Reset dependencies missing");
             isResetting = false;
             yield break;
         }
 
         settlementCoordinator.enabled = false;
 
-        // -------------------------
-        // PushableBlock削除
-        // -------------------------
-        foreach (var block in FindObjectsOfType<PushableBlock>())
-            Destroy(block.gameObject);
+        // =====================================================
+        // ? ContentRoot配下のみ削除（超重要）
+        // =====================================================
+        if (roomBuilder.ContentRoot != null)
+        {
+            foreach (var block in roomBuilder.ContentRoot
+                     .GetComponentsInChildren<PushableBlock>())
+            {
+                Destroy(block.gameObject);
+            }
+        }
 
+        // Destroy同期待ち
         yield return null;
         yield return new WaitForEndOfFrame();
         yield return new WaitForFixedUpdate();
 
-        // -------------------------
+        // =====================================================
         // Terrain再構築
-        // -------------------------
+        // =====================================================
         TerrainState newTerrain = roomBuilder.BuildTerrain();
 
         stageContext.SetRoomBuilder(roomBuilder);
         stageContext.SetSettlementCoordinator(settlementCoordinator);
+
+        // ? ColliderScheduler再接続
         stageContext.SetColliderRebuildScheduler(
             roomBuilder.GetComponent<ColliderRebuildScheduler>()
         );
+
         stageContext.SetTerrain(newTerrain);
 
-        // -------------------------
+        // =====================================================
         // CarryBlock再生成
-        // -------------------------
+        // =====================================================
         GameObject carryPrefab = BlockFactory.GetPrefab('3');
 
         if (carryPrefab != null)
@@ -103,19 +98,10 @@ public class ResettableStageController : MonoBehaviour
                 settlementCoordinator
             );
         }
-
-        // -------------------------
-        // Playerリセット
-        // -------------------------
-        if (playerRb != null)
+        else
         {
-            playerRb.velocity = Vector3.zero;
-            playerRb.angularVelocity = Vector3.zero;
-            playerRb.position = playerStartPos;
-            playerRb.rotation = playerStartRot;
+            Debug.LogError("Carry prefab missing");
         }
-
-        Physics.SyncTransforms();
 
         settlementCoordinator.enabled = true;
 

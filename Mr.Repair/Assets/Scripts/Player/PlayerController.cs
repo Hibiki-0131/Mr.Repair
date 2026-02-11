@@ -13,9 +13,17 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<PlayerAnimation>();
     }
 
+    // Player‚ğStage‚É“o˜^iˆÀ‘S”Åj
+    private void OnEnable()
+    {
+        StageRuntimeManager.EnsureExists()
+            .RegisterPlayer(transform);
+    }
+
     public void OnMove(InputAction.CallbackContext context)
     {
         Vector2 input = context.ReadValue<Vector2>();
+
         movement.SetMoveInput(input);
         anim.SetIsWalking(input.sqrMagnitude > 0.01f);
     }

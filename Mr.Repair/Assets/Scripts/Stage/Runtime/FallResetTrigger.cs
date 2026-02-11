@@ -7,12 +7,6 @@ public class FallResetTrigger : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
-        if (StageRuntimeManager.Instance == null)
-        {
-            Debug.LogError("[FallResetTrigger] StageRuntimeManager not found");
-            return;
-        }
-
         StageRuntimeManager.EnsureExists().ResetStage();
     }
 }
