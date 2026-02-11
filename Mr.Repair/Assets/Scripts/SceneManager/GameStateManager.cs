@@ -27,24 +27,24 @@ public class GameStateManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        Debug.Log($"[GameState] Initialized -> {CurrentState}");
+        //Debug.Log($"[GameState] Initialized -> {CurrentState}");
     }
 
     public void SetState(GameState newState)
     {
         if (CurrentState == newState)
         {
-            Debug.Log($"[GameState] State unchanged: {CurrentState}");
+           // Debug.Log($"[GameState] State unchanged: {CurrentState}");
             return;
         }
 
         GameState prevState = CurrentState;
         CurrentState = newState;
 
-        Debug.Log(
-            $"[GameState] {prevState} -> {newState} " +
-            $"(Scene: {SceneManager.GetActiveScene().name}, Frame: {Time.frameCount})"
-        );
+        //Debug.Log(
+          //  $"[GameState] {prevState} -> {newState} " +
+            //$"(Scene: {SceneManager.GetActiveScene().name}, Frame: {Time.frameCount})"
+      //  );
     }
 
     public bool IsPaused => CurrentState == GameState.Paused;
@@ -53,7 +53,7 @@ public class GameStateManager : MonoBehaviour
     {
         if (IsPaused)
         {
-            Debug.Log("[GameState] PauseGame ignored (already paused)");
+            //Debug.Log("[GameState] PauseGame ignored (already paused)");
             return;
         }
 

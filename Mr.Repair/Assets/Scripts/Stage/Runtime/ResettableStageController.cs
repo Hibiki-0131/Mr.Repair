@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Linq;
 
 public class ResettableStageController : MonoBehaviour
 {
@@ -12,8 +14,8 @@ public class ResettableStageController : MonoBehaviour
     private Quaternion playerStartRot;
     private Rigidbody playerRb;
 
-    // ================================
-    // Unity Lifecycle
+    private bool isResetting;
+
     // ================================
     private void Awake()
     {
@@ -27,74 +29,83 @@ public class ResettableStageController : MonoBehaviour
         ResolveDependencies();
     }
 
-    // ================================
-    // Dependency Resolution
-    // ================================
     private void ResolveDependencies()
     {
         if (roomBuilder == null)
-            roomBuilder = FindObjectOfType<RoomBuilder>();
+            roomBuilder = GetComponent<RoomBuilder>();
 
         if (stageContext == null)
-            stageContext = FindObjectOfType<StageContext>();
+            stageContext = GetComponent<StageContext>();
 
         if (settlementCoordinator == null)
-            settlementCoordinator = FindObjectOfType<SettlementCoordinator>();
+            settlementCoordinator = GetComponent<SettlementCoordinator>();
     }
 
     // ================================
-    // Reset API
+    // ★ 外部公開（RuntimeManager用）
     // ================================
-    public void ResetStage()
+    public void ResetRoomInternal()
     {
+        if (isResetting) return;
+
+        StartCoroutine(ResetRoutine());
+    }
+
+    // ================================
+    private IEnumerator ResetRoutine()
+    {
+        isResetting = true;
+
         ResolveDependencies();
 
         if (roomBuilder == null ||
             stageContext == null ||
             settlementCoordinator == null)
         {
-            Debug.LogError(
-                "[ResettableStageController] Dependencies not set",
-                this
-            );
-            return;
+            Debug.LogError("[ResettableStageController] Dependencies not set");
+            isResetting = false;
+            yield break;
         }
 
+        settlementCoordinator.enabled = false;
+
         // -------------------------
-        // 1. 動的エンティティ破棄
+        // PushableBlock削除
         // -------------------------
         foreach (var block in FindObjectsOfType<PushableBlock>())
-        {
             Destroy(block.gameObject);
-        }
+
+        yield return null;
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForFixedUpdate();
 
         // -------------------------
-        // 2. Terrain 再構築
+        // Terrain再構築
         // -------------------------
         TerrainState newTerrain = roomBuilder.BuildTerrain();
 
-        // -------------------------
-        // 3. StageContext 再配線（★重要）
-        // -------------------------
         stageContext.SetRoomBuilder(roomBuilder);
         stageContext.SetSettlementCoordinator(settlementCoordinator);
         stageContext.SetColliderRebuildScheduler(
             roomBuilder.GetComponent<ColliderRebuildScheduler>()
         );
-
         stageContext.SetTerrain(newTerrain);
 
         // -------------------------
-        // 4. CarryBlock 再生成
+        // CarryBlock再生成
         // -------------------------
         GameObject carryPrefab = BlockFactory.GetPrefab('3');
-        roomBuilder.SpawnInitialCarryBlocks(
-            carryPrefab,
-            settlementCoordinator
-        );
+
+        if (carryPrefab != null)
+        {
+            roomBuilder.SpawnInitialCarryBlocks(
+                carryPrefab,
+                settlementCoordinator
+            );
+        }
 
         // -------------------------
-        // 5. Player リセット
+        // Playerリセット
         // -------------------------
         if (playerRb != null)
         {
@@ -105,5 +116,9 @@ public class ResettableStageController : MonoBehaviour
         }
 
         Physics.SyncTransforms();
+
+        settlementCoordinator.enabled = true;
+
+        isResetting = false;
     }
 }

@@ -52,6 +52,7 @@ public class StageEditorWindow : EditorWindow
         // ----------------------------
         // Prefab Instantiate
         // ----------------------------
+        EnsureRuntimeManagerExists();
         var room = (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
         if (room == null)
         {
@@ -72,6 +73,13 @@ public class StageEditorWindow : EditorWindow
         var builder =
             room.GetComponent<RoomBuilder>() ??
             room.AddComponent<RoomBuilder>();
+
+        // ----------------------------
+        // ★ StageRoom（Room識別）
+        // ----------------------------
+        var stageRoom =
+            room.GetComponent<StageRoom>() ??
+            room.AddComponent<StageRoom>();
 
         var context =
             room.GetComponent<StageContext>() ??
@@ -94,19 +102,20 @@ public class StageEditorWindow : EditorWindow
             room.AddComponent<ColliderRebuildScheduler>();
 
         // ----------------------------
-        // RoomMetadataHolder
+        // ★ RoomMetadataHolder（RoomRoot 直下限定）
         // ----------------------------
-        var holder = room.GetComponentInChildren<RoomMetadataHolder>();
+        var holder = room.GetComponent<RoomMetadataHolder>();
+
         if (holder == null)
         {
             var holderGO = new GameObject("RoomMetadataHolder");
-            holderGO.transform.SetParent(room.transform);
-            holderGO.transform.localPosition = Vector3.zero;
-            holderGO.transform.localRotation = Quaternion.identity;
-            holderGO.transform.localScale = Vector3.one;
+
+            // ★ 絶対に RoomRoot 直下
+            holderGO.transform.SetParent(room.transform, false);
 
             holder = holderGO.AddComponent<RoomMetadataHolder>();
         }
+
         holder.metadata = selectedMetadata;
 
         // ----------------------------
@@ -114,7 +123,6 @@ public class StageEditorWindow : EditorWindow
         // ----------------------------
         if (builder.ContentRoot == null)
         {
-            // 既存 ContentRoot を探索
             Transform existing = room.transform.Find("ContentRoot");
 
             if (existing != null)
@@ -124,10 +132,7 @@ public class StageEditorWindow : EditorWindow
             else
             {
                 var contentRootGO = new GameObject("ContentRoot");
-                contentRootGO.transform.SetParent(room.transform);
-                contentRootGO.transform.localPosition = Vector3.zero;
-                contentRootGO.transform.localRotation = Quaternion.identity;
-                contentRootGO.transform.localScale = Vector3.one;
+                contentRootGO.transform.SetParent(room.transform, false);
 
                 builder.SetContentRoot(contentRootGO.transform);
             }
@@ -144,7 +149,7 @@ public class StageEditorWindow : EditorWindow
         colliderScheduler.SetOwner(builder);
 
         // ----------------------------
-        // Editor 用ビルド（※ carryblock は生成しない）
+        // Editor 用ビルド
         // ----------------------------
         builder.BuildForEditor(selectedMetadata);
 
@@ -154,4 +159,18 @@ public class StageEditorWindow : EditorWindow
         Selection.activeGameObject = room;
         EditorGUIUtility.PingObject(room);
     }
+
+    private void EnsureRuntimeManagerExists()
+    {
+        var managers = FindObjectsOfType<StageRuntimeManager>();
+
+        if (managers.Length > 0)
+            return;
+
+        var go = new GameObject("StageRuntimeManager");
+        go.AddComponent<StageRuntimeManager>();
+
+        Undo.RegisterCreatedObjectUndo(go, "Create StageRuntimeManager");
+    }
+
 }
