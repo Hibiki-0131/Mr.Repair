@@ -297,7 +297,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &99752750
 RectTransform:
   m_ObjectHideFlags: 0
@@ -858,11 +858,10 @@ MonoBehaviour:
   mainMenu: {fileID: 696498143}
   settingsPanel: {fileID: 566184429}
   audioPanel: {fileID: 1833269749}
-  graphicsPanel: {fileID: 732323122}
   masterSlider: {fileID: 1154831288}
   bgmSlider: {fileID: 950652481}
   sfxSlider: {fileID: 853678975}
-  graphicsTabButton: {fileID: 99752749}
+  graphicsTabButton: {fileID: 0}
   audioTabButton: {fileID: 982780839}
   backToMainButton: {fileID: 1101772280}
   startButton: {fileID: 1581162054}
