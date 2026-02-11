@@ -1,15 +1,17 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
+[RequireComponent(typeof(BoxCollider))]
+[RequireComponent(typeof(Rigidbody))]
 public class RepeatMoverBlock : MonoBehaviour
 {
     [Header("基本設定")]
     [SerializeField] private string blockID;
-    [SerializeField] private float moveSpeed = 2f;   // 移動速度
-    [SerializeField] private float waitTime = 0.5f;  // 停止時間
+    [SerializeField] private float moveSpeed = 2f;
+    [SerializeField] private float waitTime = 0.5f;
 
     [Header("移動パターン設定")]
-    [Tooltip("移動方向リスト（順番に移動）")]
     [SerializeField]
     private Vector3[] moveDirections = new Vector3[]
     {
@@ -17,7 +19,6 @@ public class RepeatMoverBlock : MonoBehaviour
         new Vector3(0, 1, 0),
     };
 
-    [Tooltip("各方向に対応する移動距離（moveDirectionsと同じ数に）")]
     [SerializeField]
     private float[] moveDistances = new float[]
     {
@@ -25,35 +26,49 @@ public class RepeatMoverBlock : MonoBehaviour
         2f
     };
 
+    private Rigidbody rb;
+
     private bool isRepeating = false;
     private bool isMoving = false;
     private int currentIndex = 0;
-    private Vector3 currentStartPos;  // ← 現在のスタート位置を記録
+
+    private Vector3 currentStartPos;
     private Coroutine routine;
 
     public string BlockID => blockID;
 
-    private void Start()
+    // ===============================
+    // 初期化
+    // ===============================
+    private void Awake()
     {
-        // 起動時の位置を初期スタート位置として記録
-        currentStartPos = transform.position;
+        rb = GetComponent<Rigidbody>();
+
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        rb.constraints =
+            RigidbodyConstraints.FreezeRotationX |
+            RigidbodyConstraints.FreezeRotationY |
+            RigidbodyConstraints.FreezeRotationZ;
     }
 
-    /// <summary>
-    /// 動作開始・停止を切り替える
-    /// </summary>
+    private void Start()
+    {
+        currentStartPos = rb.position;
+    }
+
+    // ===============================
+    // 外部トグル
+    // ===============================
     public void ToggleRepeat()
     {
         if (isRepeating)
-        {
-            // 停止処理
             StopRepeating();
-        }
         else
-        {
-            // 再開処理
             StartRepeating();
-        }
     }
 
     private void StartRepeating()
@@ -74,59 +89,71 @@ public class RepeatMoverBlock : MonoBehaviour
         isRepeating = false;
         isMoving = false;
 
-        // 現在位置を新しいスタート地点に
-        currentStartPos = transform.position;
+        currentStartPos = rb.position;
     }
 
+    // ===============================
+    // ループ処理
+    // ===============================
     private IEnumerator RepeatRoutine()
     {
         while (isRepeating)
         {
-            if (moveDirections.Length == 0 || moveDirections.Length != moveDistances.Length)
+            if (moveDirections.Length == 0 ||
+                moveDirections.Length != moveDistances.Length)
             {
-                Debug.LogWarning($"[{name}] moveDirections と moveDistances の要素数が一致していません。");
+                Debug.LogWarning($"[{name}] 移動設定の配列数が一致していません");
                 yield break;
             }
 
-            // 現在の方向・距離を取得
             Vector3 dir = moveDirections[currentIndex].normalized;
             float distance = moveDistances[currentIndex];
+
             Vector3 target = currentStartPos + dir * distance;
 
-            // 移動
             yield return MoveBetween(currentStartPos, target);
             yield return new WaitForSeconds(waitTime);
 
-            // スタート位置を更新（今の位置を次の基準にする）
-            currentStartPos = transform.position;
-
-            // 次の方向へ
+            currentStartPos = rb.position;
             currentIndex = (currentIndex + 1) % moveDirections.Length;
         }
 
         isMoving = false;
     }
 
+    // ===============================
+    // 物理同期移動
+    // ===============================
     private IEnumerator MoveBetween(Vector3 from, Vector3 to)
     {
         float t = 0f;
+
         while (t < 1f)
         {
-            t += Time.deltaTime * moveSpeed;
-            transform.position = Vector3.Lerp(from, to, t);
-            yield return null;
+            t += Time.fixedDeltaTime * moveSpeed;
+
+            Vector3 nextPos = Vector3.Lerp(from, to, t);
+            rb.MovePosition(nextPos);
+
+            yield return new WaitForFixedUpdate();
         }
-        transform.position = to;
+
+        rb.MovePosition(to);
     }
 
 #if UNITY_EDITOR
+    // ===============================
+    // Gizmo表示
+    // ===============================
     private void OnDrawGizmosSelected()
     {
         if (moveDirections == null || moveDistances == null)
             return;
 
         Gizmos.color = Color.cyan;
-        Vector3 previewPos = Application.isPlaying ? transform.position : transform.position;
+
+        Vector3 previewPos = transform.position;
+
         for (int i = 0; i < Mathf.Min(moveDirections.Length, moveDistances.Length); i++)
         {
             Vector3 dir = moveDirections[i].normalized * moveDistances[i];

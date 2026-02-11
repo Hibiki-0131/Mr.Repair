@@ -395,12 +395,12 @@ MonoBehaviour:
   partsSpeed: 1
   rotationSpeed: 5
   cameraTransform: {fileID: 0}
-  normalCenter: {x: -0.004472177, y: -0.1159836, z: 0.00197506}
+  normalCenter: {x: -0.004484892, y: -0.1159836, z: 0.0020504}
   normalHeight: 0.9264027
-  normalRadius: 0.2659147
-  partsCenter: {x: -0.004472177, y: -0.3392527, z: 0.00197506}
-  partsHeight: 0.5318294
-  partsRadius: 0.2659147
+  normalRadius: 0.2778256
+  partsCenter: {x: -0.004484892, y: -0.3013594, z: 0.0020504}
+  partsHeight: 0.5556512
+  partsRadius: 0.2778256
   gravityMultiplier: 3
 --- !u!114 &4355468495394074489
 MonoBehaviour:
@@ -497,10 +497,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.26591468
+  m_Radius: 0.2778256
   m_Height: 0.9264027
   m_Direction: 1
-  m_Center: {x: -0.0044721765, y: -0.1159836, z: 0.0019750595}
+  m_Center: {x: -0.004484892, y: -0.1159836, z: 0.0020503998}
 --- !u!114 &5861587339561990275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,7 +641,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1794142048444413811
 Transform:
   m_ObjectHideFlags: 0
@@ -1340,7 +1340,7 @@ Transform:
   m_GameObject: {fileID: 9171367627274362508}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.071, y: -0.544, z: 0}
+  m_LocalPosition: {x: -0.003, y: -0.544, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []

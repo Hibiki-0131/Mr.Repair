@@ -24266,6 +24266,7 @@ GameObject:
   - component: {fileID: 121882194}
   - component: {fileID: 121882193}
   - component: {fileID: 121882192}
+  - component: {fileID: 121882196}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A
   m_TagString: Untagged
@@ -24380,6 +24381,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 121882190}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &121882196
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121882190}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &121959078
 GameObject:
   m_ObjectHideFlags: 0
@@ -34032,7 +34060,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 353575813}
 --- !u!114 &166599639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39826,6 +39853,7 @@ GameObject:
   - component: {fileID: 195759359}
   - component: {fileID: 195759358}
   - component: {fileID: 195759357}
+  - component: {fileID: 195759361}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (7)
   m_TagString: Untagged
@@ -39940,6 +39968,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 195759355}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &195759361
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 195759355}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &196107102
 GameObject:
   m_ObjectHideFlags: 0
@@ -68686,11 +68741,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 352850367}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &353575813 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8616784190852115458, guid: 82c8be9575f8aab4184fbafd4f0abc59, type: 3}
-  m_PrefabInstance: {fileID: 806986659}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &353785471
 GameObject:
   m_ObjectHideFlags: 0
@@ -88049,6 +88099,7 @@ GameObject:
   - component: {fileID: 451482558}
   - component: {fileID: 451482557}
   - component: {fileID: 451482556}
+  - component: {fileID: 451482560}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (3)
   m_TagString: Untagged
@@ -88163,6 +88214,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 451482554}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &451482560
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451482554}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &451588924
 GameObject:
   m_ObjectHideFlags: 0
@@ -101900,6 +101978,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockDuration: 2
+  soundTrigger: {fileID: 0}
 --- !u!65 &529879666
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -151255,6 +151334,9 @@ GameObject:
   m_Component:
   - component: {fileID: 802730181}
   - component: {fileID: 802730180}
+  - component: {fileID: 802730184}
+  - component: {fileID: 802730183}
+  - component: {fileID: 802730182}
   m_Layer: 0
   m_Name: StageResetController
   m_TagString: Untagged
@@ -151274,7 +151356,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 353575813}
 --- !u!4 &802730181
 Transform:
   m_ObjectHideFlags: 0
@@ -151290,6 +151371,46 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &802730182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802730179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32121eac8447de3478ac622f0c189dc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &802730183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802730179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afac17d04149cbc498e4ea5203ca0528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &802730184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802730179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198a9c29b421f5d43b82ae569520695b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  voxelSize: 1
+  yOffset: 0
+  contentRoot: {fileID: 0}
+  metadataHolder: {fileID: 0}
 --- !u!1 &803042008
 GameObject:
   m_ObjectHideFlags: 0
@@ -151968,15 +152089,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8616784190852115458, guid: 82c8be9575f8aab4184fbafd4f0abc59, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.569602
+      value: -3.33
       objectReference: {fileID: 0}
     - target: {fileID: 8616784190852115458, guid: 82c8be9575f8aab4184fbafd4f0abc59, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.804
+      value: 10.05
       objectReference: {fileID: 0}
     - target: {fileID: 8616784190852115458, guid: 82c8be9575f8aab4184fbafd4f0abc59, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.469165
+      value: 6.13
       objectReference: {fileID: 0}
     - target: {fileID: 8616784190852115458, guid: 82c8be9575f8aab4184fbafd4f0abc59, type: 3}
       propertyPath: m_LocalRotation.w
@@ -196708,6 +196829,7 @@ GameObject:
   - component: {fileID: 1037480484}
   - component: {fileID: 1037480483}
   - component: {fileID: 1037480482}
+  - component: {fileID: 1037480486}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (1)
   m_TagString: Untagged
@@ -196822,6 +196944,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1037480480}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1037480486
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1037480480}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &1038412034
 GameObject:
   m_ObjectHideFlags: 0
@@ -216025,7 +216174,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseUI: {fileID: 1390767951}
-  resetController: {fileID: 802730180}
 --- !u!224 &1142561920
 RectTransform:
   m_ObjectHideFlags: 0
@@ -264824,7 +264972,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 353575813}
 --- !u!114 &1388645919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -269734,6 +269881,7 @@ GameObject:
   - component: {fileID: 1415369966}
   - component: {fileID: 1415369965}
   - component: {fileID: 1415369964}
+  - component: {fileID: 1415369968}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (4)
   m_TagString: Untagged
@@ -269848,6 +269996,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1415369962}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1415369968
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415369962}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &1415860861
 GameObject:
   m_ObjectHideFlags: 0
@@ -283772,6 +283947,7 @@ GameObject:
   - component: {fileID: 1494069415}
   - component: {fileID: 1494069414}
   - component: {fileID: 1494069413}
+  - component: {fileID: 1494069417}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (8)
   m_TagString: Untagged
@@ -283890,6 +284066,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1494069411}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1494069417
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494069411}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &1494339770
 GameObject:
   m_ObjectHideFlags: 0
@@ -288229,7 +288432,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 353575813}
 --- !u!114 &1517436615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294033,11 +294235,11 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &1553465687
 GameObject:
   m_ObjectHideFlags: 0
@@ -302192,6 +302394,7 @@ GameObject:
   - component: {fileID: 1597479442}
   - component: {fileID: 1597479441}
   - component: {fileID: 1597479440}
+  - component: {fileID: 1597479444}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (2)
   m_TagString: Untagged
@@ -302306,6 +302509,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1597479438}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1597479444
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1597479438}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &1598853311
 GameObject:
   m_ObjectHideFlags: 0
@@ -306824,6 +307054,7 @@ GameObject:
   - component: {fileID: 1625356545}
   - component: {fileID: 1625356544}
   - component: {fileID: 1625356543}
+  - component: {fileID: 1625356547}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (5)
   m_TagString: Untagged
@@ -306938,6 +307169,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1625356541}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1625356547
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625356541}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &1626061794
 GameObject:
   m_ObjectHideFlags: 0
@@ -329436,6 +329694,7 @@ GameObject:
   - component: {fileID: 1747914862}
   - component: {fileID: 1747914861}
   - component: {fileID: 1747914860}
+  - component: {fileID: 1747914864}
   m_Layer: 0
   m_Name: RepeatMoverBlock_A (6)
   m_TagString: Untagged
@@ -329550,6 +329809,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747914858}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1747914864
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747914858}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &1748838064
 GameObject:
   m_ObjectHideFlags: 0
@@ -354544,7 +354830,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d9cf7fe074809499a31df3f6dc1289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 353575813}
 --- !u!114 &1890277392
 MonoBehaviour:
   m_ObjectHideFlags: 0
