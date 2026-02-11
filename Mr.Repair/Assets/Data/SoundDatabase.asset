@@ -14,19 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - key: walk
-    clip: {fileID: 8300000, guid: bcf32b285f3d1b547b32b192b992a41b, type: 3}
+    clip: {fileID: 8300000, guid: 42f6e099e53a75e4f9e4e1d3bcb50f08, type: 3}
     category: 0
     volumeMultiplier: 40
   - key: parts_transform
-    clip: {fileID: 8300000, guid: 08d9f803396232c46a0c15db58067b3f, type: 3}
+    clip: {fileID: 8300000, guid: c74d1b2c0e40ec44388325769481d13c, type: 3}
     category: 0
     volumeMultiplier: 40
   - key: parts_restore
-    clip: {fileID: 8300000, guid: b4949a4f925e89e41bbe12425819c2d1, type: 3}
+    clip: {fileID: 8300000, guid: 247fd75e2832a3f4c832a07584ecb9c4, type: 3}
     category: 0
     volumeMultiplier: 40
   - key: parts_walk
-    clip: {fileID: 8300000, guid: df01b8b09ddee8f4f9be09f672bbaa89, type: 3}
+    clip: {fileID: 8300000, guid: ea5e37ca62e0d5749a2b40ea44c7fcab, type: 3}
     category: 0
     volumeMultiplier: 40
   - key: switch_press
