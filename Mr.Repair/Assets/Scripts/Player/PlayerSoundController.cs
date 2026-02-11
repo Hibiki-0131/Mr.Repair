@@ -34,7 +34,17 @@ public class PlayerSoundController : MonoBehaviour
             return;
 
         //----------------------------------
-        // ★ 演出中はSE停止
+        // ★ Pause中は全SE停止
+        //----------------------------------
+        if (GameStateManager.Instance != null &&
+            GameStateManager.Instance.IsPaused)
+        {
+            footstepTimer = 0f;
+            return;
+        }
+
+        //----------------------------------
+        // ★ 演出ロック中も停止
         //----------------------------------
         if (presentation != null && presentation.IsLocked)
         {
