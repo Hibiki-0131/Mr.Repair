@@ -271,7 +271,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!95 &8886965453099726250
 Animator:
   serializedVersion: 5
@@ -497,10 +497,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.2778256
-  m_Height: 0.9264027
+  m_Radius: 0.30383995
+  m_Height: 0.92640275
   m_Direction: 1
-  m_Center: {x: -0.004484892, y: -0.1159836, z: 0.0020503998}
+  m_Center: {x: -0.004484892, y: -0.115983605, z: 0.028064769}
 --- !u!114 &5861587339561990275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -747,7 +747,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.12513743
   m_Height: 0.71830964
@@ -770,7 +770,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.1153925
   m_Height: 0.64080656
