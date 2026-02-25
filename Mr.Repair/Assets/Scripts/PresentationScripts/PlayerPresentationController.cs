@@ -10,6 +10,7 @@ public class PlayerPresentationController : MonoBehaviour
     [SerializeField] private PlayerController controller;
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private PlayerAnimation gameplayAnimation;
+    [SerializeField] private PlayerEffectController effectController;
 
     [Header("Camera")]
     [SerializeField] private string goalCameraID = "GoalCamera";
@@ -32,6 +33,7 @@ public class PlayerPresentationController : MonoBehaviour
         controller = GetComponent<PlayerController>();
         movement = GetComponent<PlayerMovement>();
         gameplayAnimation = GetComponent<PlayerAnimation>();
+        effectController = GetComponent<PlayerEffectController>();
     }
 
     private void Start()
@@ -74,26 +76,17 @@ public class PlayerPresentationController : MonoBehaviour
 
     private IEnumerator GoalRoutine(Vector3 goalPos)
     {
-        Debug.Log("<color=cyan>[Presentation] GoalRoutine START</color>");
-
         BeginLock();
 
-        //-----------------------------------
-        // プレイヤーをゴール位置へ配置
-        //-----------------------------------
         transform.position = goalPos;
+        yield return null;
 
-        yield return null; // 物理安定用1フレーム待機
-
-        //-----------------------------------
-        // カメラ切替
-        //-----------------------------------
         if (CameraManager.Instance != null)
             CameraManager.Instance.SwitchToCamera(goalCameraID);
 
-        //-----------------------------------
-        // アニメーション再生
-        //-----------------------------------
+        // ★ここでエフェクト再生
+        effectController?.PlayGoalEffect();
+
         gameplayAnimation.PlayGoal();
     }
 
