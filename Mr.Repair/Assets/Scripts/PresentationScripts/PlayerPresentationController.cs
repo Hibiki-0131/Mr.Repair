@@ -130,6 +130,7 @@ public class PlayerPresentationController : MonoBehaviour
 
         if (controller) controller.enabled = false;
         if (movement) movement.enabled = false;
+        if (effectController) effectController.enabled = false;
 
         // Animation‚Í’âŽ~‚³‚¹‚È‚¢
         if (gameplayAnimation) gameplayAnimation.enabled = true;
@@ -141,6 +142,7 @@ public class PlayerPresentationController : MonoBehaviour
 
         if (controller) controller.enabled = true;
         if (movement) movement.enabled = true;
+        if (effectController) effectController.enabled = true;
         if (gameplayAnimation) gameplayAnimation.enabled = true;
 
         IsLocked = false;
